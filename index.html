@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>CADF — Shift Handover</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#1B3A6B;--sky:#2B8FD4;--teal:#00B5B8;
+  --yellow:#F5D000;--red:#E8344A;
+  --morning:#FF8C00;--afternoon:#2B8FD4;--evening:#1B3A6B;
+  --green-team:#27AE60;--blue-team:#2B8FD4;--yellow-team:#F5D000;
+  --bg:#F4F7FB;--card:#fff;--tx:#1a2a3a;--tx2:#5a7080;
+  --bd:1px solid #E0E8F0;--rad:12px;--rsm:8px;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;padding-bottom:40px}
+
+/* HEADER */
+.hdr{background:var(--navy);padding:0 20px;position:sticky;top:0;z-index:50;box-shadow:0 2px 12px rgba(27,58,107,.35)}
+.hdr-inner{max-width:680px;margin:0 auto;display:flex;align-items:center;gap:14px;padding:12px 0}
+.hdr-logo{height:38px;width:auto}
+.hdr-div{width:1px;height:28px;background:rgba(255,255,255,.25)}
+.hdr-title{font-size:15px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#fff}
+.hdr-sub{font-size:11px;color:rgba(255,255,255,.65);margin-top:1px}
+
+/* SHIFT BADGE on header */
+.shift-badge{margin-left:auto;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;color:#fff;display:none}
+.shift-badge.morning{background:var(--morning)}
+.shift-badge.afternoon{background:var(--afternoon)}
+.shift-badge.evening{background:var(--evening)}
+
+.wrap{max-width:680px;margin:0 auto;padding:20px 16px}
+.card{background:var(--card);border-radius:var(--rad);border:var(--bd);padding:20px;margin-bottom:16px;box-shadow:0 1px 4px rgba(27,58,107,.06)}
+.card-title{font-size:13px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.07em;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.card-title::before{content:'';display:block;width:3px;height:16px;border-radius:2px;background:var(--sky)}
+.frow{margin-bottom:14px}
+.lbl{font-size:12px;font-weight:600;color:var(--tx2);margin-bottom:5px;display:block}
+.inp{width:100%;padding:10px 12px;border:var(--bd);border-radius:var(--rsm);font-size:14px;color:var(--tx);background:#fff;font-family:inherit;transition:.15s}
+.inp:focus{outline:2px solid var(--sky);outline-offset:-1px}
+select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235a7080' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* SHIFT SELECTOR — colored pills */
+.shift-pills{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
+.shift-pill{padding:12px 8px;border-radius:var(--rsm);border:2px solid transparent;cursor:pointer;text-align:center;font-size:13px;font-weight:600;font-family:inherit;background:var(--bg);color:var(--tx2);transition:.15s}
+.shift-pill.morning.sel{background:#FFF4E6;border-color:var(--morning);color:var(--morning)}
+.shift-pill.afternoon.sel{background:#EBF5FF;border-color:var(--afternoon);color:var(--afternoon)}
+.shift-pill.evening.sel{background:#EEF2F9;border-color:var(--evening);color:var(--evening)}
+.shift-pill:hover{background:#f0f4f8}
+
+/* TEAM PILLS */
+.team-pills{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
+.team-pill{padding:10px 8px;border-radius:var(--rsm);border:2px solid transparent;cursor:pointer;text-align:center;font-size:13px;font-weight:700;font-family:inherit;background:var(--bg);color:var(--tx2);transition:.15s}
+.team-pill.green.sel{background:#EAFAF1;border-color:var(--green-team);color:var(--green-team)}
+.team-pill.blue.sel{background:#EBF5FF;border-color:var(--blue-team);color:var(--blue-team)}
+.team-pill.yellow.sel{background:#FFFBEC;border-color:#c4a800;color:#8a7000}
+
+/* HANDOVER FROM/TO */
+.handover-arrow{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.handover-arrow .inp{flex:1}
+.arrow-icon{font-size:20px;flex-shrink:0;color:var(--sky)}
+
+/* STOCK */
+.stock-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.stock-item{background:var(--bg);border-radius:var(--rsm);border:var(--bd);padding:12px}
+.stock-lbl{font-size:11px;font-weight:600;color:var(--tx2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em}
+.stock-inp{width:100%;border:none;background:transparent;font-size:22px;font-weight:700;color:var(--navy);font-family:inherit;text-align:center;padding:4px 0}
+.stock-inp:focus{outline:none}
+.formula-row{background:#EEF5FB;border:1px solid #C5DDF0;border-radius:var(--rsm);padding:10px 14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px;margin-top:10px}
+.handover-result{font-size:20px;font-weight:800;color:var(--navy)}
+.disc-ok{color:#27AE60;font-weight:600}
+.disc-warn{color:var(--red);font-weight:600}
+
+/* PHOTOS */
+.photo-zone{border:2px dashed #C5DDF0;border-radius:var(--rad);padding:22px;text-align:center;cursor:pointer;background:#F7FBFF;transition:.2s}
+.photo-zone:hover,.photo-zone.has{border-color:var(--teal);background:#EFF9F9;border-style:solid}
+.photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px;margin-top:10px}
+.photo-thumb{position:relative;border-radius:var(--rsm);overflow:hidden;aspect-ratio:1;border:2px solid var(--teal)}
+.photo-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.photo-del{position:absolute;top:3px;right:3px;background:rgba(232,52,74,.9);color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700;line-height:1}
+.photo-count-badge{background:var(--teal);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;display:inline-block;margin-top:8px}
+
+/* CONFIRM */
+.confirm-row{display:flex;align-items:flex-start;gap:10px;padding:12px;background:#FFFBEC;border:1px solid var(--yellow);border-radius:var(--rsm);margin-bottom:14px;cursor:pointer}
+.confirm-row input{width:18px;height:18px;margin-top:1px;flex-shrink:0;accent-color:var(--navy);cursor:pointer}
+.confirm-row label{font-size:13px;color:var(--tx);cursor:pointer;line-height:1.4}
+
+/* STATUS */
+.status-bar{padding:12px 16px;border-radius:var(--rsm);font-size:13px;font-weight:600;display:none;margin-bottom:16px;align-items:center;gap:8px}
+.status-bar.show{display:flex}
+.status-bar.ok{background:#EAFAF1;border:1px solid #27AE60;color:#1a6e3a}
+.status-bar.err{background:#FEF0F0;border:1px solid var(--red);color:#8b1a1a}
+
+/* SUBMIT BTN */
+.btn-submit{width:100%;padding:15px;background:var(--navy);color:#fff;border:none;border-radius:var(--rsm);font-size:15px;font-weight:700;cursor:pointer;letter-spacing:.04em;display:flex;align-items:center;justify-content:center;gap:10px;font-family:inherit;transition:.2s}
+.btn-submit:hover:not(:disabled){background:#254d8f}
+.btn-submit:disabled{background:#aaa;cursor:not-allowed}
+.btn-submit.sending{background:var(--sky)}
+.btn-submit.sent{background:#27AE60}
+
+textarea.inp{min-height:80px;resize:vertical;line-height:1.5}
+
+/* FLOW ROWS */
+.flow-row{display:flex;align-items:center;gap:10px}
+.flow-box{flex:1;background:var(--bg);border:var(--bd);border-radius:var(--rsm);padding:10px 14px;font-size:14px;font-weight:600;color:var(--navy);text-align:center;min-width:0}
+.flow-arrow{font-size:20px;color:var(--sky);flex-shrink:0;font-weight:700}
+.flow-box.morning-box{background:#FFF4E6;border-color:#FFD49A;color:var(--morning)}
+.flow-box.afternoon-box{background:#EBF5FF;border-color:#9DD2FF;color:var(--afternoon)}
+.flow-box.evening-box{background:#EEF2F9;border-color:#9AAFD4;color:var(--evening)}
+.flow-box.green-box{background:#EAFAF1;border-color:#A9DFBF;color:var(--green-team)}
+.flow-box.blue-box{background:#EBF5FF;border-color:#9DD2FF;color:var(--blue-team)}
+.flow-box.yellow-box{background:#FFFBEC;border-color:#F5D000;color:var(--yellow-team)}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-inner">
+    <div style="font-size:22px;font-weight:900;color:#fff;letter-spacing:-.5px">CADF</div>
+    <div class="hdr-div"></div>
+    <div>
+      <div class="hdr-title">Shift Handover</div>
+      <div class="hdr-sub" id="hdr-date"></div>
+    </div>
+    <div class="shift-badge" id="shift-badge"></div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="status-bar" id="status-bar"></div>
+
+  <!-- SHIFT INFO -->
+  <div class="card">
+    <div class="card-title">Shift Information</div>
+
+    <!-- Terminal -->
+    <div class="frow">
+      <label class="lbl">Terminal</label>
+      <select class="inp" id="terminal">
+        <option value="">Select terminal</option>
+        <option>Terminal 1</option>
+        <option>Terminal 2</option>
+        <option>Terminal 3</option>
+      </select>
+    </div>
+
+    <!-- Team pills -->
+    <div class="frow">
+      <label class="lbl">Team</label>
+      <div class="team-pills">
+        <button class="team-pill green" onclick="selectTeam('Green',this)">🟢 Green</button>
+        <button class="team-pill blue"  onclick="selectTeam('Blue',this)">🔵 Blue</button>
+        <button class="team-pill yellow" onclick="selectTeam('Yellow',this)">🟡 Yellow</button>
+      </div>
+      <input type="hidden" id="team" value="">
+    </div>
+
+    <!-- Shift pills -->
+    <div class="frow">
+      <label class="lbl">Shift</label>
+      <div class="shift-pills">
+        <button class="shift-pill morning"   onclick="selectShift('Morning',this)">🌅 Morning</button>
+        <button class="shift-pill afternoon" onclick="selectShift('Afternoon',this)">☀️ Afternoon</button>
+        <button class="shift-pill evening"   onclick="selectShift('Evening',this)">🌙 Evening</button>
+      </div>
+      <input type="hidden" id="shift" value="">
+    </div>
+
+    <!-- Staff name -->
+    <div class="frow" style="margin-bottom:0">
+      <label class="lbl">Staff Name</label>
+      <input class="inp" id="staff" placeholder="Your full name" autocomplete="off" oninput="updateFromStaff()">
+    </div>
+  </div>
+
+  <!-- HANDOVER FROM / TO — auto-filled from selections -->
+  <div class="card" id="handover-card" style="display:none">
+    <div class="card-title">Handover Summary</div>
+
+    <!-- Shift flow -->
+    <div style="margin-bottom:14px">
+      <div class="lbl">Shift Handover</div>
+      <div class="flow-row" id="shift-flow-row">
+        <div class="flow-box" id="from-shift-box">–</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box" id="to-shift-box">–</div>
+      </div>
+    </div>
+
+    <!-- Team flow -->
+    <div style="margin-bottom:14px">
+      <div class="lbl">Team Handover</div>
+      <div class="flow-row">
+        <div class="flow-box" id="from-team-box">–</div>
+        <div class="flow-arrow">→</div>
+        <div style="flex:1">
+          <div class="lbl" style="margin-bottom:6px">Handover To Team</div>
+          <div class="team-pills" style="margin-bottom:0" id="to-team-pills">
+            <button class="team-pill green" onclick="selectToTeam('Green',this)">🟢 Green</button>
+            <button class="team-pill blue"  onclick="selectToTeam('Blue',this)">🔵 Blue</button>
+            <button class="team-pill yellow" onclick="selectToTeam('Yellow',this)">🟡 Yellow</button>
+          </div>
+          <input type="hidden" id="to-team" value="">
+        </div>
+      </div>
+    </div>
+
+    <!-- Staff flow -->
+    <div>
+      <div class="lbl">Staff Handover</div>
+      <div class="flow-row">
+        <div class="flow-box" id="from-staff-box" style="font-size:13px">–</div>
+        <div class="flow-arrow">→</div>
+        <div style="flex:1">
+          <div class="lbl" style="margin-bottom:6px">Receiving Staff Name</div>
+          <input class="inp" id="to-staff" placeholder="Name of receiving staff" autocomplete="off">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CATEGORY & BRAND -->
+  <div class="card">
+    <div class="card-title">Category & Brand</div>
+    <div class="row2">
+      <div class="frow">
+        <label class="lbl">Category</label>
+        <input class="inp" id="category" placeholder="e.g. Fragrances, Tobaccos" autocomplete="off">
+      </div>
+      <div class="frow">
+        <label class="lbl">Brand</label>
+        <input class="inp" id="brand" placeholder="e.g. Chanel, Dior, Marlboro" autocomplete="off">
+      </div>
+    </div>
+  </div>
+
+  <!-- STOCK COUNT -->
+  <div class="card">
+    <div class="card-title">Stock Count</div>
+    <div class="stock-grid">
+      <div class="stock-item">
+        <div class="stock-lbl">Display Stock</div>
+        <input class="stock-inp" id="display-stock" type="number" min="0" placeholder="0" oninput="calcHandover()">
+      </div>
+      <div class="stock-item">
+        <div class="stock-lbl">Delivery Stock</div>
+        <input class="stock-inp" id="delivery-stock" type="number" min="0" placeholder="0" oninput="calcHandover()">
+      </div>
+      <div class="stock-item">
+        <div class="stock-lbl">Sold</div>
+        <input class="stock-inp" id="sold" type="number" min="0" placeholder="0" oninput="calcHandover()">
+      </div>
+    </div>
+    <div class="formula-row">
+      <span style="font-size:12px;color:var(--tx2)">(Display + Delivery) − Sold =</span>
+      <span style="font-weight:700;color:var(--sky)">Handover Stock:</span>
+      <span class="handover-result" id="handover-val">–</span>
+      <span id="disc-badge"></span>
+    </div>
+  </div>
+
+  <!-- PHOTO ATTACHMENTS -->
+  <div class="card">
+    <div class="card-title">Count Photos</div>
+    <p style="font-size:12px;color:var(--tx2);margin-bottom:12px">Attach photos of the stock count — visible on the manager dashboard.</p>
+    <div class="photo-zone" id="photo-zone" onclick="document.getElementById('photo-fi').click()">
+      <div style="font-size:36px;margin-bottom:6px">📷</div>
+      <div style="font-size:13px;color:var(--tx2);font-weight:500">Tap to add photos</div>
+      <div style="font-size:11px;color:#9ab0be;margin-top:3px">Camera · Photo library · Max 5 photos</div>
+    </div>
+    <input type="file" id="photo-fi" accept="image/*" multiple style="display:none" onchange="handlePhotos(this)">
+    <div class="photo-grid" id="photo-grid"></div>
+    <div id="photo-count-badge"></div>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button onclick="document.getElementById('photo-fi').removeAttribute('capture');document.getElementById('photo-fi').click()" style="flex:1;padding:8px;background:var(--bg);border:var(--bd);border-radius:var(--rsm);font-size:12px;font-weight:600;color:var(--sky);cursor:pointer;font-family:inherit">📁 From Library</button>
+      <button onclick="document.getElementById('photo-fi').setAttribute('capture','environment');document.getElementById('photo-fi').click()" style="flex:1;padding:8px;background:var(--bg);border:var(--bd);border-radius:var(--rsm);font-size:12px;font-weight:600;color:var(--sky);cursor:pointer;font-family:inherit">📷 Take Photo</button>
+    </div>
+  </div>
+
+  <!-- NOTES -->
+  <div class="card">
+    <div class="card-title">Notes & Issues</div>
+    <textarea class="inp" id="notes" placeholder="Any issues, discrepancies, or notes for the incoming shift…"></textarea>
+  </div>
+
+  <!-- CONFIRM -->
+  <div class="confirm-row" onclick="toggleConfirm()">
+    <input type="checkbox" id="confirm-check">
+    <label for="confirm-check">I confirm the stock count is accurate and this handover report is ready to submit.</label>
+  </div>
+
+  <button class="btn-submit" id="submit-btn" onclick="submitHandover()">
+    <span id="submit-icon">📤</span>
+    <span id="submit-label">Submit Handover & Send Email</span>
+  </button>
+</div>
+
+<script>
+// ── CONFIG (set by manager, never shown to staff) ──
+const RESEND_KEY = localStorage.getItem('cadf_resend_key') || 're_dGbDGLew_CvoazEbN5YGjA5qLFxiSVzbe';
+const getRecipient = () => localStorage.getItem('cadf_recipient') || 'chokri.salmi@chalhoub.com';
+
+// ── DATE ──
+document.getElementById('hdr-date').textContent = new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
+// ── SHIFT PILLS ──
+let selShift='', selTeam='';
+const NEXT_SHIFT={Morning:'Afternoon',Afternoon:'Evening',Evening:'Morning'};
+
+function selectShift(val, el){
+  selShift=val;
+  document.getElementById('shift').value=val;
+  document.querySelectorAll('.shift-pill').forEach(p=>p.classList.remove('sel'));
+  el.classList.add('sel');
+  // Header badge
+  const badge=document.getElementById('shift-badge');
+  badge.textContent=val+' Shift';
+  badge.className='shift-badge '+val.toLowerCase();
+  badge.style.display='block';
+  // Update flow boxes
+  const nextShift=NEXT_SHIFT[val]||'';
+  const fromBox=document.getElementById('from-shift-box');
+  const toBox=document.getElementById('to-shift-box');
+  fromBox.textContent='🌅 '+val+' Shift';
+  fromBox.className='flow-box '+val.toLowerCase()+'-box';
+  toBox.textContent=(nextShift==='Morning'?'🌅':nextShift==='Afternoon'?'☀️':'🌙')+' '+nextShift+' Shift';
+  toBox.className='flow-box '+nextShift.toLowerCase()+'-box';
+  updateHandoverCard();
+}
+
+function selectTeam(val, el){
+  selTeam=val;
+  document.getElementById('team').value=val;
+  document.querySelectorAll('.team-pill:not(#to-team-pills .team-pill)').forEach(p=>p.classList.remove('sel'));
+  el.classList.add('sel');
+  // Update from-team box
+  const fromBox=document.getElementById('from-team-box');
+  const icons={Green:'🟢',Blue:'🔵',Yellow:'🟡'};
+  fromBox.textContent=(icons[val]||'')+' '+val+' Team';
+  fromBox.className='flow-box '+val.toLowerCase()+'-box';
+  updateHandoverCard();
+}
+
+function selectToTeam(val, el){
+  document.getElementById('to-team').value=val;
+  document.querySelectorAll('#to-team-pills .team-pill').forEach(p=>p.classList.remove('sel'));
+  el.classList.add('sel');
+}
+
+function updateHandoverCard(){
+  const card=document.getElementById('handover-card');
+  if(selShift||selTeam) card.style.display='block';
+  // Update from-staff box live
+  const staffVal=document.getElementById('staff').value.trim();
+  if(staffVal){
+    const fromStaff=document.getElementById('from-staff-box');
+    fromStaff.textContent=staffVal;
+  }
+}
+
+// ── PHOTOS ──
+let photos=[];
+function handlePhotos(input){
+  Array.from(input.files).forEach(f=>{
+    if(photos.length>=5){alert('Max 5 photos');return;}
+    if(f.size>5*1024*1024){alert('Max 5MB per photo');return;}
+    const canvas=document.createElement('canvas'),img=new Image();
+    img.onload=()=>{
+      const MAX=1200;let w=img.width,h=img.height;
+      if(w>h){if(w>MAX){h=Math.round(h*MAX/w);w=MAX;}}else{if(h>MAX){w=Math.round(w*MAX/h);h=MAX;}}
+      canvas.width=w;canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      photos.push(canvas.toDataURL('image/jpeg',.82));
+      renderPhotos();
+    };
+    img.src=URL.createObjectURL(f);
+  });
+  input.value='';
+}
+function renderPhotos(){
+  document.getElementById('photo-grid').innerHTML=photos.map((p,i)=>`
+    <div class="photo-thumb"><img src="${p}">
+    <button class="photo-del" onclick="removePhoto(${i})">✕</button></div>`).join('');
+  document.getElementById('photo-count-badge').innerHTML=photos.length
+    ?`<span class="photo-count-badge" style="background:var(--teal);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;display:inline-block;margin-top:8px">✅ ${photos.length} photo${photos.length>1?'s':''} attached</span>`:'';
+  document.getElementById('photo-zone').className='photo-zone'+(photos.length?' has':'');
+}
+function removePhoto(i){photos.splice(i,1);renderPhotos();}
+
+function updateFromStaff(){
+  const v=document.getElementById('staff').value.trim();
+  document.getElementById('from-staff-box').textContent=v||'–';
+}
+
+// ── STOCK CALC ──
+function calcHandover(){
+  const d=parseFloat(document.getElementById('display-stock').value)||0;
+  const dl=parseFloat(document.getElementById('delivery-stock').value)||0;
+  const s=parseFloat(document.getElementById('sold').value)||0;
+  const h=(d+dl)-s;
+  document.getElementById('handover-val').textContent=isNaN(h)?'–':h;
+  const badge=document.getElementById('disc-badge');
+  if(d||dl||s){
+    badge.innerHTML=h>=0?'<span class="disc-ok">✓ OK</span>':'<span class="disc-warn">⚠ Negative — check figures</span>';
+  }else badge.innerHTML='';
+}
+
+// ── CONFIRM ──
+function toggleConfirm(){document.getElementById('confirm-check').checked=!document.getElementById('confirm-check').checked;}
+
+// ── SUBMIT ──
+async function submitHandover(){
+  const terminal=document.getElementById('terminal').value;
+  const team=document.getElementById('team').value;
+  const shift=document.getElementById('shift').value;
+  const staff=document.getElementById('staff').value.trim();
+  const toTeam=document.getElementById('to-team').value;
+  const toStaff=document.getElementById('to-staff').value.trim();
+  const display=document.getElementById('display-stock').value;
+  const delivery=document.getElementById('delivery-stock').value;
+  const sold=document.getElementById('sold').value;
+  const notes=document.getElementById('notes').value.trim();
+
+  if(!terminal){showStatus('err','Please select a terminal.');return;}
+  if(!team){showStatus('err','Please select a team.');return;}
+  if(!shift){showStatus('err','Please select a shift.');return;}
+  if(!staff){showStatus('err','Please enter your name.');return;}
+  if(!toTeam){showStatus('err','Please select the team you are handing over to.');return;}
+  if(!toStaff){showStatus('err','Please enter the receiving staff name.');return;}
+  if(!display&&!delivery&&!sold){showStatus('err','Please enter stock counts.');return;}
+  if(!document.getElementById('confirm-check').checked){showStatus('err','Please confirm the stock count before submitting.');return;}
+
+  const handover=(parseFloat(display)||0)+(parseFloat(delivery)||0)-(parseFloat(sold)||0);
+  const now=new Date();
+  const dateStr=now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const timeStr=now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+
+  // Save to localStorage for manager dashboard
+  const fromShift=selShift+' Shift';
+  const toShift=NEXT_SHIFT[selShift]?NEXT_SHIFT[selShift]+' Shift':'–';
+  const category=document.getElementById('category').value;
+  const brand=document.getElementById('brand').value.trim();
+  const record={
+    id:Date.now(),date:now.toISOString(),dateStr,timeStr,
+    terminal,team,shift,staff,fromShift,toShift,
+    fromTeam:team,toTeam,fromStaff:staff,toStaff,
+    category,brand,
+    display:parseFloat(display)||0,
+    delivery:parseFloat(delivery)||0,
+    sold:parseFloat(sold)||0,
+    handover,notes,
+    photos:[...photos]
+  };
+  const all=JSON.parse(localStorage.getItem('cadf_handovers')||'[]');
+  all.unshift(record);
+  localStorage.setItem('cadf_handovers',JSON.stringify(all.slice(0,200)));
+
+  const btn=document.getElementById('submit-btn');
+  const lbl=document.getElementById('submit-label');
+  btn.disabled=true;btn.className='btn-submit sending';
+  lbl.textContent='Sending…';
+
+  const photoNote=photos.length>0?`${photos.length} photo(s) attached — view in manager dashboard`:'No photos attached';
+
+  const emailBody=`CADF Shift Handover Report
+════════════════════════════════
+Date:      ${dateStr} at ${timeStr}
+Terminal:  ${terminal}
+Team:      ${team} Team
+Shift:     ${shift} Shift
+Staff:     ${staff}
+
+HANDOVER
+────────
+Shift:  ${fromShift} → ${toShift}
+Team:   ${team} Team → ${toTeam} Team
+Staff:  ${staff} → ${toStaff}
+
+CATEGORY & BRAND
+────────────────
+Category: ${category||'–'}
+Brand:    ${brand||'–'}
+
+STOCK COUNT
+───────────
+Display Stock:  ${display||0}
+Delivery Stock: ${delivery||0}
+Sold:           ${sold||0}
+────────────────
+Handover Stock: ${handover}
+
+PHOTOS
+──────
+${photoNote}
+
+NOTES
+─────
+${notes||'None'}
+════════════════════════════════
+Submitted via CADF Handover App`;
+
+  try{
+    const key=localStorage.getItem('cadf_resend_key')||'re_dGbDGLew_CvoazEbN5YGjA5qLFxiSVzbe';
+    const res=await fetch('https://cadf-email-proxy.chokri-salmi.workers.dev',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        apiKey:key,
+        to:getRecipient(),
+        subject:`CADF Handover — ${shift} Shift — ${terminal} — ${team} Team — ${dateStr}`,
+        text:emailBody
+      })
+    });
+    const data=await res.json();
+    if(data.id){
+      btn.className='btn-submit sent';lbl.textContent='✅ Handover submitted & email sent!';
+      showStatus('ok',`✅ Handover saved and email sent successfully.`);
+      resetForm();
+    }else{
+      throw new Error(data.message||data.name||'Unknown error');
+    }
+  }catch(e){
+    // Still saved locally even if email fails
+    btn.disabled=false;btn.className='btn-submit';lbl.textContent='Submit Handover & Send Email';
+    showStatus('err',`Handover saved to dashboard. Email failed: ${e.message}`);
+  }
+}
+
+function resetForm(){
+  setTimeout(()=>{
+    document.getElementById('terminal').value='';
+    document.getElementById('team').value='';
+    document.getElementById('shift').value='';
+    document.getElementById('staff').value='';
+    document.getElementById('category').value='';
+    document.getElementById('brand').value='';
+    document.getElementById('to-team').value='';
+    document.getElementById('to-staff').value='';
+    document.getElementById('handover-card').style.display='none';
+    document.querySelectorAll('#to-team-pills .team-pill').forEach(p=>p.classList.remove('sel'));
+    document.getElementById('display-stock').value='';
+    document.getElementById('delivery-stock').value='';
+    document.getElementById('sold').value='';
+    document.getElementById('notes').value='';
+    document.getElementById('confirm-check').checked=false;
+    document.getElementById('handover-val').textContent='–';
+    document.getElementById('disc-badge').innerHTML='';
+    document.getElementById('shift-badge').style.display='none';
+    document.querySelectorAll('.shift-pill,.team-pill').forEach(p=>p.classList.remove('sel'));
+    selShift='';selTeam='';
+    photos=[];renderPhotos();
+    const btn=document.getElementById('submit-btn');
+    btn.disabled=false;btn.className='btn-submit';
+    document.getElementById('submit-label').textContent='Submit Handover & Send Email';
+  },3000);
+}
+
+function showStatus(type,msg){
+  const bar=document.getElementById('status-bar');
+  bar.className=`status-bar show ${type}`;
+  bar.innerHTML=(type==='ok'?'✅ ':'⚠️ ')+msg;
+  bar.scrollIntoView({behavior:'smooth',block:'nearest'});
+  setTimeout(()=>bar.classList.remove('show'),8000);
+}
+</script>
+</body>
+</html>

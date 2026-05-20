@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CADF — Manager Dashboard</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#1B3A6B;--sky:#2B8FD4;--teal:#00B5B8;
+  --yellow:#F5D000;--red:#E8344A;
+  --morning:#FF8C00;--afternoon:#2B8FD4;--evening:#1B3A6B;
+  --green-team:#27AE60;--blue-team:#2B8FD4;--yellow-team:#c4a800;
+  --bg:#F4F7FB;--card:#fff;--tx:#1a2a3a;--tx2:#5a7080;
+  --bd:1px solid #E0E8F0;--rad:12px;--rsm:8px;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh}
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--navy)}
+.login-card{background:#fff;border-radius:var(--rad);padding:32px;width:min(360px,90vw);box-shadow:0 8px 40px rgba(0,0,0,.25)}
+.login-logo{font-size:28px;font-weight:900;color:var(--navy);letter-spacing:-.5px;margin-bottom:4px}
+.login-sub{font-size:13px;color:var(--tx2);margin-bottom:24px}
+#dashboard{display:none}
+.hdr{background:var(--navy);padding:0 20px;position:sticky;top:0;z-index:50;box-shadow:0 2px 12px rgba(27,58,107,.35)}
+.hdr-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:12px 0}
+.hdr-left{display:flex;align-items:center;gap:14px}
+.hdr-div{width:1px;height:28px;background:rgba(255,255,255,.25)}
+.hdr-title{font-size:15px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#fff}
+.hdr-sub{font-size:11px;color:rgba(255,255,255,.65);margin-top:1px}
+.hdr-btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:6px 14px;border-radius:var(--rsm);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;margin-left:8px}
+.wrap{max-width:1100px;margin:0 auto;padding:20px 16px}
+.card{background:var(--card);border-radius:var(--rad);border:var(--bd);padding:18px;margin-bottom:16px;box-shadow:0 1px 4px rgba(27,58,107,.06)}
+.card-title{font-size:13px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.07em;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.card-title::before{content:'';display:block;width:3px;height:16px;border-radius:2px;background:var(--sky)}
+.frow{margin-bottom:12px}
+.lbl{font-size:12px;font-weight:600;color:var(--tx2);margin-bottom:5px;display:block}
+.inp{width:100%;padding:10px 12px;border:var(--bd);border-radius:var(--rsm);font-size:14px;color:var(--tx);font-family:inherit}
+.inp:focus{outline:2px solid var(--sky);outline-offset:-1px}
+.btn{padding:8px 16px;border-radius:var(--rsm);border:var(--bd);background:transparent;color:var(--tx);font-size:13px;cursor:pointer;font-family:inherit}
+.btn-primary{background:var(--navy);color:#fff;border-color:var(--navy)}
+.btn-sm{padding:5px 12px;font-size:12px}
+
+/* KPIs */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+@media(max-width:600px){.kpi-grid{grid-template-columns:repeat(2,1fr)}}
+.kpi{background:var(--card);border-radius:var(--rad);border:var(--bd);padding:16px;box-shadow:0 1px 4px rgba(27,58,107,.06)}
+.kpi-val{font-size:28px;font-weight:800;line-height:1}
+.kpi-lbl{font-size:11px;color:var(--tx2);margin-top:4px;text-transform:uppercase;letter-spacing:.05em}
+
+/* FILTERS */
+.filters{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px}
+.fpill{padding:5px 13px;border-radius:20px;border:var(--bd);font-size:12px;cursor:pointer;background:var(--card);color:var(--tx2);font-family:inherit;font-weight:500;white-space:nowrap}
+.fpill.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+.fpill.morning.active{background:var(--morning);border-color:var(--morning)}
+.fpill.afternoon.active{background:var(--afternoon);border-color:var(--afternoon)}
+.fpill.evening.active{background:var(--evening);border-color:var(--evening)}
+.fpill.green.active{background:var(--green-team);border-color:var(--green-team)}
+.fpill.blue.active{background:var(--blue-team);border-color:var(--blue-team)}
+.fpill.yellow.active{background:var(--yellow-team);border-color:var(--yellow-team);color:#fff}
+
+/* RECORDS */
+.rec{background:var(--card);border-radius:var(--rad);border:var(--bd);margin-bottom:10px;overflow:hidden;box-shadow:0 1px 4px rgba(27,58,107,.06)}
+.rec-hdr{padding:14px 16px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;cursor:pointer}
+.rec-hdr:hover{background:#f7fafb}
+.rec-body{border-top:var(--bd);padding:14px 16px;display:none}
+.rec-body.open{display:block}
+.arrow{font-size:14px;color:var(--tx2);flex-shrink:0;transition:transform .2s;margin-top:2px}
+.arrow.open{transform:rotate(180deg)}
+
+/* SHIFT/TEAM BADGES */
+.badge{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;border:1px solid transparent;white-space:nowrap;display:inline-block}
+.badge-morning{background:#FFF4E6;color:var(--morning);border-color:#FFD49A}
+.badge-afternoon{background:#EBF5FF;color:var(--afternoon);border-color:#9DD2FF}
+.badge-evening{background:#EEF2F9;color:var(--evening);border-color:#9AAFD4}
+.badge-green{background:#EAFAF1;color:var(--green-team);border-color:#A9DFBF}
+.badge-blue{background:#EBF5FF;color:var(--blue-team);border-color:#9DD2FF}
+.badge-yellow{background:#FFFBEC;color:var(--yellow-team);border-color:#F5D000}
+.badge-navy{background:#EEF3FA;color:var(--navy);border-color:#C5D3E8}
+.badge-teal{background:#E8F9F9;color:#007B7D;border-color:#A0D8D9}
+
+/* STOCK CHIPS */
+.stock-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.chip{background:var(--bg);border:var(--bd);border-radius:var(--rsm);padding:8px 12px;flex:1;min-width:70px;text-align:center}
+.chip-val{font-size:18px;font-weight:700;color:var(--navy)}
+.chip-lbl{font-size:10px;color:var(--tx2);text-transform:uppercase;margin-top:1px}
+.chip.result{background:#EEF3FA;border-color:#C5D3E8}
+
+/* HANDOVER ARROW */
+.handover-flow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;padding:10px 12px;background:var(--bg);border-radius:var(--rsm);border:var(--bd);font-size:13px}
+.handover-flow .arrow-lbl{font-size:11px;color:var(--tx2);font-weight:600;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:2px}
+.handover-flow .val{font-weight:600;color:var(--navy)}
+
+/* PHOTOS */
+.photo-section{margin-top:10px}
+.photo-section-title{font-size:11px;font-weight:700;color:var(--tx2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}
+.photo-grid-dash{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:7px}
+.photo-item{border-radius:var(--rsm);overflow:hidden;aspect-ratio:1;border:2px solid var(--teal);cursor:pointer;transition:.15s}
+.photo-item:hover{transform:scale(1.04);border-color:var(--sky)}
+.photo-item img{width:100%;height:100%;object-fit:cover;display:block}
+.no-photo{font-size:12px;color:var(--tx2);font-style:italic;margin-top:8px}
+
+/* NOTES */
+.notes-box{margin-top:10px;padding:10px 12px;background:var(--bg);border-radius:var(--rsm);border:var(--bd);font-size:13px;line-height:1.5;border-top:2px solid var(--yellow)}
+.handover-flow-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}
+@media(max-width:500px){.handover-flow-grid{grid-template-columns:1fr}}
+.hf-col{background:var(--bg);border:var(--bd);border-radius:var(--rsm);padding:8px 12px}
+.hf-lbl{font-size:10px;font-weight:700;color:var(--tx2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px}
+.hf-val{font-size:13px;font-weight:600;color:var(--navy)}
+.hf-arrow{color:var(--sky);font-weight:700;margin:0 4px}
+
+/* LIGHTBOX */
+#lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:200;align-items:center;justify-content:center}
+#lightbox.open{display:flex}
+#lightbox img{max-width:92vw;max-height:90vh;border-radius:var(--rad);object-fit:contain}
+#lb-close{position:absolute;top:14px;right:18px;color:#fff;font-size:30px;cursor:pointer;background:none;border:none;line-height:1;font-weight:300}
+#lb-info{position:absolute;bottom:18px;color:rgba(255,255,255,.7);font-size:13px;text-align:center;padding:0 20px}
+
+/* EMAIL SETTINGS MODAL */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;align-items:center;justify-content:center}
+.overlay.open{display:flex}
+.modal{background:#fff;border-radius:var(--rad);padding:24px;width:min(440px,92vw);box-shadow:0 8px 40px rgba(0,0,0,.2)}
+.modal h3{font-size:16px;font-weight:700;color:var(--navy);margin-bottom:6px}
+.modal-sub{font-size:12px;color:var(--tx2);margin-bottom:16px}
+
+.empty{text-align:center;padding:3rem 1rem;color:var(--tx2)}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+<div class="login-card">
+  <div class="login-logo">CADF</div>
+  <div class="login-sub">Manager Dashboard — Shift Handover</div>
+  <div class="frow"><label class="lbl">Username</label><input class="inp" id="u" type="text" autocomplete="off" placeholder="Username"></div>
+  <div class="frow"><label class="lbl">Password</label><input class="inp" id="p" type="password" placeholder="Password" onkeydown="if(event.key==='Enter')login()"></div>
+  <button class="btn btn-primary" style="width:100%;padding:12px;font-size:14px;margin-top:4px" onclick="login()">Sign In</button>
+  <div id="login-err" style="color:var(--red);font-size:12px;margin-top:8px;display:none">Incorrect credentials.</div>
+</div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard">
+<div class="hdr">
+  <div class="hdr-inner">
+    <div class="hdr-left">
+      <div style="font-size:22px;font-weight:900;color:#fff;letter-spacing:-.5px">CADF</div>
+      <div class="hdr-div"></div>
+      <div>
+        <div class="hdr-title">Manager Dashboard</div>
+        <div class="hdr-sub" id="hdr-date"></div>
+      </div>
+    </div>
+    <div>
+      <button class="hdr-btn" onclick="openEmailSettings()">⚙️ Email Settings</button>
+      <button class="hdr-btn" onclick="logout()">Sign Out</button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <!-- KPIs -->
+  <div class="kpi-grid" id="kpi-grid"></div>
+
+  <!-- FILTERS -->
+  <div class="card">
+    <div class="card-title">Filter Records</div>
+    <div style="font-size:11px;font-weight:700;color:var(--tx2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">Shift</div>
+    <div class="filters" id="shift-filters"></div>
+    <div style="font-size:11px;font-weight:700;color:var(--tx2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;margin-top:10px">Terminal</div>
+    <div class="filters" id="terminal-filters"></div>
+    <div style="font-size:11px;font-weight:700;color:var(--tx2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;margin-top:10px">Team</div>
+    <div class="filters" id="team-filters"></div>
+  </div>
+
+  <!-- RECORDS -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+    <div style="font-size:13px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.07em">Handover Records <span id="rec-count" style="font-weight:400;color:var(--tx2);font-size:12px;text-transform:none;letter-spacing:0"></span></div>
+    <button class="btn btn-sm" onclick="clearAll()" style="color:var(--red);border-color:var(--red)">Clear All</button>
+  </div>
+  <div id="records-list"></div>
+</div>
+</div>
+
+<!-- EMAIL SETTINGS MODAL -->
+<div class="overlay" id="email-modal">
+<div class="modal">
+  <h3>⚙️ Email Settings</h3>
+  <div class="modal-sub">Configure where handover reports are sent. Only visible to managers.</div>
+  <div class="frow">
+    <label class="lbl">Recipient Email (receives all reports)</label>
+    <input class="inp" id="cfg-recipient" type="email" placeholder="manager@cadf.ae">
+  </div>
+  <div class="frow">
+    <label class="lbl">Resend API Key</label>
+    <input class="inp" id="cfg-key" placeholder="re_xxxxxxxxxxxxxxxxxxxx">
+    <div style="font-size:11px;color:var(--tx2);margin-top:5px">Free at <strong>resend.com</strong> — 3,000 emails/month. Get your key from API Keys section.</div>
+  </div>
+  <div id="email-status" style="font-size:12px;margin-bottom:10px;display:none"></div>
+  <div style="display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap">
+    <button class="btn btn-sm" onclick="testEmail()">📧 Send Test Email</button>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-sm" onclick="closeEmailModal()">Cancel</button>
+      <button class="btn btn-sm btn-primary" onclick="saveEmailSettings()">Save</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- LIGHTBOX -->
+<div id="lightbox" onclick="closeLightbox()">
+  <button id="lb-close" onclick="closeLightbox()">✕</button>
+  <img id="lb-img" src="" alt="">
+  <div id="lb-info"></div>
+</div>
+
+<script>
+const CREDS={user:'CADF',pass:'Chalhoub2026'};
+let fShift='All',fTerminal='All',fTeam='All';
+
+function login(){
+  const u=document.getElementById('u').value.trim();
+  const p=document.getElementById('p').value;
+  if(u===CREDS.user&&p===CREDS.pass){
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('dashboard').style.display='block';
+    document.getElementById('hdr-date').textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+    render();
+  }else{
+    document.getElementById('login-err').style.display='block';
+  }
+}
+function logout(){
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('dashboard').style.display='none';
+  document.getElementById('u').value='';
+  document.getElementById('p').value='';
+}
+
+function getAll(){return JSON.parse(localStorage.getItem('cadf_handovers')||'[]');}
+
+function render(){renderKPIs();renderFilters();renderRecords();}
+
+function renderKPIs(){
+  const all=getAll();
+  const today=new Date().toISOString().slice(0,10);
+  const todayRecs=all.filter(r=>r.date.slice(0,10)===today);
+  const withPhotos=all.filter(r=>r.photos&&r.photos.length>0).length;
+  const totalStock=all.reduce((a,r)=>a+(r.handover||0),0);
+  document.getElementById('kpi-grid').innerHTML=`
+    <div class="kpi"><div class="kpi-val" style="color:var(--navy)">${all.length}</div><div class="kpi-lbl">Total Records</div></div>
+    <div class="kpi"><div class="kpi-val" style="color:var(--teal)">${todayRecs.length}</div><div class="kpi-lbl">Today</div></div>
+    <div class="kpi"><div class="kpi-val" style="color:var(--sky)">${totalStock}</div><div class="kpi-lbl">Total Handover Stock</div></div>
+    <div class="kpi"><div class="kpi-val" style="color:#27AE60">${withPhotos}</div><div class="kpi-lbl">With Photos</div></div>`;
+}
+
+function renderFilters(){
+  const shiftOpts=[{v:'All',cls:''},{v:'Morning',cls:'morning'},{v:'Afternoon',cls:'afternoon'},{v:'Evening',cls:'evening'}];
+  document.getElementById('shift-filters').innerHTML=shiftOpts.map(o=>
+    `<button class="fpill${o.cls?' '+o.cls:''}${o.v===fShift?' active':''}" onclick="setFShift('${o.v}')">${o.v==='Morning'?'🌅 ':o.v==='Afternoon'?'☀️ ':o.v==='Evening'?'🌙 ':''}${o.v}</button>`
+  ).join('');
+  const termOpts=['All','Terminal 1','Terminal 2','Terminal 3'];
+  document.getElementById('terminal-filters').innerHTML=termOpts.map(o=>
+    `<button class="fpill${o===fTerminal?' active':''}" onclick="setFTerminal('${o}')">${o}</button>`
+  ).join('');
+  const teamOpts=[{v:'All',cls:''},{v:'Green',cls:'green'},{v:'Blue',cls:'blue'},{v:'Yellow',cls:'yellow'}];
+  document.getElementById('team-filters').innerHTML=teamOpts.map(o=>
+    `<button class="fpill${o.cls?' '+o.cls:''}${o.v===fTeam?' active':''}" onclick="setFTeam('${o.v}')">${o.v==='Green'?'🟢 ':o.v==='Blue'?'🔵 ':o.v==='Yellow'?'🟡 ':''}${o.v}</button>`
+  ).join('');
+}
+function setFShift(v){fShift=v;render();}
+function setFTerminal(v){fTerminal=v;render();}
+function setFTeam(v){fTeam=v;render();}
+
+function renderRecords(){
+  let recs=getAll();
+  if(fShift!=='All') recs=recs.filter(r=>r.shift===fShift);
+  if(fTerminal!=='All') recs=recs.filter(r=>r.terminal===fTerminal);
+  if(fTeam!=='All') recs=recs.filter(r=>r.team===fTeam);
+  document.getElementById('rec-count').textContent=`(${recs.length} record${recs.length!==1?'s':''})`;
+
+  if(!recs.length){
+    document.getElementById('records-list').innerHTML=`<div class="empty"><div style="font-size:44px;margin-bottom:10px">📋</div><div style="font-weight:600">No records yet</div><div style="font-size:13px;margin-top:4px">Records appear here after staff submit handovers.</div></div>`;
+    return;
+  }
+
+  document.getElementById('records-list').innerHTML=recs.map((r,i)=>{
+    const shiftCls=r.shift?r.shift.toLowerCase():'navy';
+    const teamCls=r.team?r.team.toLowerCase():'navy';
+    const hasPhotos=r.photos&&r.photos.length>0;
+    return `<div class="rec">
+      <div class="rec-hdr" onclick="toggleRec(${i})">
+        <div style="flex:1">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:5px">
+            <span style="font-size:14px;font-weight:700">${r.staff||'Unknown'}</span>
+            ${hasPhotos?`<span class="badge badge-teal">📷 ${r.photos.length} photo${r.photos.length>1?'s':''}</span>`:''}
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <span class="badge badge-navy">${r.terminal||'–'}</span>
+            <span class="badge badge-${shiftCls}">${r.shift||'–'} Shift</span>
+            <span class="badge badge-${teamCls}">${r.team||'–'} Team</span>
+            <span class="badge badge-navy">📦 ${r.handover}</span>
+            ${r.category?`<span class="badge badge-navy">${r.category}</span>`:''}
+            ${r.brand?`<span class="badge badge-teal">${r.brand}</span>`:''}
+          </div>
+          <div style="font-size:11px;color:var(--tx2);margin-top:4px">${r.dateStr||''} at ${r.timeStr||''}</div>
+        </div>
+        <div class="arrow" id="arr-${i}">▼</div>
+      </div>
+      <div class="rec-body" id="body-${i}">
+        <div class="handover-flow-grid">
+          <div class="hf-col">
+            <div class="hf-lbl">Shift</div>
+            <div class="hf-val">${r.fromShift||r.shift||'–'} <span class="hf-arrow">→</span> ${r.toShift||'–'}</div>
+          </div>
+          <div class="hf-col">
+            <div class="hf-lbl">Team</div>
+            <div class="hf-val">${r.fromTeam||r.team||'–'} <span class="hf-arrow">→</span> ${r.toTeam||'–'}</div>
+          </div>
+          <div class="hf-col">
+            <div class="hf-lbl">Staff</div>
+            <div class="hf-val">${r.fromStaff||r.staff||'–'} <span class="hf-arrow">→</span> ${r.toStaff||'–'}</div>
+          </div>
+        </div>
+        ${(r.category||r.brand)?`<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+          ${r.category?`<span class="badge badge-navy">📦 ${r.category}</span>`:''}
+          ${r.brand?`<span class="badge badge-teal">🏷️ ${r.brand}</span>`:''}
+        </div>`:''}
+        <div class="stock-row">
+          <div class="chip"><div class="chip-val">${r.display}</div><div class="chip-lbl">Display</div></div>
+          <div class="chip"><div class="chip-val">${r.delivery}</div><div class="chip-lbl">Delivery</div></div>
+          <div class="chip"><div class="chip-val">${r.sold}</div><div class="chip-lbl">Sold</div></div>
+          <div class="chip result"><div class="chip-val">${r.handover}</div><div class="chip-lbl">Handover</div></div>
+        </div>
+        ${hasPhotos?`<div class="photo-section">
+          <div class="photo-section-title">📷 Count Photos (${r.photos.length})</div>
+          <div class="photo-grid-dash">${r.photos.map((p,pi)=>`<div class="photo-item" onclick="openLightbox('${p}','Photo ${pi+1} — ${r.staff} — ${r.shift} Shift')"><img src="${p}" loading="lazy"></div>`).join('')}</div>
+        </div>`:`<div class="no-photo">No photos attached</div>`}
+        ${r.notes?`<div class="notes-box"><strong style="font-size:11px;color:var(--tx2);text-transform:uppercase;letter-spacing:.05em">Notes:</strong><br>${r.notes}</div>`:''}
+        <div style="margin-top:12px;text-align:right">
+          <button class="btn btn-sm" onclick="deleteRec(${r.id})" style="color:var(--red);border-color:var(--red)">Delete</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleRec(i){
+  const body=document.getElementById(`body-${i}`);
+  const arr=document.getElementById(`arr-${i}`);
+  const open=body.classList.toggle('open');
+  arr.classList.toggle('open',open);
+}
+function deleteRec(id){
+  if(!confirm('Delete this record?'))return;
+  let all=getAll().filter(r=>r.id!==id);
+  localStorage.setItem('cadf_handovers',JSON.stringify(all));
+  render();
+}
+function clearAll(){
+  if(!confirm('Delete ALL handover records? This cannot be undone.'))return;
+  localStorage.removeItem('cadf_handovers');
+  render();
+}
+
+// ── EMAIL SETTINGS (manager only) ──
+function openEmailSettings(){
+  document.getElementById('cfg-recipient').value=localStorage.getItem('cadf_recipient')||'chokri.salmi@chalhoub.com';
+  document.getElementById('cfg-key').value=localStorage.getItem('cadf_resend_key')||'re_dGbDGLew_CvoazEbN5YGjA5qLFxiSVzbe';
+  document.getElementById('email-status').style.display='none';
+  document.getElementById('email-modal').classList.add('open');
+}
+function closeEmailModal(){document.getElementById('email-modal').classList.remove('open');}
+function saveEmailSettings(){
+  const r=document.getElementById('cfg-recipient').value.trim();
+  const k=document.getElementById('cfg-key').value.trim();
+  if(r)localStorage.setItem('cadf_recipient',r);
+  if(k)localStorage.setItem('cadf_resend_key',k);
+  closeEmailModal();
+  showToast('✅ Email settings saved');
+}
+async function testEmail(){
+  const r=document.getElementById('cfg-recipient').value.trim();
+  const k=document.getElementById('cfg-key').value.trim();
+  if(!r||!k){alert('Please fill in both fields first.');return;}
+  const st=document.getElementById('email-status');
+  st.style.display='block';st.style.color='var(--sky)';st.textContent='Sending test email…';
+  try{
+    const res=await fetch('https://cadf-email-proxy.chokri-salmi.workers.dev',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        apiKey:k,
+        to:r,
+        subject:'CADF Handover — Test Email',
+        text:'This is a test email from CADF Shift Handover system. Email is configured correctly!'
+      })
+    });
+    const d=await res.json();
+    if(d.id){st.style.color='#27AE60';st.textContent='✅ Test email sent successfully!';}
+    else throw new Error(d.message||'Failed');
+  }catch(e){
+    st.style.color='var(--red)';st.textContent='❌ Failed: '+e.message;
+  }
+}
+
+function showToast(msg){
+  const t=document.createElement('div');
+  t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a2a3a;color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:600;z-index:999';
+  t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(),3000);
+}
+
+function openLightbox(src,info){
+  document.getElementById('lb-img').src=src;
+  document.getElementById('lb-info').textContent=info;
+  document.getElementById('lightbox').classList.add('open');
+}
+function closeLightbox(){
+  document.getElementById('lightbox').classList.remove('open');
+  document.getElementById('lb-img').src='';
+}
+document.getElementById('email-modal').addEventListener('click',e=>{if(e.target===document.getElementById('email-modal'))closeEmailModal();});
+</script>
+</body>
+</html>
