@@ -1,0 +1,1819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>CADF — Shift Handover</title>
+
+<!-- STAFF FORM STYLES -->
+<style>
+
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#1B3A6B;--sky:#2B8FD4;--teal:#00B5B8;
+  --yellow:#F5D000;--red:#E8344A;
+  --morning:#FF8C00;--afternoon:#2B8FD4;--evening:#1B3A6B;
+  --green-team:#27AE60;--blue-team:#2B8FD4;--yellow-team:#F5D000;
+  --bg:#F4F7FB;--card:#fff;--tx:#1a2a3a;--tx2:#5a7080;
+  --bd:1px solid #E0E8F0;--rad:12px;--rsm:8px;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;padding-bottom:40px}
+
+/* HEADER */
+.hdr{background:var(--navy);padding:0 20px;position:sticky;top:0;z-index:50;box-shadow:0 2px 12px rgba(27,58,107,.35)}
+.hdr-inner{max-width:680px;margin:0 auto;display:flex;align-items:center;gap:14px;padding:12px 0}
+.hdr-logo{height:38px;width:auto}
+.hdr-div{width:1px;height:28px;background:rgba(255,255,255,.25)}
+.hdr-title{font-size:15px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#fff}
+.hdr-sub{font-size:11px;color:rgba(255,255,255,.65);margin-top:1px}
+
+/* SHIFT BADGE on header */
+.shift-badge{margin-left:auto;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;color:#fff;display:none}
+.shift-badge.morning{background:var(--morning)}
+.shift-badge.afternoon{background:var(--afternoon)}
+.shift-badge.evening{background:var(--evening)}
+
+.wrap{max-width:680px;margin:0 auto;padding:20px 16px}
+.card{background:var(--card);border-radius:var(--rad);border:var(--bd);padding:20px;margin-bottom:16px;box-shadow:0 1px 4px rgba(27,58,107,.06)}
+.card-title{font-size:13px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.07em;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.card-title::before{content:'';display:block;width:3px;height:16px;border-radius:2px;background:var(--sky)}
+.frow{margin-bottom:14px}
+.lbl{font-size:12px;font-weight:600;color:var(--tx2);margin-bottom:5px;display:block}
+.inp{width:100%;padding:10px 12px;border:var(--bd);border-radius:var(--rsm);font-size:14px;color:var(--tx);background:#fff;font-family:inherit;transition:.15s}
+.inp:focus{outline:2px solid var(--sky);outline-offset:-1px}
+select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235a7080' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* SHIFT SELECTOR — colored pills */
+.shift-pills{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
+.shift-pill{padding:12px 8px;border-radius:var(--rsm);border:2px solid transparent;cursor:pointer;text-align:center;font-size:13px;font-weight:600;font-family:inherit;background:var(--bg);color:var(--tx2);transition:.15s}
+.shift-pill.morning.sel{background:#FFF4E6;border-color:var(--morning);color:var(--morning)}
+.shift-pill.afternoon.sel{background:#EBF5FF;border-color:var(--afternoon);color:var(--afternoon)}
+.shift-pill.evening.sel{background:#EEF2F9;border-color:var(--evening);color:var(--evening)}
+.shift-pill:hover{background:#f0f4f8}
+
+/* TEAM PILLS */
+.team-pills{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
+.team-pill{padding:10px 8px;border-radius:var(--rsm);border:2px solid transparent;cursor:pointer;text-align:center;font-size:13px;font-weight:700;font-family:inherit;background:var(--bg);color:var(--tx2);transition:.15s}
+.team-pill.green.sel{background:#EAFAF1;border-color:var(--green-team);color:var(--green-team)}
+.team-pill.blue.sel{background:#EBF5FF;border-color:var(--blue-team);color:var(--blue-team)}
+.team-pill.yellow.sel{background:#FFFBEC;border-color:#c4a800;color:#8a7000}
+
+/* HANDOVER FROM/TO */
+.handover-arrow{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.handover-arrow .inp{flex:1}
+.arrow-icon{font-size:20px;flex-shrink:0;color:var(--sky)}
+
+/* STOCK */
+.stock-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.stock-item{background:var(--bg);border-radius:var(--rsm);border:var(--bd);padding:12px}
+.stock-lbl{font-size:11px;font-weight:600;color:var(--tx2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em}
+.stock-inp{width:100%;border:none;background:transparent;font-size:22px;font-weight:700;color:var(--navy);font-family:inherit;text-align:center;padding:4px 0}
+.stock-inp:focus{outline:none}
+.formula-row{background:#EEF5FB;border:1px solid #C5DDF0;border-radius:var(--rsm);padding:10px 14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px;margin-top:10px}
+.handover-result{font-size:20px;font-weight:800;color:var(--navy)}
+.disc-ok{color:#27AE60;font-weight:600}
+.disc-warn{color:var(--red);font-weight:600}
+
+/* PHOTOS */
+.photo-zone{border:2px dashed #C5DDF0;border-radius:var(--rad);padding:22px;text-align:center;cursor:pointer;background:#F7FBFF;transition:.2s}
+.photo-zone:hover,.photo-zone.has{border-color:var(--teal);background:#EFF9F9;border-style:solid}
+.photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px;margin-top:10px}
+.photo-thumb{position:relative;border-radius:var(--rsm);overflow:hidden;aspect-ratio:1;border:2px solid var(--teal)}
+.photo-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.photo-del{position:absolute;top:3px;right:3px;background:rgba(232,52,74,.9);color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700;line-height:1}
+.photo-count-badge{background:var(--teal);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;display:inline-block;margin-top:8px}
+
+/* CONFIRM */
+.confirm-row{display:flex;align-items:flex-start;gap:10px;padding:12px;background:#FFFBEC;border:1px solid var(--yellow);border-radius:var(--rsm);margin-bottom:14px;cursor:pointer}
+.confirm-row input{width:18px;height:18px;margin-top:1px;flex-shrink:0;accent-color:var(--navy);cursor:pointer}
+.confirm-row label{font-size:13px;color:var(--tx);cursor:pointer;line-height:1.4}
+
+/* STATUS */
+.status-bar{padding:12px 16px;border-radius:var(--rsm);font-size:13px;font-weight:600;display:none;margin-bottom:16px;align-items:center;gap:8px}
+.status-bar.show{display:flex}
+.status-bar.ok{background:#EAFAF1;border:1px solid #27AE60;color:#1a6e3a}
+.status-bar.err{background:#FEF0F0;border:1px solid var(--red);color:#8b1a1a}
+
+/* SUBMIT BTN */
+.btn-submit{width:100%;padding:15px;background:var(--navy);color:#fff;border:none;border-radius:var(--rsm);font-size:15px;font-weight:700;cursor:pointer;letter-spacing:.04em;display:flex;align-items:center;justify-content:center;gap:10px;font-family:inherit;transition:.2s}
+.btn-submit:hover:not(:disabled){background:#254d8f}
+.btn-submit:disabled{background:#aaa;cursor:not-allowed}
+.btn-submit.sending{background:var(--sky)}
+.btn-submit.sent{background:#27AE60}
+
+textarea.inp{min-height:80px;resize:vertical;line-height:1.5}
+
+/* FLOW ROWS */
+.flow-row{display:flex;align-items:center;gap:10px}
+.flow-box{flex:1;background:var(--bg);border:var(--bd);border-radius:var(--rsm);padding:10px 14px;font-size:14px;font-weight:600;color:var(--navy);text-align:center;min-width:0}
+.flow-arrow{font-size:20px;color:var(--sky);flex-shrink:0;font-weight:700}
+.flow-box.morning-box{background:#FFF4E6;border-color:#FFD49A;color:var(--morning)}
+.flow-box.afternoon-box{background:#EBF5FF;border-color:#9DD2FF;color:var(--afternoon)}
+.flow-box.evening-box{background:#EEF2F9;border-color:#9AAFD4;color:var(--evening)}
+.flow-box.green-box{background:#EAFAF1;border-color:#A9DFBF;color:var(--green-team)}
+.flow-box.blue-box{background:#EBF5FF;border-color:#9DD2FF;color:var(--blue-team)}
+.flow-box.yellow-box{background:#FFFBEC;border-color:#F5D000;color:var(--yellow-team)}
+
+</style>
+
+<!-- MANAGER STYLES -->
+<style>
+/* Manager panel — hidden by default */
+#mgr-panel { display:none }
+#staff-panel { display:block }
+
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#1B3A6B;--sky:#2B8FD4;--teal:#00B5B8;
+  --yellow:#F5D000;--red:#E8344A;
+  --morning:#FF8C00;--afternoon:#2B8FD4;--evening:#1B3A6B;
+  --green-team:#27AE60;--blue-team:#2B8FD4;--yellow-team:#c4a800;
+  --bg:#F4F7FB;--card:#fff;--tx:#1a2a3a;--tx2:#5a7080;
+  --bd:1px solid #E0E8F0;--rad:12px;--rsm:8px;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh}
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--navy)}
+.login-card{background:#fff;border-radius:var(--rad);padding:32px;width:min(360px,90vw);box-shadow:0 8px 40px rgba(0,0,0,.25)}
+.login-logo{font-size:28px;font-weight:900;color:var(--navy);letter-spacing:-.5px;margin-bottom:4px}
+.login-sub{font-size:13px;color:var(--tx2);margin-bottom:24px}
+#dashboard{display:none}
+.hdr{background:var(--navy);padding:0 20px;position:sticky;top:0;z-index:50;box-shadow:0 2px 12px rgba(27,58,107,.35)}
+.hdr-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:12px 0}
+.hdr-left{display:flex;align-items:center;gap:14px}
+.hdr-div{width:1px;height:28px;background:rgba(255,255,255,.25)}
+.hdr-title{font-size:15px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#fff}
+.hdr-sub{font-size:11px;color:rgba(255,255,255,.65);margin-top:1px}
+.hdr-btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:6px 14px;border-radius:var(--rsm);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;margin-left:8px}
+.wrap{max-width:1100px;margin:0 auto;padding:20px 16px}
+.card{background:var(--card);border-radius:var(--rad);border:var(--bd);padding:18px;margin-bottom:16px;box-shadow:0 1px 4px rgba(27,58,107,.06)}
+.card-title{font-size:13px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.07em;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.card-title::before{content:'';display:block;width:3px;height:16px;border-radius:2px;background:var(--sky)}
+.frow{margin-bottom:12px}
+.lbl{font-size:12px;font-weight:600;color:var(--tx2);margin-bottom:5px;display:block}
+.inp{width:100%;padding:10px 12px;border:var(--bd);border-radius:var(--rsm);font-size:14px;color:var(--tx);font-family:inherit}
+.inp:focus{outline:2px solid var(--sky);outline-offset:-1px}
+.btn{padding:8px 16px;border-radius:var(--rsm);border:var(--bd);background:transparent;color:var(--tx);font-size:13px;cursor:pointer;font-family:inherit}
+.btn-primary{background:var(--navy);color:#fff;border-color:var(--navy)}
+.btn-sm{padding:5px 12px;font-size:12px}
+
+/* KPIs */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+@media(max-width:600px){.kpi-grid{grid-template-columns:repeat(2,1fr)}}
+.kpi{background:var(--card);border-radius:var(--rad);border:var(--bd);padding:16px;box-shadow:0 1px 4px rgba(27,58,107,.06)}
+.kpi-val{font-size:28px;font-weight:800;line-height:1}
+.kpi-lbl{font-size:11px;color:var(--tx2);margin-top:4px;text-transform:uppercase;letter-spacing:.05em}
+
+/* FILTERS */
+.filters{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px}
+.fpill{padding:5px 13px;border-radius:20px;border:var(--bd);font-size:12px;cursor:pointer;background:var(--card);color:var(--tx2);font-family:inherit;font-weight:500;white-space:nowrap}
+.fpill.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+.fpill.morning.active{background:var(--morning);border-color:var(--morning)}
+.fpill.afternoon.active{background:var(--afternoon);border-color:var(--afternoon)}
+.fpill.evening.active{background:var(--evening);border-color:var(--evening)}
+.fpill.green.active{background:var(--green-team);border-color:var(--green-team)}
+.fpill.blue.active{background:var(--blue-team);border-color:var(--blue-team)}
+.fpill.yellow.active{background:var(--yellow-team);border-color:var(--yellow-team);color:#fff}
+
+/* RECORDS */
+.rec{background:var(--card);border-radius:var(--rad);border:var(--bd);margin-bottom:10px;overflow:hidden;box-shadow:0 1px 4px rgba(27,58,107,.06)}
+.rec-hdr{padding:14px 16px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;cursor:pointer}
+.rec-hdr:hover{background:#f7fafb}
+.rec-body{border-top:var(--bd);padding:14px 16px;display:none}
+.rec-body.open{display:block}
+.arrow{font-size:14px;color:var(--tx2);flex-shrink:0;transition:transform .2s;margin-top:2px}
+.arrow.open{transform:rotate(180deg)}
+
+/* SHIFT/TEAM BADGES */
+.badge{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;border:1px solid transparent;white-space:nowrap;display:inline-block}
+.badge-morning{background:#FFF4E6;color:var(--morning);border-color:#FFD49A}
+.badge-afternoon{background:#EBF5FF;color:var(--afternoon);border-color:#9DD2FF}
+.badge-evening{background:#EEF2F9;color:var(--evening);border-color:#9AAFD4}
+.badge-green{background:#EAFAF1;color:var(--green-team);border-color:#A9DFBF}
+.badge-blue{background:#EBF5FF;color:var(--blue-team);border-color:#9DD2FF}
+.badge-yellow{background:#FFFBEC;color:var(--yellow-team);border-color:#F5D000}
+.badge-navy{background:#EEF3FA;color:var(--navy);border-color:#C5D3E8}
+.badge-teal{background:#E8F9F9;color:#007B7D;border-color:#A0D8D9}
+
+/* STOCK CHIPS */
+.stock-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.chip{background:var(--bg);border:var(--bd);border-radius:var(--rsm);padding:8px 12px;flex:1;min-width:70px;text-align:center}
+.chip-val{font-size:18px;font-weight:700;color:var(--navy)}
+.chip-lbl{font-size:10px;color:var(--tx2);text-transform:uppercase;margin-top:1px}
+.chip.result{background:#EEF3FA;border-color:#C5D3E8}
+
+/* HANDOVER ARROW */
+.handover-flow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;padding:10px 12px;background:var(--bg);border-radius:var(--rsm);border:var(--bd);font-size:13px}
+.handover-flow .arrow-lbl{font-size:11px;color:var(--tx2);font-weight:600;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:2px}
+.handover-flow .val{font-weight:600;color:var(--navy)}
+
+/* PHOTOS */
+.photo-section{margin-top:10px}
+.photo-section-title{font-size:11px;font-weight:700;color:var(--tx2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}
+.photo-grid-dash{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:7px}
+.photo-item{border-radius:var(--rsm);overflow:hidden;aspect-ratio:1;border:2px solid var(--teal);cursor:pointer;transition:.15s}
+.photo-item:hover{transform:scale(1.04);border-color:var(--sky)}
+.photo-item img{width:100%;height:100%;object-fit:cover;display:block}
+.no-photo{font-size:12px;color:var(--tx2);font-style:italic;margin-top:8px}
+
+/* NOTES */
+.notes-box{margin-top:10px;padding:10px 12px;background:var(--bg);border-radius:var(--rsm);border:var(--bd);font-size:13px;line-height:1.5;border-top:2px solid var(--yellow)}
+.handover-flow-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}
+@media(max-width:500px){.handover-flow-grid{grid-template-columns:1fr}}
+.hf-col{background:var(--bg);border:var(--bd);border-radius:var(--rsm);padding:8px 12px}
+.hf-lbl{font-size:10px;font-weight:700;color:var(--tx2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px}
+.hf-val{font-size:13px;font-weight:600;color:var(--navy)}
+.hf-arrow{color:var(--sky);font-weight:700;margin:0 4px}
+
+/* LIGHTBOX */
+#lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:200;align-items:center;justify-content:center}
+#lightbox.open{display:flex}
+#lightbox img{max-width:92vw;max-height:90vh;border-radius:var(--rad);object-fit:contain}
+#lb-close{position:absolute;top:14px;right:18px;color:#fff;font-size:30px;cursor:pointer;background:none;border:none;line-height:1;font-weight:300}
+#lb-info{position:absolute;bottom:18px;color:rgba(255,255,255,.7);font-size:13px;text-align:center;padding:0 20px}
+
+/* EMAIL SETTINGS MODAL */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;align-items:center;justify-content:center}
+.overlay.open{display:flex}
+.modal{background:#fff;border-radius:var(--rad);padding:24px;width:min(440px,92vw);box-shadow:0 8px 40px rgba(0,0,0,.2)}
+.modal h3{font-size:16px;font-weight:700;color:var(--navy);margin-bottom:6px}
+.modal-sub{font-size:12px;color:var(--tx2);margin-bottom:16px}
+
+.empty{text-align:center;padding:3rem 1rem;color:var(--tx2)}
+
+</style>
+</head>
+<body>
+
+<!-- ═══ STAFF PANEL ═══ -->
+<div id="staff-panel">
+
+
+<div class="hdr">
+  <div class="hdr-inner">
+    <div style="font-size:22px;font-weight:900;color:#fff;letter-spacing:-.5px">CADF</div>
+    <div class="hdr-div"></div>
+    <div>
+      <div class="hdr-title">Shift Handover</div>
+      <div class="hdr-sub" id="hdr-date"></div>
+    </div>
+    <div class="shift-badge" id="shift-badge"></div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="status-bar" id="status-bar"></div>
+
+  <!-- SHIFT INFO -->
+  <div class="card">
+    <div class="card-title">Shift Information</div>
+
+    <!-- Terminal -->
+    <div class="frow">
+      <label class="lbl">Terminal</label>
+      <select class="inp" id="terminal">
+        <option value="">Select terminal</option>
+        <option>Terminal 1</option>
+        <option>Terminal 2</option>
+        <option>Terminal 3</option>
+      </select>
+    </div>
+
+    <!-- Team pills -->
+    <div class="frow">
+      <label class="lbl">Team</label>
+      <div class="team-pills">
+        <button class="team-pill green" onclick="selectTeam('Green',this)">🟢 Green</button>
+        <button class="team-pill blue"  onclick="selectTeam('Blue',this)">🔵 Blue</button>
+        <button class="team-pill yellow" onclick="selectTeam('Yellow',this)">🟡 Yellow</button>
+      </div>
+      <input type="hidden" id="team" value="">
+    </div>
+
+    <!-- Shift pills -->
+    <div class="frow">
+      <label class="lbl">Shift</label>
+      <div class="shift-pills">
+        <button class="shift-pill morning"   onclick="selectShift('Morning',this)">🌅 Morning</button>
+        <button class="shift-pill afternoon" onclick="selectShift('Afternoon',this)">☀️ Afternoon</button>
+        <button class="shift-pill evening"   onclick="selectShift('Evening',this)">🌙 Evening</button>
+      </div>
+      <input type="hidden" id="shift" value="">
+    </div>
+
+    <!-- Staff name + code -->
+    <div class="frow" style="margin-bottom:0">
+      <label class="lbl">Staff Name & Employee Code</label>
+      <div style="display:grid;grid-template-columns:1fr auto;gap:8px">
+        <input class="inp" id="staff" placeholder="Your full name" autocomplete="off" oninput="updateFromStaff()">
+        <input class="inp" id="staff-code" placeholder="Emp. code" autocomplete="off" style="width:110px">
+      </div>
+    </div>
+  </div>
+
+  <!-- HANDOVER FROM / TO — auto-filled from selections -->
+  <div class="card" id="handover-card" style="display:none">
+    <div class="card-title">Handover Summary</div>
+
+    <!-- Shift flow -->
+    <div style="margin-bottom:14px">
+      <div class="lbl">Shift Handover</div>
+      <div class="flow-row" id="shift-flow-row">
+        <div class="flow-box" id="from-shift-box">–</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box" id="to-shift-box">–</div>
+      </div>
+    </div>
+
+    <!-- Team flow -->
+    <div style="margin-bottom:14px">
+      <div class="lbl">Team Handover</div>
+      <div class="flow-row">
+        <div class="flow-box" id="from-team-box">–</div>
+        <div class="flow-arrow">→</div>
+        <div style="flex:1">
+          <div class="lbl" style="margin-bottom:6px">Handover To Team</div>
+          <div class="team-pills" style="margin-bottom:0" id="to-team-pills">
+            <button class="team-pill green" onclick="selectToTeam('Green',this)">🟢 Green</button>
+            <button class="team-pill blue"  onclick="selectToTeam('Blue',this)">🔵 Blue</button>
+            <button class="team-pill yellow" onclick="selectToTeam('Yellow',this)">🟡 Yellow</button>
+          </div>
+          <input type="hidden" id="to-team" value="">
+        </div>
+      </div>
+    </div>
+
+    <!-- Staff flow -->
+    <div>
+      <div class="lbl">Staff Handover</div>
+      <div class="flow-row">
+        <div class="flow-box" id="from-staff-box" style="font-size:13px">–</div>
+        <div class="flow-arrow">→</div>
+        <div style="flex:1">
+          <div class="lbl" style="margin-bottom:6px">Receiving Staff Name & Code</div>
+          <div style="display:grid;grid-template-columns:1fr auto;gap:8px">
+            <input class="inp" id="to-staff" placeholder="Receiving staff name" autocomplete="off">
+            <input class="inp" id="to-staff-code" placeholder="Emp. code" autocomplete="off" style="width:110px">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CATEGORY & BRAND -->
+  <div class="card">
+    <div class="card-title">Category & Brand</div>
+    <div class="row2">
+      <div class="frow">
+        <label class="lbl">Category</label>
+        <input class="inp" id="category" placeholder="e.g. Fragrances, Tobaccos" autocomplete="off">
+      </div>
+      <div class="frow">
+        <label class="lbl">Brand</label>
+        <input class="inp" id="brand" placeholder="e.g. Chanel, Dior, Marlboro" autocomplete="off">
+      </div>
+    </div>
+  </div>
+
+  <!-- STOCK COUNT -->
+  <div class="card">
+    <div class="card-title">Stock Count</div>
+    <div class="stock-grid">
+      <div class="stock-item">
+        <div class="stock-lbl">Display Stock</div>
+        <input class="stock-inp" id="display-stock" type="number" min="0" placeholder="0" oninput="calcHandover()">
+      </div>
+      <div class="stock-item">
+        <div class="stock-lbl">Delivery Stock</div>
+        <input class="stock-inp" id="delivery-stock" type="number" min="0" placeholder="0" oninput="calcHandover()">
+      </div>
+      <div class="stock-item">
+        <div class="stock-lbl">Sold</div>
+        <input class="stock-inp" id="sold" type="number" min="0" placeholder="0" oninput="calcHandover()">
+      </div>
+    </div>
+    <div class="formula-row">
+      <span style="font-size:12px;color:var(--tx2)">(Display + Delivery) − Sold =</span>
+      <span style="font-weight:700;color:var(--sky)">Handover Stock:</span>
+      <span class="handover-result" id="handover-val">–</span>
+      <span id="disc-badge"></span>
+    </div>
+  </div>
+
+  <!-- PHOTO ATTACHMENTS -->
+  <div class="card">
+    <div class="card-title">Count Photos</div>
+    <p style="font-size:12px;color:var(--tx2);margin-bottom:12px">Attach photos of the stock count — visible on the manager dashboard.</p>
+    <div class="photo-zone" id="photo-zone" onclick="document.getElementById('photo-fi').click()">
+      <div style="font-size:36px;margin-bottom:6px">📷</div>
+      <div style="font-size:13px;color:var(--tx2);font-weight:500">Tap to add photos</div>
+      <div style="font-size:11px;color:#9ab0be;margin-top:3px">Camera · Photo library · Max 5 photos</div>
+    </div>
+    <input type="file" id="photo-fi" accept="image/*" multiple style="display:none" onchange="handlePhotos(this)">
+    <div class="photo-grid" id="photo-grid"></div>
+    <div id="photo-count-badge"></div>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button onclick="document.getElementById('photo-fi').removeAttribute('capture');document.getElementById('photo-fi').click()" style="flex:1;padding:8px;background:var(--bg);border:var(--bd);border-radius:var(--rsm);font-size:12px;font-weight:600;color:var(--sky);cursor:pointer;font-family:inherit">📁 From Library</button>
+      <button onclick="document.getElementById('photo-fi').setAttribute('capture','environment');document.getElementById('photo-fi').click()" style="flex:1;padding:8px;background:var(--bg);border:var(--bd);border-radius:var(--rsm);font-size:12px;font-weight:600;color:var(--sky);cursor:pointer;font-family:inherit">📷 Take Photo</button>
+    </div>
+  </div>
+
+  <!-- NOTES -->
+  <div class="card">
+    <div class="card-title">Notes & Issues</div>
+    <textarea class="inp" id="notes" placeholder="Any issues, discrepancies, or notes for the incoming shift…"></textarea>
+  </div>
+
+  <!-- CONFIRM -->
+  <div class="confirm-row" onclick="toggleConfirm()" style="cursor:pointer;user-select:none;-webkit-user-select:none">
+    <input type="checkbox" id="confirm-check" onclick="event.stopPropagation()" style="width:22px;height:22px;flex-shrink:0;accent-color:var(--navy);cursor:pointer;margin-top:0">
+    <label for="confirm-check" style="cursor:pointer;font-size:14px;line-height:1.5">I confirm the stock count is accurate and this handover report is ready to submit.</label>
+  </div>
+
+  <button class="btn-submit" id="submit-btn" onclick="submitHandover()">
+    <span id="submit-icon">📤</span>
+    <span id="submit-label">Submit Handover & Send Email</span>
+  </button>
+</div>
+
+<script>
+// ── CONFIG (set by manager, never shown to staff) ──
+const RESEND_KEY = localStorage.getItem('cadf_resend_key') || '';
+const getRecipient = () => {
+  const raw = localStorage.getItem('cadf_recipient') || '';
+  // Support comma or semicolon separated emails
+  return raw.split(/[,;]/).map(e=>e.trim()).filter(e=>e);
+};
+
+// ── DATE ──
+document.getElementById('hdr-date').textContent = new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
+// ── SHIFT PILLS ──
+let selShift='', selTeam='';
+const NEXT_SHIFT={Morning:'Afternoon',Afternoon:'Evening',Evening:'Morning'};
+
+function selectShift(val, el){
+  selShift=val;
+  document.getElementById('shift').value=val;
+  document.querySelectorAll('.shift-pill').forEach(p=>p.classList.remove('sel'));
+  el.classList.add('sel');
+  // Header badge
+  const badge=document.getElementById('shift-badge');
+  badge.textContent=val+' Shift';
+  badge.className='shift-badge '+val.toLowerCase();
+  badge.style.display='block';
+  // Update flow boxes
+  const nextShift=NEXT_SHIFT[val]||'';
+  const fromBox=document.getElementById('from-shift-box');
+  const toBox=document.getElementById('to-shift-box');
+  fromBox.textContent='🌅 '+val+' Shift';
+  fromBox.className='flow-box '+val.toLowerCase()+'-box';
+  toBox.textContent=(nextShift==='Morning'?'🌅':nextShift==='Afternoon'?'☀️':'🌙')+' '+nextShift+' Shift';
+  toBox.className='flow-box '+nextShift.toLowerCase()+'-box';
+  updateHandoverCard();
+}
+
+function selectTeam(val, el){
+  selTeam=val;
+  document.getElementById('team').value=val;
+  document.querySelectorAll('.team-pill:not(#to-team-pills .team-pill)').forEach(p=>p.classList.remove('sel'));
+  el.classList.add('sel');
+  // Update from-team box
+  const fromBox=document.getElementById('from-team-box');
+  const icons={Green:'🟢',Blue:'🔵',Yellow:'🟡'};
+  fromBox.textContent=(icons[val]||'')+' '+val+' Team';
+  fromBox.className='flow-box '+val.toLowerCase()+'-box';
+  updateHandoverCard();
+}
+
+function selectToTeam(val, el){
+  document.getElementById('to-team').value=val;
+  document.querySelectorAll('#to-team-pills .team-pill').forEach(p=>p.classList.remove('sel'));
+  el.classList.add('sel');
+}
+
+function updateHandoverCard(){
+  const card=document.getElementById('handover-card');
+  if(selShift||selTeam) card.style.display='block';
+  // Update from-staff box live
+  const staffVal=document.getElementById('staff').value.trim();
+  if(staffVal){
+    const fromStaff=document.getElementById('from-staff-box');
+    fromStaff.textContent=staffVal;
+  }
+}
+
+// ── PHOTOS ──
+let photos=[];
+function handlePhotos(input){
+  Array.from(input.files).forEach(f=>{
+    if(photos.length>=5){alert('Max 5 photos');return;}
+    if(f.size>5*1024*1024){alert('Max 5MB per photo');return;}
+    const canvas=document.createElement('canvas'),img=new Image();
+    img.onload=()=>{
+      const MAX=1200;let w=img.width,h=img.height;
+      if(w>h){if(w>MAX){h=Math.round(h*MAX/w);w=MAX;}}else{if(h>MAX){w=Math.round(w*MAX/h);h=MAX;}}
+      canvas.width=w;canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      photos.push(canvas.toDataURL('image/jpeg',.82));
+      renderPhotos();
+    };
+    img.src=URL.createObjectURL(f);
+  });
+  input.value='';
+}
+function renderPhotos(){
+  document.getElementById('photo-grid').innerHTML=photos.map((p,i)=>`
+    <div class="photo-thumb"><img src="${p}">
+    <button class="photo-del" onclick="removePhoto(${i})">✕</button></div>`).join('');
+  document.getElementById('photo-count-badge').innerHTML=photos.length
+    ?`<span class="photo-count-badge" style="background:var(--teal);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;display:inline-block;margin-top:8px">✅ ${photos.length} photo${photos.length>1?'s':''} attached</span>`:'';
+  document.getElementById('photo-zone').className='photo-zone'+(photos.length?' has':'');
+}
+function removePhoto(i){photos.splice(i,1);renderPhotos();}
+
+function updateFromStaff(){
+  const v=document.getElementById('staff').value.trim();
+  document.getElementById('from-staff-box').textContent=v||'–';
+}
+
+// ── STOCK CALC ──
+function calcHandover(){
+  const d=parseFloat(document.getElementById('display-stock').value)||0;
+  const dl=parseFloat(document.getElementById('delivery-stock').value)||0;
+  const s=parseFloat(document.getElementById('sold').value)||0;
+  const h=(d+dl)-s;
+  document.getElementById('handover-val').textContent=isNaN(h)?'–':h;
+  const badge=document.getElementById('disc-badge');
+  if(d||dl||s){
+    badge.innerHTML=h>=0?'<span class="disc-ok">✓ OK</span>':'<span class="disc-warn">⚠ Negative — check figures</span>';
+  }else badge.innerHTML='';
+}
+
+// ── CONFIRM ──
+function toggleConfirm(){
+  const cb = document.getElementById('confirm-check');
+  cb.checked = !cb.checked;
+  cb.dispatchEvent(new Event('change'));
+}
+
+// ── SUBMIT ──
+function generateExcelContent(r){
+  const photoCount = r.photos && r.photos.length > 0
+    ? `${r.photos.length} photo(s) attached as separate files in this email`
+    : 'No photos attached';
+
+  return `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+<head><meta charset="UTF-8">
+<style>
+  table{border-collapse:collapse;font-family:Arial,sans-serif;font-size:11px}
+  th{background:#1B3A6B;color:#fff;padding:8px 12px;text-align:left;border:1px solid #ccc;white-space:nowrap}
+  td{padding:8px 12px;border:1px solid #ddd;vertical-align:middle}
+  .section{background:#EEF3FA;font-weight:bold;color:#1B3A6B;font-size:12px;padding:8px 12px}
+</style>
+</head><body>
+<h2 style="font-family:Arial;color:#1B3A6B;margin-bottom:4px">CADF Shift Handover Report</h2>
+<p style="font-family:Arial;font-size:12px;color:#666;margin-bottom:16px">${r.dateStr} at ${r.timeStr}</p>
+<table width="700">
+  <tr><td colspan="2" class="section">SHIFT INFORMATION</td></tr>
+  <tr><th>Terminal</th><td>${r.terminal||'–'}</td></tr>
+  <tr><th>Shift</th><td>${r.shift||'–'} Shift</td></tr>
+  <tr><th>Team</th><td>${r.team||'–'} Team</td></tr>
+  <tr><th>Staff Name</th><td>${r.fromStaff||r.staff||'–'}</td></tr>
+  <tr><td colspan="2" class="section">HANDOVER</td></tr>
+  <tr><th>Shift Handover</th><td>${r.fromShift||'–'} → ${r.toShift||'–'}</td></tr>
+  <tr><th>Team Handover</th><td>${r.fromTeam||r.team||'–'} Team → ${r.toTeam||'–'} Team</td></tr>
+  <tr><th>Staff Handover</th><td>${(r.fromStaff||r.staff||'–')}${r.fromStaffCode?' ('+r.fromStaffCode+')':''} → ${r.toStaff||'–'}${r.toStaffCode?' ('+r.toStaffCode+')':''}</td></tr>
+  <tr><td colspan="2" class="section">CATEGORY & BRAND</td></tr>
+  <tr><th>Category</th><td>${r.category||'–'}</td></tr>
+  <tr><th>Brand</th><td>${r.brand||'–'}</td></tr>
+  <tr><td colspan="2" class="section">STOCK COUNT</td></tr>
+  <tr><th>Display Stock</th><td>${r.display||0}</td></tr>
+  <tr><th>Delivery Stock</th><td>${r.delivery||0}</td></tr>
+  <tr><th>Sold</th><td>${r.sold||0}</td></tr>
+  <tr><th style="background:#1B3A6B">Handover Stock</th><td style="font-size:16px;font-weight:bold;color:#1B3A6B">${r.handover||0}</td></tr>
+  <tr><td colspan="2" class="section">COUNT PHOTOS</td></tr>
+  <tr><td colspan="2">${photoCount}</td></tr>
+  <tr><td colspan="2" class="section">NOTES</td></tr>
+  <tr><td colspan="2">${r.notes||'None'}</td></tr>
+</table>
+</body></html>`;
+}
+
+async function submitHandover(){
+  const terminal=document.getElementById('terminal').value;
+  const team=document.getElementById('team').value;
+  const shift=document.getElementById('shift').value;
+  const staff=document.getElementById('staff').value.trim();
+  const toTeam=document.getElementById('to-team').value;
+  const toStaff=document.getElementById('to-staff').value.trim();
+  const staffCode=document.getElementById('staff-code').value.trim();
+  const toStaffCode=document.getElementById('to-staff-code').value.trim();
+  const display=document.getElementById('display-stock').value;
+  const delivery=document.getElementById('delivery-stock').value;
+  const sold=document.getElementById('sold').value;
+  const notes=document.getElementById('notes').value.trim();
+
+  if(!terminal){showStatus('err','Please select a terminal.');return;}
+  if(!team){showStatus('err','Please select a team.');return;}
+  if(!shift){showStatus('err','Please select a shift.');return;}
+  if(!staff){showStatus('err','Please enter your name.');return;}
+  if(!toTeam){showStatus('err','Please select the team you are handing over to.');return;}
+  if(!toStaff){showStatus('err','Please enter the receiving staff name.');return;}
+  if(!staffCode){showStatus('err','Please enter your employee code.');return;}
+  if(!toStaffCode){showStatus('err','Please enter the receiving staff employee code.');return;}
+  if(!display&&!delivery&&!sold){showStatus('err','Please enter stock counts.');return;}
+  if(!document.getElementById('confirm-check').checked){showStatus('err','Please confirm the stock count before submitting.');return;}
+
+  const handover=(parseFloat(display)||0)+(parseFloat(delivery)||0)-(parseFloat(sold)||0);
+  const now=new Date();
+  const dateStr=now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const timeStr=now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+
+  // Save to localStorage for manager dashboard
+  const fromShift=selShift+' Shift';
+  const toShift=NEXT_SHIFT[selShift]?NEXT_SHIFT[selShift]+' Shift':'–';
+  const category=document.getElementById('category').value;
+  const brand=document.getElementById('brand').value.trim();
+  const record={
+    id:Date.now(),date:now.toISOString(),dateStr,timeStr,
+    terminal,team,shift,staff,staffCode,fromShift,toShift,
+    fromTeam:team,toTeam,fromStaff:staff,toStaff,
+    fromStaffCode:staffCode,toStaffCode,
+    category,brand,
+    display:parseFloat(display)||0,
+    delivery:parseFloat(delivery)||0,
+    sold:parseFloat(sold)||0,
+    handover,notes,
+    photos:[...photos]
+  };
+  const all=JSON.parse(localStorage.getItem('cadf_handovers')||'[]');
+  all.unshift(record);
+  localStorage.setItem('cadf_handovers',JSON.stringify(all.slice(0,200)));
+
+  const btn=document.getElementById('submit-btn');
+  const lbl=document.getElementById('submit-label');
+  btn.disabled=true;btn.className='btn-submit sending';
+  lbl.textContent='Sending…';
+
+  const photoNote=photos.length>0?`${photos.length} photo(s) attached — view in manager dashboard`:'No photos attached';
+
+  const emailBody=`CADF Shift Handover Report
+════════════════════════════════
+Date:      ${dateStr} at ${timeStr}
+Terminal:  ${terminal}
+Team:      ${team} Team
+Shift:     ${shift} Shift
+Staff:     ${staff}
+
+HANDOVER
+────────
+Shift:  ${fromShift} → ${toShift}
+Team:   ${team} Team → ${toTeam} Team
+Staff:  ${staff}${staffCode?' ('+staffCode+')':''} → ${toStaff}${toStaffCode?' ('+toStaffCode+')':''}
+
+CATEGORY & BRAND
+────────────────
+Category: ${category||'–'}
+Brand:    ${brand||'–'}
+
+STOCK COUNT
+───────────
+Display Stock:  ${display||0}
+Delivery Stock: ${delivery||0}
+Sold:           ${sold||0}
+────────────────
+Handover Stock: ${handover}
+
+PHOTOS
+──────
+${photoNote}
+
+NOTES
+─────
+${notes||'None'}
+════════════════════════════════
+Submitted via CADF Handover App`;
+
+  try{
+    const key=localStorage.getItem('cadf_resend_key')||'';
+    // Generate Excel attachment
+    const excelContent = generateExcelContent(record);
+    const excelB64 = btoa(unescape(encodeURIComponent(excelContent)));
+
+    // Attach photos as separate JPEG files
+    const photoAttachments = (record.photos||[]).map((p, i) => ({
+      filename: `photo_${i+1}_${terminal}_${shift}_${team}.jpg`,
+      content: p.split(',')[1] // strip data:image/jpeg;base64, prefix
+    }));
+
+    const res=await fetch('https://cadf-email-proxy.chokri-salmi.workers.dev',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        apiKey:key,
+        to:getRecipient(),
+        subject:`CADF Handover — ${shift} Shift — ${terminal} — ${team} Team — ${dateStr}`,
+        text:emailBody,
+        attachments:[
+          {
+            filename:`CADF_Handover_${terminal}_${shift}_${team}_${now.toISOString().slice(0,10)}.xls`,
+            content:excelB64
+          },
+          ...photoAttachments
+        ]
+      })
+    });
+    const data=await res.json();
+    if(data.id){
+      btn.className='btn-submit sent';lbl.textContent='✅ Handover submitted & email sent!';
+      showStatus('ok',`✅ Handover saved and email sent successfully.`);
+      resetForm();
+    }else{
+      throw new Error(data.message||data.name||'Unknown error');
+    }
+  }catch(e){
+    // Still saved locally even if email fails
+    btn.disabled=false;btn.className='btn-submit';lbl.textContent='Submit Handover & Send Email';
+    showStatus('err',`Handover saved to dashboard. Email failed: ${e.message}`);
+  }
+}
+
+function resetForm(){
+  setTimeout(()=>{
+    document.getElementById('terminal').value='';
+    document.getElementById('team').value='';
+    document.getElementById('shift').value='';
+    document.getElementById('staff').value='';
+    document.getElementById('category').value='';
+    document.getElementById('brand').value='';
+    document.getElementById('staff-code').value='';
+    document.getElementById('to-team').value='';
+    document.getElementById('to-staff').value='';
+    document.getElementById('to-staff-code').value='';
+    document.getElementById('handover-card').style.display='none';
+    document.querySelectorAll('#to-team-pills .team-pill').forEach(p=>p.classList.remove('sel'));
+    document.getElementById('display-stock').value='';
+    document.getElementById('delivery-stock').value='';
+    document.getElementById('sold').value='';
+    document.getElementById('notes').value='';
+    document.getElementById('confirm-check').checked=false;
+    document.getElementById('handover-val').textContent='–';
+    document.getElementById('disc-badge').innerHTML='';
+    document.getElementById('shift-badge').style.display='none';
+    document.querySelectorAll('.shift-pill,.team-pill').forEach(p=>p.classList.remove('sel'));
+    selShift='';selTeam='';
+    photos=[];renderPhotos();
+    const btn=document.getElementById('submit-btn');
+    btn.disabled=false;btn.className='btn-submit';
+    document.getElementById('submit-label').textContent='Submit Handover & Send Email';
+  },3000);
+}
+
+function showStatus(type,msg){
+  const bar=document.getElementById('status-bar');
+  bar.className=`status-bar show ${type}`;
+  bar.innerHTML=(type==='ok'?'✅ ':'⚠️ ')+msg;
+  bar.scrollIntoView({behavior:'smooth',block:'nearest'});
+  setTimeout(()=>bar.classList.remove('show'),8000);
+}
+</script>
+
+</div>
+
+<!-- ═══ MANAGER PANEL ═══ -->
+<div id="mgr-panel">
+
+
+<!-- LOGIN -->
+<div id="login-screen">
+<div class="login-card">
+  <div class="login-logo">CADF</div>
+  <div class="login-sub">Manager Dashboard — Shift Handover</div>
+  <div class="frow"><label class="lbl">Username</label><input class="inp" id="u" type="text" autocomplete="off" placeholder="Username"></div>
+  <div class="frow"><label class="lbl">Password</label><input class="inp" id="p" type="password" placeholder="Password" onkeydown="if(event.key==='Enter')login()"></div>
+  <button class="btn btn-primary" style="width:100%;padding:12px;font-size:14px;margin-top:4px" onclick="login()">Sign In</button>
+  <div id="login-err" style="color:var(--red);font-size:12px;margin-top:8px;display:none">Incorrect credentials.</div>
+</div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard">
+<div class="hdr">
+  <div class="hdr-inner">
+    <div class="hdr-left">
+      <div style="font-size:22px;font-weight:900;color:#fff;letter-spacing:-.5px">CADF</div>
+      <div class="hdr-div"></div>
+      <div>
+        <div class="hdr-title">Manager Dashboard</div>
+        <div class="hdr-sub" id="hdr-date"></div>
+      </div>
+    </div>
+    <div>
+      <button class="hdr-btn" onclick="openEmailSettings()">⚙️ Email Settings</button>
+      <button class="hdr-btn" onclick="exportExcel()" style="background:rgba(39,174,96,.25);border-color:rgba(39,174,96,.5)">📥 Export Excel</button>
+      <button class="hdr-btn" onclick="logout()">Sign Out</button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <!-- KPIs -->
+  <div class="kpi-grid" id="kpi-grid"></div>
+
+  <!-- FILTERS -->
+  <div class="card">
+    <div class="card-title">Filter Records</div>
+    <div style="font-size:11px;font-weight:700;color:var(--tx2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">Shift</div>
+    <div class="filters" id="shift-filters"></div>
+    <div style="font-size:11px;font-weight:700;color:var(--tx2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;margin-top:10px">Terminal</div>
+    <div class="filters" id="terminal-filters"></div>
+    <div style="font-size:11px;font-weight:700;color:var(--tx2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;margin-top:10px">Team</div>
+    <div class="filters" id="team-filters"></div>
+  </div>
+
+  <!-- RECORDS -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+    <div style="font-size:13px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.07em">Handover Records <span id="rec-count" style="font-weight:400;color:var(--tx2);font-size:12px;text-transform:none;letter-spacing:0"></span></div>
+    <button class="btn btn-sm" onclick="clearAll()" style="color:var(--red);border-color:var(--red)">Clear All</button>
+  </div>
+  <div id="records-list"></div>
+</div>
+</div>
+
+<!-- EMAIL SETTINGS MODAL -->
+<div class="overlay" id="email-modal">
+<div class="modal">
+  <h3>⚙️ Email Settings</h3>
+  <div class="modal-sub">Configure where handover reports are sent. Only visible to managers.</div>
+  <div class="frow">
+    <label class="lbl">Recipient Email (receives all reports)</label>
+    <input class="inp" id="cfg-recipient" type="email" placeholder="manager@cadf.ae">
+  </div>
+  <div class="frow">
+    <label class="lbl">Resend API Key</label>
+    <input class="inp" id="cfg-key" placeholder="re_xxxxxxxxxxxxxxxxxxxx">
+    <div style="font-size:11px;color:var(--tx2);margin-top:5px">Free at <strong>resend.com</strong> — 3,000 emails/month. Get your key from API Keys section.</div>
+  </div>
+  <div id="email-status" style="font-size:12px;margin-bottom:10px;display:none"></div>
+  <div style="display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap">
+    <button class="btn btn-sm" onclick="testEmail()">📧 Send Test Email</button>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-sm" onclick="closeEmailModal()">Cancel</button>
+      <button class="btn btn-sm btn-primary" onclick="saveEmailSettings()">Save</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- LIGHTBOX -->
+<div id="lightbox" onclick="closeLightbox()">
+  <button id="lb-close" onclick="closeLightbox()">✕</button>
+  <img id="lb-img" src="" alt="">
+  <div id="lb-info"></div>
+</div>
+
+<script>
+const CREDS={user:'CADF',pass:'Chalhoub2026'};
+let fShift='All',fTerminal='All',fTeam='All';
+
+function login(){
+  const u=document.getElementById('u').value.trim();
+  const p=document.getElementById('p').value;
+  if(u===CREDS.user&&p===CREDS.pass){
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('dashboard').style.display='block';
+    document.getElementById('hdr-date').textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+    render();
+  }else{
+    document.getElementById('login-err').style.display='block';
+  }
+}
+function logout(){
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('dashboard').style.display='none';
+  document.getElementById('u').value='';
+  document.getElementById('p').value='';
+}
+
+function getAll(){return JSON.parse(localStorage.getItem('cadf_handovers')||'[]');}
+
+function render(){renderKPIs();renderFilters();renderRecords();}
+
+function renderKPIs(){
+  const all=getAll();
+  const today=new Date().toISOString().slice(0,10);
+  const todayRecs=all.filter(r=>r.date.slice(0,10)===today);
+  const withPhotos=all.filter(r=>r.photos&&r.photos.length>0).length;
+  const totalStock=all.reduce((a,r)=>a+(r.handover||0),0);
+  document.getElementById('kpi-grid').innerHTML=`
+    <div class="kpi"><div class="kpi-val" style="color:var(--navy)">${all.length}</div><div class="kpi-lbl">Total Records</div></div>
+    <div class="kpi"><div class="kpi-val" style="color:var(--teal)">${todayRecs.length}</div><div class="kpi-lbl">Today</div></div>
+    <div class="kpi"><div class="kpi-val" style="color:var(--sky)">${totalStock}</div><div class="kpi-lbl">Total Handover Stock</div></div>
+    <div class="kpi"><div class="kpi-val" style="color:#27AE60">${withPhotos}</div><div class="kpi-lbl">With Photos</div></div>`;
+}
+
+function renderFilters(){
+  const shiftOpts=[{v:'All',cls:''},{v:'Morning',cls:'morning'},{v:'Afternoon',cls:'afternoon'},{v:'Evening',cls:'evening'}];
+  document.getElementById('shift-filters').innerHTML=shiftOpts.map(o=>
+    `<button class="fpill${o.cls?' '+o.cls:''}${o.v===fShift?' active':''}" onclick="setFShift('${o.v}')">${o.v==='Morning'?'🌅 ':o.v==='Afternoon'?'☀️ ':o.v==='Evening'?'🌙 ':''}${o.v}</button>`
+  ).join('');
+  const termOpts=['All','Terminal 1','Terminal 2','Terminal 3'];
+  document.getElementById('terminal-filters').innerHTML=termOpts.map(o=>
+    `<button class="fpill${o===fTerminal?' active':''}" onclick="setFTerminal('${o}')">${o}</button>`
+  ).join('');
+  const teamOpts=[{v:'All',cls:''},{v:'Green',cls:'green'},{v:'Blue',cls:'blue'},{v:'Yellow',cls:'yellow'}];
+  document.getElementById('team-filters').innerHTML=teamOpts.map(o=>
+    `<button class="fpill${o.cls?' '+o.cls:''}${o.v===fTeam?' active':''}" onclick="setFTeam('${o.v}')">${o.v==='Green'?'🟢 ':o.v==='Blue'?'🔵 ':o.v==='Yellow'?'🟡 ':''}${o.v}</button>`
+  ).join('');
+}
+function setFShift(v){fShift=v;render();}
+function setFTerminal(v){fTerminal=v;render();}
+function setFTeam(v){fTeam=v;render();}
+
+function renderRecords(){
+  let recs=getAll();
+  if(fShift!=='All') recs=recs.filter(r=>r.shift===fShift);
+  if(fTerminal!=='All') recs=recs.filter(r=>r.terminal===fTerminal);
+  if(fTeam!=='All') recs=recs.filter(r=>r.team===fTeam);
+  document.getElementById('rec-count').textContent=`(${recs.length} record${recs.length!==1?'s':''})`;
+
+  if(!recs.length){
+    document.getElementById('records-list').innerHTML=`<div class="empty"><div style="font-size:44px;margin-bottom:10px">📋</div><div style="font-weight:600">No records yet</div><div style="font-size:13px;margin-top:4px">Records appear here after staff submit handovers.</div></div>`;
+    return;
+  }
+
+  document.getElementById('records-list').innerHTML=recs.map((r,i)=>{
+    const shiftCls=r.shift?r.shift.toLowerCase():'navy';
+    const teamCls=r.team?r.team.toLowerCase():'navy';
+    const hasPhotos=r.photos&&r.photos.length>0;
+    return `<div class="rec">
+      <div class="rec-hdr" onclick="toggleRec(${i})">
+        <div style="flex:1">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:5px">
+            <span style="font-size:14px;font-weight:700">${r.staff||'Unknown'}</span>
+            ${r.staffCode?`<span style="font-size:11px;background:var(--color-background-secondary);color:var(--tx2);border:0.5px solid var(--color-border-tertiary);padding:2px 8px;border-radius:12px;font-weight:600">${r.staffCode}</span>`:''}
+            ${hasPhotos?`<span class="badge badge-teal">📷 ${r.photos.length} photo${r.photos.length>1?'s':''}</span>`:''}
+            ${r.mgrComment?`<span class="badge" style="background:#FFFBEC;color:#8a7000;border:1px solid #F5D000">⚠️ Commented</span>`:''}
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <span class="badge badge-navy">${r.terminal||'–'}</span>
+            <span class="badge badge-${shiftCls}">${r.shift||'–'} Shift</span>
+            <span class="badge badge-${teamCls}">${r.team||'–'} Team</span>
+            <span class="badge badge-navy">📦 ${r.handover}</span>
+            ${r.category?`<span class="badge badge-navy">${r.category}</span>`:''}
+            ${r.brand?`<span class="badge badge-teal">${r.brand}</span>`:''}
+          </div>
+          <div style="font-size:11px;color:var(--tx2);margin-top:4px">${r.dateStr||''} at ${r.timeStr||''}</div>
+        </div>
+        <div class="arrow" id="arr-${i}">▼</div>
+      </div>
+      <div class="rec-body" id="body-${i}">
+        <div class="handover-flow-grid">
+          <div class="hf-col">
+            <div class="hf-lbl">Shift</div>
+            <div class="hf-val">${r.fromShift||r.shift||'–'} <span class="hf-arrow">→</span> ${r.toShift||'–'}</div>
+          </div>
+          <div class="hf-col">
+            <div class="hf-lbl">Team</div>
+            <div class="hf-val">${r.fromTeam||r.team||'–'} <span class="hf-arrow">→</span> ${r.toTeam||'–'}</div>
+          </div>
+          <div class="hf-col">
+            <div class="hf-lbl">Staff</div>
+            <div class="hf-val">${r.fromStaff||r.staff||'–'} <span class="hf-arrow">→</span> ${r.toStaff||'–'}</div>
+          </div>
+        </div>
+        ${(r.category||r.brand)?`<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+          ${r.category?`<span class="badge badge-navy">📦 ${r.category}</span>`:''}
+          ${r.brand?`<span class="badge badge-teal">🏷️ ${r.brand}</span>`:''}
+          ${hasPhotos?`<div style="display:flex;gap:3px;margin-top:5px;flex-wrap:wrap">${r.photos.slice(0,3).map(p=>`<img src="${p}" style="width:36px;height:36px;object-fit:cover;border-radius:4px;border:1.5px solid var(--teal)">`).join('')}${r.photos.length>3?`<div style="width:36px;height:36px;border-radius:4px;background:var(--teal);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">+${r.photos.length-3}</div>`:''}</div>`:''}
+        </div>`:''}
+        <div class="stock-row">
+          <div class="chip"><div class="chip-val">${r.display}</div><div class="chip-lbl">Display</div></div>
+          <div class="chip"><div class="chip-val">${r.delivery}</div><div class="chip-lbl">Delivery</div></div>
+          <div class="chip"><div class="chip-val">${r.sold}</div><div class="chip-lbl">Sold</div></div>
+          <div class="chip result"><div class="chip-val">${r.handover}</div><div class="chip-lbl">Handover</div></div>
+        </div>
+        ${hasPhotos?`<div class="photo-section">
+          <div class="photo-section-title">📷 Count Photos (${r.photos.length})</div>
+          <div class="photo-grid-dash">${r.photos.map((p,pi)=>`<div class="photo-item" onclick="openLightbox('${p}','Photo ${pi+1} — ${r.staff} — ${r.shift} Shift')"><img src="${p}" loading="lazy"></div>`).join('')}</div>
+        </div>`:`<div class="no-photo">No photos attached</div>`}
+        ${r.notes?`<div class="notes-box"><strong style="font-size:11px;color:var(--tx2);text-transform:uppercase;letter-spacing:.05em">Notes:</strong><br>${r.notes}</div>`:''}
+        
+        <!-- MANAGER COMMENT -->
+        <div style="margin-top:12px;background:#FFFBEC;border:1px solid #F5D000;border-radius:var(--rsm);padding:12px">
+          <div style="font-size:11px;font-weight:700;color:#8a7000;text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">⚠️ Manager Comment</div>
+          <textarea id="mgr-comment-${r.id}" rows="2" placeholder="Add your investigation comment here…" style="width:100%;padding:8px 10px;border:1px solid #E0E8F0;border-radius:var(--rsm);font-size:13px;font-family:inherit;resize:vertical;background:#fff">${r.mgrComment||''}</textarea>
+          <div style="display:flex;justify-content:flex-end;margin-top:6px">
+            <button onclick="saveMgrComment('${r.id}')" style="padding:6px 16px;background:#1B3A6B;color:#fff;border:none;border-radius:var(--rsm);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">💾 Save Comment</button>
+          </div>
+          ${r.mgrComment?`<div style="font-size:10px;color:#8a7000;margin-top:4px">Last saved: ${r.mgrCommentDate||''}</div>`:''}
+        </div>
+
+        <div style="margin-top:12px;text-align:right">
+          <button class="btn btn-sm" onclick="deleteRec(${r.id})" style="color:var(--red);border-color:var(--red)">Delete</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleRec(i){
+  const body=document.getElementById(`body-${i}`);
+  const arr=document.getElementById(`arr-${i}`);
+  const open=body.classList.toggle('open');
+  arr.classList.toggle('open',open);
+}
+function deleteRec(id){
+  if(!confirm('Delete this record?'))return;
+  let all=getAll().filter(r=>r.id!==id);
+  localStorage.setItem('cadf_handovers',JSON.stringify(all));
+  render();
+}
+function clearAll(){
+  if(!confirm('Delete ALL handover records? This cannot be undone.'))return;
+  localStorage.removeItem('cadf_handovers');
+  render();
+}
+
+// ── EMAIL SETTINGS (manager only) ──
+function openEmailSettings(){
+  document.getElementById('cfg-recipient').value=localStorage.getItem('cadf_recipient')||'';
+  document.getElementById('cfg-key').value=localStorage.getItem('cadf_resend_key')||'';
+  document.getElementById('email-status').style.display='none';
+  document.getElementById('email-modal').classList.add('open');
+}
+function closeEmailModal(){document.getElementById('email-modal').classList.remove('open');}
+function saveEmailSettings(){
+  const r=document.getElementById('cfg-recipient').value.trim();
+  const k=document.getElementById('cfg-key').value.trim();
+  if(r)localStorage.setItem('cadf_recipient',r);
+  if(k)localStorage.setItem('cadf_resend_key',k);
+  closeEmailModal();
+  showToast('✅ Email settings saved');
+}
+async function testEmail(){
+  const r=document.getElementById('cfg-recipient').value.trim();
+  const k=document.getElementById('cfg-key').value.trim();
+  if(!r||!k){alert('Please fill in both fields first.');return;}
+  const st=document.getElementById('email-status');
+  st.style.display='block';st.style.color='var(--sky)';st.textContent='Sending test email…';
+  try{
+    const res=await fetch('https://cadf-email-proxy.chokri-salmi.workers.dev',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        apiKey:k,
+        to:r,
+        subject:'CADF Handover — Test Email',
+        text:'This is a test email from CADF Shift Handover system. Email is configured correctly!'
+      })
+    });
+    const d=await res.json();
+    if(d.id){st.style.color='#27AE60';st.textContent='✅ Test email sent successfully!';}
+    else throw new Error(d.message||'Failed');
+  }catch(e){
+    st.style.color='var(--red)';st.textContent='❌ Failed: '+e.message;
+  }
+}
+
+function exportExcel(){
+  let recs = getAll();
+  if(fShift!=='All') recs=recs.filter(r=>r.shift===fShift);
+  if(fTerminal!=='All') recs=recs.filter(r=>r.terminal===fTerminal);
+  if(fTeam!=='All') recs=recs.filter(r=>r.team===fTeam);
+
+  if(!recs.length){showToast('No records to export');return;}
+
+  // Build HTML table for Excel (supports embedded images via data URIs)
+  const imgSize = 80; // px
+
+  let tableRows = recs.map(r => {
+    const photoCell = r.photos && r.photos.length > 0
+      ? r.photos.slice(0,3).map(p =>
+          `<img src="${p}" width="${imgSize}" height="${imgSize}" style="object-fit:cover;margin:2px;border-radius:4px">`
+        ).join('')
+      : 'No photos';
+
+    return `<tr>
+      <td>${r.dateStr||''}</td>
+      <td>${r.timeStr||''}</td>
+      <td>${r.terminal||''}</td>
+      <td>${r.shift||''} Shift</td>
+      <td>${r.team||''} Team</td>
+      <td>${r.staff||''}</td>
+      <td>${r.toStaff||''}</td>
+      <td>${r.toTeam||''} Team</td>
+      <td>${r.category||''}</td>
+      <td>${r.brand||''}</td>
+      <td style="text-align:center">${r.display||0}</td>
+      <td style="text-align:center">${r.delivery||0}</td>
+      <td style="text-align:center">${r.sold||0}</td>
+      <td style="text-align:center;font-weight:bold">${r.handover||0}</td>
+      <td>${r.notes||''}</td>
+      <td style="text-align:center">${photoCell}</td>
+    </tr>`;
+  }).join('');
+
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('en-GB');
+
+  const excelHtml = `
+    <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+    <head><meta charset="UTF-8">
+    <style>
+      table{border-collapse:collapse;font-family:Arial,sans-serif;font-size:11px}
+      th{background:#1B3A6B;color:#fff;padding:8px 10px;text-align:left;white-space:nowrap;border:1px solid #ccc}
+      td{padding:6px 10px;border:1px solid #ddd;vertical-align:middle}
+      tr:nth-child(even) td{background:#f5f8fc}
+      img{border-radius:4px}
+    </style>
+    </head><body>
+    <h2 style="font-family:Arial;color:#1B3A6B">CADF Shift Handover Report — ${dateStr}</h2>
+    <table>
+      <thead><tr>
+        <th>Date</th><th>Time</th><th>Terminal</th><th>Shift</th><th>From Team</th>
+        <th>From Staff</th><th>To Staff</th><th>To Team</th>
+        <th>Category</th><th>Brand</th>
+        <th>Display</th><th>Delivery</th><th>Sold</th><th>Handover Stock</th>
+        <th>Notes</th><th>Photos</th>
+      </tr></thead>
+      <tbody>${tableRows}</tbody>
+    </table>
+    </body></html>`;
+
+  const blob = new Blob([excelHtml], {type:'application/vnd.ms-excel;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `CADF_Handover_${now.toISOString().slice(0,10)}.xls`;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(url);},200);
+  showToast('✅ Excel file downloaded');
+}
+
+function saveMgrComment(id){
+  const textarea = document.getElementById('mgr-comment-'+id);
+  if(!textarea) return;
+  const comment = textarea.value.trim();
+  const all = getAll();
+  const rec = all.find(r=>String(r.id)===String(id));
+  if(!rec) return;
+  rec.mgrComment = comment;
+  rec.mgrCommentDate = new Date().toLocaleString('en-GB',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  localStorage.setItem('cadf_handovers', JSON.stringify(all));
+  showToast('✅ Manager comment saved');
+  render();
+}
+
+function showToast(msg){
+  const t=document.createElement('div');
+  t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a2a3a;color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:600;z-index:999';
+  t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(),3000);
+}
+
+function openLightbox(src,info){
+  document.getElementById('lb-img').src=src;
+  document.getElementById('lb-info').textContent=info;
+  document.getElementById('lightbox').classList.add('open');
+}
+function closeLightbox(){
+  document.getElementById('lightbox').classList.remove('open');
+  document.getElementById('lb-img').src='';
+}
+document.getElementById('email-modal').addEventListener('click',e=>{if(e.target===document.getElementById('email-modal'))closeEmailModal();});
+</script>
+
+</div>
+
+<!-- ROUTING: /manager → show manager panel -->
+<script>
+// Show manager panel if URL contains /manager or ?manager
+function routePanel() {
+  const path = window.location.pathname + window.location.search + window.location.hash;
+  if(path.includes('manager') || window.location.hash === '#manager') {
+    document.getElementById('staff-panel').style.display = 'none';
+    document.getElementById('mgr-panel').style.display = 'block';
+  }
+}
+routePanel();
+</script>
+
+<!-- STAFF SCRIPTS -->
+<script>
+const NEXT_SHIFT={Morning:'Afternoon',Afternoon:'Evening',Evening:'Morning'};
+const RESEND_KEY = localStorage.getItem('cadf_resend_key') || '';
+const getRecipient = () => {
+  const raw = localStorage.getItem('cadf_recipient') || '';
+  // Support comma or semicolon separated emails
+  return raw.split(/[,;]/).map(e=>e.trim()).filter(e=>e);
+};
+
+document.getElementById && (() => {
+  const el = document.getElementById('hdr-date');
+  if(el) el.textContent = new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+})();
+
+let selShift='', selTeam='', photos=[];
+
+function selectShift(val, el){
+  selShift=val;
+  document.getElementById('shift').value=val;
+  document.querySelectorAll('.shift-pill').forEach(p=>p.classList.remove('sel'));
+  el.classList.add('sel');
+  const badge=document.getElementById('shift-badge');
+  if(badge){badge.textContent=val+' Shift';badge.className='shift-badge '+val.toLowerCase();badge.style.display='block';}
+  const nextShift=NEXT_SHIFT[val]||'';
+  const fromBox=document.getElementById('from-shift-box');
+  const toBox=document.getElementById('to-shift-box');
+  if(fromBox){fromBox.textContent='🌅 '+val+' Shift';fromBox.className='flow-box '+val.toLowerCase()+'-box';}
+  if(toBox){toBox.textContent=(nextShift==='Morning'?'🌅':nextShift==='Afternoon'?'☀️':'🌙')+' '+nextShift+' Shift';toBox.className='flow-box '+nextShift.toLowerCase()+'-box';}
+  updateHandoverCard();
+}
+
+function selectTeam(val, el){
+  selTeam=val;
+  document.getElementById('team').value=val;
+  document.querySelectorAll('.team-pill:not(#to-team-pills .team-pill)').forEach(p=>p.classList.remove('sel'));
+  el.classList.add('sel');
+  const fromBox=document.getElementById('from-team-box');
+  const icons={Green:'🟢',Blue:'🔵',Yellow:'🟡'};
+  if(fromBox){fromBox.textContent=(icons[val]||'')+' '+val+' Team';fromBox.className='flow-box '+val.toLowerCase()+'-box';}
+  updateHandoverCard();
+}
+
+function selectToTeam(val, el){
+  document.getElementById('to-team').value=val;
+  document.querySelectorAll('#to-team-pills .team-pill').forEach(p=>p.classList.remove('sel'));
+  el.classList.add('sel');
+}
+
+function updateHandoverCard(){
+  const card=document.getElementById('handover-card');
+  if(card&&(selShift||selTeam)) card.style.display='block';
+  const staffVal=document.getElementById('staff')?.value.trim();
+  if(staffVal){const fb=document.getElementById('from-staff-box');if(fb)fb.textContent=staffVal;}
+}
+
+function updateFromStaff(){
+  const v=document.getElementById('staff').value.trim();
+  const fb=document.getElementById('from-staff-box');
+  if(fb) fb.textContent=v||'–';
+}
+
+function calcHandover(){
+  const d=parseFloat(document.getElementById('display-stock').value)||0;
+  const dl=parseFloat(document.getElementById('delivery-stock').value)||0;
+  const s=parseFloat(document.getElementById('sold').value)||0;
+  const h=(d+dl)-s;
+  const hv=document.getElementById('handover-val');
+  if(hv) hv.textContent=isNaN(h)?'–':h;
+  const badge=document.getElementById('disc-badge');
+  if(badge&&(d||dl||s)){
+    badge.innerHTML=h>=0?'<span class="disc-ok">✓ OK</span>':'<span class="disc-warn">⚠ Negative — check figures</span>';
+  }else if(badge) badge.innerHTML='';
+}
+
+function toggleConfirm(){
+  const cb = document.getElementById('confirm-check');
+  cb.checked = !cb.checked;
+  cb.dispatchEvent(new Event('change'));
+}
+
+function handlePhotos(input){
+  Array.from(input.files).forEach(f=>{
+    if(photos.length>=5){alert('Max 5 photos');return;}
+    if(f.size>5*1024*1024){alert('Max 5MB per photo');return;}
+    const canvas=document.createElement('canvas'),img=new Image();
+    img.onload=()=>{
+      const MAX=1200;let w=img.width,h=img.height;
+      if(w>h){if(w>MAX){h=Math.round(h*MAX/w);w=MAX;}}else{if(h>MAX){w=Math.round(w*MAX/h);h=MAX;}}
+      canvas.width=w;canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      photos.push(canvas.toDataURL('image/jpeg',.82));
+      renderPhotos();
+    };
+    img.src=URL.createObjectURL(f);
+  });
+  input.value='';
+}
+function renderPhotos(){
+  const grid=document.getElementById('photo-grid');
+  if(grid) grid.innerHTML=photos.map((p,i)=>`<div class="photo-thumb"><img src="${p}"><button class="photo-del" onclick="removePhoto(${i})">✕</button></div>`).join('');
+  const badge=document.getElementById('photo-count-badge');
+  if(badge) badge.innerHTML=photos.length?`<span style="background:var(--teal);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;display:inline-block;margin-top:8px">✅ ${photos.length} photo${photos.length>1?'s':''} attached</span>`:'';
+  const zone=document.getElementById('photo-zone');
+  if(zone) zone.className='photo-zone'+(photos.length?' has':'');
+}
+function removePhoto(i){photos.splice(i,1);renderPhotos();}
+
+function generateExcelContent(r){
+  const photoCount = r.photos && r.photos.length > 0
+    ? `${r.photos.length} photo(s) attached as separate files in this email`
+    : 'No photos attached';
+
+  return `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+<head><meta charset="UTF-8">
+<style>
+  table{border-collapse:collapse;font-family:Arial,sans-serif;font-size:11px}
+  th{background:#1B3A6B;color:#fff;padding:8px 12px;text-align:left;border:1px solid #ccc;white-space:nowrap}
+  td{padding:8px 12px;border:1px solid #ddd;vertical-align:middle}
+  .section{background:#EEF3FA;font-weight:bold;color:#1B3A6B;font-size:12px;padding:8px 12px}
+</style>
+</head><body>
+<h2 style="font-family:Arial;color:#1B3A6B;margin-bottom:4px">CADF Shift Handover Report</h2>
+<p style="font-family:Arial;font-size:12px;color:#666;margin-bottom:16px">${r.dateStr} at ${r.timeStr}</p>
+<table width="700">
+  <tr><td colspan="2" class="section">SHIFT INFORMATION</td></tr>
+  <tr><th>Terminal</th><td>${r.terminal||'–'}</td></tr>
+  <tr><th>Shift</th><td>${r.shift||'–'} Shift</td></tr>
+  <tr><th>Team</th><td>${r.team||'–'} Team</td></tr>
+  <tr><th>Staff Name</th><td>${r.fromStaff||r.staff||'–'}</td></tr>
+  <tr><td colspan="2" class="section">HANDOVER</td></tr>
+  <tr><th>Shift Handover</th><td>${r.fromShift||'–'} → ${r.toShift||'–'}</td></tr>
+  <tr><th>Team Handover</th><td>${r.fromTeam||r.team||'–'} Team → ${r.toTeam||'–'} Team</td></tr>
+  <tr><th>Staff Handover</th><td>${(r.fromStaff||r.staff||'–')}${r.fromStaffCode?' ('+r.fromStaffCode+')':''} → ${r.toStaff||'–'}${r.toStaffCode?' ('+r.toStaffCode+')':''}</td></tr>
+  <tr><td colspan="2" class="section">CATEGORY & BRAND</td></tr>
+  <tr><th>Category</th><td>${r.category||'–'}</td></tr>
+  <tr><th>Brand</th><td>${r.brand||'–'}</td></tr>
+  <tr><td colspan="2" class="section">STOCK COUNT</td></tr>
+  <tr><th>Display Stock</th><td>${r.display||0}</td></tr>
+  <tr><th>Delivery Stock</th><td>${r.delivery||0}</td></tr>
+  <tr><th>Sold</th><td>${r.sold||0}</td></tr>
+  <tr><th style="background:#1B3A6B">Handover Stock</th><td style="font-size:16px;font-weight:bold;color:#1B3A6B">${r.handover||0}</td></tr>
+  <tr><td colspan="2" class="section">COUNT PHOTOS</td></tr>
+  <tr><td colspan="2">${photoCount}</td></tr>
+  <tr><td colspan="2" class="section">NOTES</td></tr>
+  <tr><td colspan="2">${r.notes||'None'}</td></tr>
+</table>
+</body></html>`;
+}
+
+async function submitHandover(){
+  const terminal=document.getElementById('terminal').value;
+  const team=document.getElementById('team').value;
+  const shift=document.getElementById('shift').value;
+  const staff=document.getElementById('staff').value.trim();
+  const toTeam=document.getElementById('to-team').value;
+  const toStaff=document.getElementById('to-staff').value.trim();
+  const staffCode=document.getElementById('staff-code').value.trim();
+  const toStaffCode=document.getElementById('to-staff-code').value.trim();
+  const category=document.getElementById('category').value.trim();
+  const brand=document.getElementById('brand').value.trim();
+  const display=document.getElementById('display-stock').value;
+  const delivery=document.getElementById('delivery-stock').value;
+  const sold=document.getElementById('sold').value;
+  const notes=document.getElementById('notes').value.trim();
+
+  if(!terminal){showStatus('err','Please select a terminal.');return;}
+  if(!team){showStatus('err','Please select a team.');return;}
+  if(!shift){showStatus('err','Please select a shift.');return;}
+  if(!staff){showStatus('err','Please enter your name.');return;}
+  if(!toTeam){showStatus('err','Please select the team you are handing over to.');return;}
+  if(!toStaff){showStatus('err','Please enter the receiving staff name.');return;}
+  if(!staffCode){showStatus('err','Please enter your employee code.');return;}
+  if(!toStaffCode){showStatus('err','Please enter the receiving staff employee code.');return;}
+  if(!display&&!delivery&&!sold){showStatus('err','Please enter stock counts.');return;}
+  if(!document.getElementById('confirm-check').checked){showStatus('err','Please confirm the stock count before submitting.');return;}
+
+  const handover=(parseFloat(display)||0)+(parseFloat(delivery)||0)-(parseFloat(sold)||0);
+  const now=new Date();
+  const dateStr=now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const timeStr=now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+  const fromShift=selShift+' Shift';
+  const toShift=NEXT_SHIFT[selShift]?NEXT_SHIFT[selShift]+' Shift':'–';
+
+  const record={
+    id:Date.now(),date:now.toISOString(),dateStr,timeStr,
+    terminal,team,shift,staff,staffCode,fromShift,toShift,
+    fromTeam:team,toTeam,fromStaff:staff,toStaff,
+    fromStaffCode:staffCode,toStaffCode,
+    category,brand,
+    display:parseFloat(display)||0,
+    delivery:parseFloat(delivery)||0,
+    sold:parseFloat(sold)||0,
+    handover,notes,
+    photos:[...photos]
+  };
+  const all=JSON.parse(localStorage.getItem('cadf_handovers')||'[]');
+  all.unshift(record);
+  localStorage.setItem('cadf_handovers',JSON.stringify(all.slice(0,200)));
+
+  const btn=document.getElementById('submit-btn');
+  const lbl=document.getElementById('submit-label');
+  btn.disabled=true;btn.className='btn-submit sending';lbl.textContent='Sending…';
+
+  const photoNote=photos.length>0?`${photos.length} photo(s) attached — view in manager dashboard`:'No photos attached';
+  const emailBody=`CADF Shift Handover Report
+════════════════════════════════
+Date:      ${dateStr} at ${timeStr}
+Terminal:  ${terminal}
+Team:      ${team} Team
+Shift:     ${shift} Shift
+Staff:     ${staff}
+
+HANDOVER
+────────
+Shift:  ${fromShift} → ${toShift}
+Team:   ${team} Team → ${toTeam} Team
+Staff:  ${staff}${staffCode?' ('+staffCode+')':''} → ${toStaff}${toStaffCode?' ('+toStaffCode+')':''}
+
+CATEGORY & BRAND
+────────────────
+Category: ${category||'–'}
+Brand:    ${brand||'–'}
+
+STOCK COUNT
+───────────
+Display Stock:  ${display||0}
+Delivery Stock: ${delivery||0}
+Sold:           ${sold||0}
+────────────────
+Handover Stock: ${handover}
+
+PHOTOS
+──────
+${photoNote}
+
+NOTES
+─────
+${notes||'None'}
+════════════════════════════════
+Submitted via CADF Handover App`;
+
+  try{
+    const key=localStorage.getItem('cadf_resend_key')||'';
+    // Generate Excel attachment
+    const excelContent = generateExcelContent(record);
+    const excelB64 = btoa(unescape(encodeURIComponent(excelContent)));
+
+    // Attach photos as separate JPEG files
+    const photoAttachments = (record.photos||[]).map((p, i) => ({
+      filename: `photo_${i+1}_${terminal}_${shift}_${team}.jpg`,
+      content: p.split(',')[1] // strip data:image/jpeg;base64, prefix
+    }));
+
+    const res=await fetch('https://cadf-email-proxy.chokri-salmi.workers.dev',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        apiKey:key,
+        to:getRecipient(),
+        subject:`CADF Handover — ${shift} Shift — ${terminal} — ${team} Team — ${dateStr}`,
+        text:emailBody,
+        attachments:[
+          {
+            filename:`CADF_Handover_${terminal}_${shift}_${team}_${now.toISOString().slice(0,10)}.xls`,
+            content:excelB64
+          },
+          ...photoAttachments
+        ]
+      })
+    });
+    const data=await res.json();
+    if(data.id){
+      btn.className='btn-submit sent';lbl.textContent='✅ Handover submitted & email sent!';
+      showStatus('ok','✅ Handover saved and email sent successfully.');
+      resetForm();
+    }else throw new Error(data.message||data.name||'Unknown error');
+  }catch(e){
+    btn.disabled=false;btn.className='btn-submit';lbl.textContent='Submit Handover & Send Email';
+    showStatus('err',`Handover saved to dashboard. Email failed: ${e.message}`);
+  }
+}
+
+function resetForm(){
+  setTimeout(()=>{
+    document.getElementById('terminal').value='';
+    document.getElementById('team').value='';
+    document.getElementById('shift').value='';
+    document.getElementById('staff').value='';
+    document.getElementById('category').value='';
+    document.getElementById('brand').value='';
+    document.getElementById('staff-code').value='';
+    document.getElementById('to-team').value='';
+    document.getElementById('to-staff').value='';
+    document.getElementById('to-staff-code').value='';
+    document.getElementById('display-stock').value='';
+    document.getElementById('delivery-stock').value='';
+    document.getElementById('sold').value='';
+    document.getElementById('notes').value='';
+    document.getElementById('confirm-check').checked=false;
+    document.getElementById('handover-val').textContent='–';
+    document.getElementById('disc-badge').innerHTML='';
+    const sb=document.getElementById('shift-badge');if(sb)sb.style.display='none';
+    document.querySelectorAll('.shift-pill,.team-pill').forEach(p=>p.classList.remove('sel'));
+    const hc=document.getElementById('handover-card');if(hc)hc.style.display='none';
+    selShift='';selTeam='';photos=[];renderPhotos();
+    const btn=document.getElementById('submit-btn');
+    btn.disabled=false;btn.className='btn-submit';
+    document.getElementById('submit-label').textContent='Submit Handover & Send Email';
+  },3000);
+}
+
+function showStatus(type,msg){
+  const bar=document.getElementById('status-bar');
+  if(!bar)return;
+  bar.className=`status-bar show ${type}`;
+  bar.innerHTML=(type==='ok'?'✅ ':'⚠️ ')+msg;
+  bar.scrollIntoView({behavior:'smooth',block:'nearest'});
+  setTimeout(()=>bar.classList.remove('show'),8000);
+}
+</script>
+
+<!-- MANAGER SCRIPTS -->
+<script>
+const CREDS={user:'CADF',pass:'Chalhoub2026'};
+let fShift='All',fTerminal='All',fTeam='All';
+
+function login(){
+  const u=document.getElementById('u').value.trim();
+  const p=document.getElementById('p').value;
+  if(u===CREDS.user&&p===CREDS.pass){
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('dashboard').style.display='block';
+    const hd=document.getElementById('hdr-date');
+    if(hd) hd.textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+    render();
+  }else{
+    document.getElementById('login-err').style.display='block';
+  }
+}
+function logout(){
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('dashboard').style.display='none';
+  document.getElementById('u').value='';
+  document.getElementById('p').value='';
+}
+function getAll(){return JSON.parse(localStorage.getItem('cadf_handovers')||'[]');}
+function render(){renderKPIs();renderFilters();renderRecords();}
+
+function renderKPIs(){
+  const all=getAll();
+  const today=new Date().toISOString().slice(0,10);
+  const todayRecs=all.filter(r=>r.date.slice(0,10)===today);
+  const withPhotos=all.filter(r=>r.photos&&r.photos.length>0).length;
+  const totalStock=all.reduce((a,r)=>a+(r.handover||0),0);
+  const kg=document.getElementById('kpi-grid');
+  if(kg) kg.innerHTML=`
+    <div class="kpi"><div class="kpi-val" style="color:var(--navy)">${all.length}</div><div class="kpi-lbl">Total Records</div></div>
+    <div class="kpi"><div class="kpi-val" style="color:var(--teal)">${todayRecs.length}</div><div class="kpi-lbl">Today</div></div>
+    <div class="kpi"><div class="kpi-val" style="color:var(--sky)">${totalStock}</div><div class="kpi-lbl">Total Handover Stock</div></div>
+    <div class="kpi"><div class="kpi-val" style="color:#27AE60">${withPhotos}</div><div class="kpi-lbl">With Photos</div></div>`;
+}
+
+function renderFilters(){
+  const shiftOpts=[{v:'All',cls:''},{v:'Morning',cls:'morning'},{v:'Afternoon',cls:'afternoon'},{v:'Evening',cls:'evening'}];
+  const sf=document.getElementById('shift-filters');
+  if(sf) sf.innerHTML=shiftOpts.map(o=>`<button class="fpill${o.cls?' '+o.cls:''}${o.v===fShift?' active':''}" onclick="setFShift('${o.v}')">${o.v==='Morning'?'🌅 ':o.v==='Afternoon'?'☀️ ':o.v==='Evening'?'🌙 ':''}<span>${o.v}</span></button>`).join('');
+  const termOpts=['All','Terminal 1','Terminal 2','Terminal 3'];
+  const tf=document.getElementById('terminal-filters');
+  if(tf) tf.innerHTML=termOpts.map(o=>`<button class="fpill${o===fTerminal?' active':''}" onclick="setFTerminal('${o}')">${o}</button>`).join('');
+  const teamOpts=[{v:'All',cls:''},{v:'Green',cls:'green'},{v:'Blue',cls:'blue'},{v:'Yellow',cls:'yellow'}];
+  const teamF=document.getElementById('team-filters');
+  if(teamF) teamF.innerHTML=teamOpts.map(o=>`<button class="fpill${o.cls?' '+o.cls:''}${o.v===fTeam?' active':''}" onclick="setFTeam('${o.v}')">${o.v==='Green'?'🟢 ':o.v==='Blue'?'🔵 ':o.v==='Yellow'?'🟡 ':''}<span>${o.v}</span></button>`).join('');
+}
+function setFShift(v){fShift=v;render();}
+function setFTerminal(v){fTerminal=v;render();}
+function setFTeam(v){fTeam=v;render();}
+
+function renderRecords(){
+  let recs=getAll();
+  if(fShift!=='All') recs=recs.filter(r=>r.shift===fShift);
+  if(fTerminal!=='All') recs=recs.filter(r=>r.terminal===fTerminal);
+  if(fTeam!=='All') recs=recs.filter(r=>r.team===fTeam);
+  const rc=document.getElementById('rec-count');
+  if(rc) rc.textContent=`(${recs.length} record${recs.length!==1?'s':''})`;
+  const rl=document.getElementById('records-list');
+  if(!rl) return;
+  if(!recs.length){
+    rl.innerHTML=`<div class="empty"><div style="font-size:44px;margin-bottom:10px">📋</div><div style="font-weight:600">No records yet</div><div style="font-size:13px;margin-top:4px">Records appear here after staff submit handovers.</div></div>`;
+    return;
+  }
+  rl.innerHTML=recs.map((r,i)=>{
+    const shiftCls=r.shift?r.shift.toLowerCase():'navy';
+    const teamCls=r.team?r.team.toLowerCase():'navy';
+    const hasPhotos=r.photos&&r.photos.length>0;
+    return `<div class="rec">
+      <div class="rec-hdr" onclick="toggleRec(${i})">
+        <div style="flex:1">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:5px">
+            <span style="font-size:14px;font-weight:700">${r.staff||'Unknown'}</span>
+            ${r.staffCode?`<span style="font-size:11px;background:var(--color-background-secondary);color:var(--tx2);border:0.5px solid var(--color-border-tertiary);padding:2px 8px;border-radius:12px;font-weight:600">${r.staffCode}</span>`:''}
+            ${hasPhotos?`<span class="badge badge-teal">📷 ${r.photos.length} photo${r.photos.length>1?'s':''}</span>`:''}
+            ${r.mgrComment?`<span class="badge" style="background:#FFFBEC;color:#8a7000;border:1px solid #F5D000">⚠️ Commented</span>`:''}
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <span class="badge badge-navy">${r.terminal||'–'}</span>
+            <span class="badge badge-${shiftCls}">${r.shift||'–'} Shift</span>
+            <span class="badge badge-${teamCls}">${r.team||'–'} Team</span>
+            <span class="badge badge-navy">📦 ${r.handover}</span>
+            ${r.category?`<span class="badge badge-navy">${r.category}</span>`:''}
+            ${r.brand?`<span class="badge badge-teal">${r.brand}</span>`:''}
+          </div>
+          <div style="font-size:11px;color:var(--tx2);margin-top:4px">${r.dateStr||''} at ${r.timeStr||''}</div>
+        </div>
+        <div class="arrow" id="arr-${i}">▼</div>
+      </div>
+      <div class="rec-body" id="body-${i}">
+        <div class="handover-flow-grid">
+          <div class="hf-col"><div class="hf-lbl">Shift</div><div class="hf-val">${r.fromShift||r.shift||'–'} <span class="hf-arrow">→</span> ${r.toShift||'–'}</div></div>
+          <div class="hf-col"><div class="hf-lbl">Team</div><div class="hf-val">${r.fromTeam||r.team||'–'} <span class="hf-arrow">→</span> ${r.toTeam||'–'}</div></div>
+          <div class="hf-col"><div class="hf-lbl">Staff</div><div class="hf-val">${r.fromStaff||r.staff||'–'}${r.fromStaffCode?' ('+r.fromStaffCode+')':''} <span class="hf-arrow">→</span> ${r.toStaff||'–'}${r.toStaffCode?' ('+r.toStaffCode+')':''}</div></div>
+        </div>
+        ${(r.category||r.brand)?`<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+          ${r.category?`<span class="badge badge-navy">📦 ${r.category}</span>`:''}
+          ${r.brand?`<span class="badge badge-teal">🏷️ ${r.brand}</span>`:''}
+          ${hasPhotos?`<div style="display:flex;gap:3px;margin-top:5px;flex-wrap:wrap">${r.photos.slice(0,3).map(p=>`<img src="${p}" style="width:36px;height:36px;object-fit:cover;border-radius:4px;border:1.5px solid var(--teal)">`).join('')}${r.photos.length>3?`<div style="width:36px;height:36px;border-radius:4px;background:var(--teal);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">+${r.photos.length-3}</div>`:''}</div>`:''}
+        </div>`:''}
+        <div class="stock-row">
+          <div class="chip"><div class="chip-val">${r.display}</div><div class="chip-lbl">Display</div></div>
+          <div class="chip"><div class="chip-val">${r.delivery}</div><div class="chip-lbl">Delivery</div></div>
+          <div class="chip"><div class="chip-val">${r.sold}</div><div class="chip-lbl">Sold</div></div>
+          <div class="chip result"><div class="chip-val">${r.handover}</div><div class="chip-lbl">Handover</div></div>
+        </div>
+        ${hasPhotos?`<div class="photo-section">
+          <div class="photo-section-title">📷 Count Photos (${r.photos.length})</div>
+          <div class="photo-grid-dash">${r.photos.map((p,pi)=>`<div class="photo-item" onclick="openLightbox('${p}','Photo ${pi+1} — ${r.staff} — ${r.shift} Shift')"><img src="${p}" loading="lazy"></div>`).join('')}</div>
+        </div>`:`<div class="no-photo">No photos attached</div>`}
+        ${r.notes?`<div class="notes-box"><strong style="font-size:11px;color:var(--tx2);text-transform:uppercase;letter-spacing:.05em">Notes:</strong><br>${r.notes}</div>`:''}
+        
+        <!-- MANAGER COMMENT -->
+        <div style="margin-top:12px;background:#FFFBEC;border:1px solid #F5D000;border-radius:var(--rsm);padding:12px">
+          <div style="font-size:11px;font-weight:700;color:#8a7000;text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">⚠️ Manager Comment</div>
+          <textarea id="mgr-comment-${r.id}" rows="2" placeholder="Add your investigation comment here…" style="width:100%;padding:8px 10px;border:1px solid #E0E8F0;border-radius:var(--rsm);font-size:13px;font-family:inherit;resize:vertical;background:#fff">${r.mgrComment||''}</textarea>
+          <div style="display:flex;justify-content:flex-end;margin-top:6px">
+            <button onclick="saveMgrComment('${r.id}')" style="padding:6px 16px;background:#1B3A6B;color:#fff;border:none;border-radius:var(--rsm);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">💾 Save Comment</button>
+          </div>
+          ${r.mgrComment?`<div style="font-size:10px;color:#8a7000;margin-top:4px">Last saved: ${r.mgrCommentDate||''}</div>`:''}
+        </div>
+
+        <div style="margin-top:12px;text-align:right">
+          <button class="btn btn-sm" onclick="deleteRec(${r.id})" style="color:var(--red);border-color:var(--red)">Delete</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleRec(i){
+  const body=document.getElementById(`body-${i}`);
+  const arr=document.getElementById(`arr-${i}`);
+  const open=body.classList.toggle('open');
+  arr.classList.toggle('open',open);
+}
+function deleteRec(id){
+  if(!confirm('Delete this record?'))return;
+  localStorage.setItem('cadf_handovers',JSON.stringify(getAll().filter(r=>r.id!==id)));
+  render();
+}
+function clearAll(){
+  if(!confirm('Delete ALL records? This cannot be undone.'))return;
+  localStorage.removeItem('cadf_handovers');render();
+}
+function openEmailSettings(){
+  document.getElementById('cfg-recipient').value=localStorage.getItem('cadf_recipient')||'';
+  document.getElementById('cfg-key').value=localStorage.getItem('cadf_resend_key')||'';
+  document.getElementById('email-status').style.display='none';
+  document.getElementById('email-modal').classList.add('open');
+}
+function closeEmailModal(){document.getElementById('email-modal').classList.remove('open');}
+function saveEmailSettings(){
+  const r=document.getElementById('cfg-recipient').value.trim();
+  const k=document.getElementById('cfg-key').value.trim();
+  if(r)localStorage.setItem('cadf_recipient',r);
+  if(k)localStorage.setItem('cadf_resend_key',k);
+  closeEmailModal();
+  showToast('✅ Email settings saved');
+}
+async function testEmail(){
+  const r=document.getElementById('cfg-recipient').value.trim();
+  const k=document.getElementById('cfg-key').value.trim();
+  if(!r||!k){alert('Please fill in both fields first.');return;}
+  const st=document.getElementById('email-status');
+  st.style.display='block';st.style.color='var(--sky)';st.textContent='Sending test email…';
+  try{
+    const res=await fetch('https://cadf-email-proxy.chokri-salmi.workers.dev',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({apiKey:k,to:r.split(/[,;]/).map(e=>e.trim()).filter(e=>e),subject:'CADF Handover — Test Email',text:'This is a test email from CADF Shift Handover system. Email is configured correctly!'})
+    });
+    const d=await res.json();
+    if(d.id){st.style.color='#27AE60';st.textContent='✅ Test email sent successfully!';}
+    else throw new Error(d.message||'Failed');
+  }catch(e){st.style.color='var(--red)';st.textContent='❌ Failed: '+e.message;}
+}
+function exportExcel(){
+  let recs = getAll();
+  if(fShift!=='All') recs=recs.filter(r=>r.shift===fShift);
+  if(fTerminal!=='All') recs=recs.filter(r=>r.terminal===fTerminal);
+  if(fTeam!=='All') recs=recs.filter(r=>r.team===fTeam);
+
+  if(!recs.length){showToast('No records to export');return;}
+
+  // Build HTML table for Excel (supports embedded images via data URIs)
+  const imgSize = 80; // px
+
+  let tableRows = recs.map(r => {
+    const photoCell = r.photos && r.photos.length > 0
+      ? r.photos.slice(0,3).map(p =>
+          `<img src="${p}" width="${imgSize}" height="${imgSize}" style="object-fit:cover;margin:2px;border-radius:4px">`
+        ).join('')
+      : 'No photos';
+
+    return `<tr>
+      <td>${r.dateStr||''}</td>
+      <td>${r.timeStr||''}</td>
+      <td>${r.terminal||''}</td>
+      <td>${r.shift||''} Shift</td>
+      <td>${r.team||''} Team</td>
+      <td>${r.staff||''}</td>
+      <td>${r.toStaff||''}</td>
+      <td>${r.toTeam||''} Team</td>
+      <td>${r.category||''}</td>
+      <td>${r.brand||''}</td>
+      <td style="text-align:center">${r.display||0}</td>
+      <td style="text-align:center">${r.delivery||0}</td>
+      <td style="text-align:center">${r.sold||0}</td>
+      <td style="text-align:center;font-weight:bold">${r.handover||0}</td>
+      <td>${r.notes||''}</td>
+      <td style="text-align:center">${photoCell}</td>
+    </tr>`;
+  }).join('');
+
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('en-GB');
+
+  const excelHtml = `
+    <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+    <head><meta charset="UTF-8">
+    <style>
+      table{border-collapse:collapse;font-family:Arial,sans-serif;font-size:11px}
+      th{background:#1B3A6B;color:#fff;padding:8px 10px;text-align:left;white-space:nowrap;border:1px solid #ccc}
+      td{padding:6px 10px;border:1px solid #ddd;vertical-align:middle}
+      tr:nth-child(even) td{background:#f5f8fc}
+      img{border-radius:4px}
+    </style>
+    </head><body>
+    <h2 style="font-family:Arial;color:#1B3A6B">CADF Shift Handover Report — ${dateStr}</h2>
+    <table>
+      <thead><tr>
+        <th>Date</th><th>Time</th><th>Terminal</th><th>Shift</th><th>From Team</th>
+        <th>From Staff</th><th>To Staff</th><th>To Team</th>
+        <th>Category</th><th>Brand</th>
+        <th>Display</th><th>Delivery</th><th>Sold</th><th>Handover Stock</th>
+        <th>Notes</th><th>Photos</th>
+      </tr></thead>
+      <tbody>${tableRows}</tbody>
+    </table>
+    </body></html>`;
+
+  const blob = new Blob([excelHtml], {type:'application/vnd.ms-excel;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `CADF_Handover_${now.toISOString().slice(0,10)}.xls`;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(url);},200);
+  showToast('✅ Excel file downloaded');
+}
+
+function saveMgrComment(id){
+  const textarea = document.getElementById('mgr-comment-'+id);
+  if(!textarea) return;
+  const comment = textarea.value.trim();
+  const all = getAll();
+  const rec = all.find(r=>String(r.id)===String(id));
+  if(!rec) return;
+  rec.mgrComment = comment;
+  rec.mgrCommentDate = new Date().toLocaleString('en-GB',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  localStorage.setItem('cadf_handovers', JSON.stringify(all));
+  showToast('✅ Manager comment saved');
+  render();
+}
+
+function showToast(msg){
+  const t=document.createElement('div');
+  t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a2a3a;color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:600;z-index:999';
+  t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3000);
+}
+function openLightbox(src,info){
+  document.getElementById('lb-img').src=src;
+  document.getElementById('lb-info').textContent=info;
+  document.getElementById('lightbox').classList.add('open');
+}
+function closeLightbox(){
+  document.getElementById('lightbox').classList.remove('open');
+  document.getElementById('lb-img').src='';
+}
+const em=document.getElementById('email-modal');
+if(em) em.addEventListener('click',e=>{if(e.target===em)closeEmailModal();});
+</script>
+
+</body>
+</html>
