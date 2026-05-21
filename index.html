@@ -105,6 +105,13 @@ select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns
 .btn-submit.sent{background:#27AE60}
 
 textarea.inp{min-height:80px;resize:vertical;line-height:1.5}
+.sr-grid{display:grid;grid-template-columns:1fr 1fr 68px 68px 60px 68px 26px;gap:5px;margin-bottom:5px;align-items:center}
+.sn-inp{width:100%;padding:7px 4px;border:var(--bd);border-radius:var(--rsm);font-size:13px;font-weight:600;color:var(--navy);font-family:inherit;text-align:center;background:#fff}
+.sn-inp:focus{outline:2px solid var(--sky);outline-offset:-1px}
+.hov-chip{border-radius:var(--rsm);padding:7px 2px;font-size:13px;font-weight:800;text-align:center;background:#EEF3FA;border:1px solid #C5D3E8;color:var(--navy)}
+.hov-chip.neg{background:#FEF0F0;border-color:var(--red);color:var(--red)}
+.del-btn{width:22px;height:22px;border-radius:50%;background:transparent;border:1px solid #E0E8F0;color:var(--tx2);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;padding:0}
+.del-btn:hover{border-color:var(--red);color:var(--red)}
 
 /* FLOW ROWS */
 .flow-row{display:flex;align-items:center;gap:10px}
@@ -117,6 +124,132 @@ textarea.inp{min-height:80px;resize:vertical;line-height:1.5}
 .flow-box.blue-box{background:#EBF5FF;border-color:#9DD2FF;color:var(--blue-team)}
 .flow-box.yellow-box{background:#FFFBEC;border-color:#F5D000;color:var(--yellow-team)}
 .flow-box.red-box{background:#FDEDEC;border-color:#E6A89A;color:#C0392B}
+
+</style>
+
+<!-- MANAGER STYLES -->
+<style>
+/* Manager panel — hidden by default */
+#mgr-panel { display:none }
+#staff-panel { display:block }
+
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#1B3A6B;--sky:#2B8FD4;--teal:#00B5B8;
+  --yellow:#F5D000;--red:#E8344A;
+  --morning:#FF8C00;--afternoon:#2B8FD4;--evening:#1B3A6B;
+  --green-team:#27AE60;--blue-team:#2B8FD4;--yellow-team:#c4a800;
+  --bg:#F4F7FB;--card:#fff;--tx:#1a2a3a;--tx2:#5a7080;
+  --bd:1px solid #E0E8F0;--rad:12px;--rsm:8px;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh}
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--navy)}
+.login-card{background:#fff;border-radius:var(--rad);padding:32px;width:min(360px,90vw);box-shadow:0 8px 40px rgba(0,0,0,.25)}
+.login-logo{font-size:28px;font-weight:900;color:var(--navy);letter-spacing:-.5px;margin-bottom:4px}
+.login-sub{font-size:13px;color:var(--tx2);margin-bottom:24px}
+#dashboard{display:none}
+.hdr{background:var(--navy);padding:0 20px;position:sticky;top:0;z-index:50;box-shadow:0 2px 12px rgba(27,58,107,.35)}
+.hdr-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:12px 0}
+.hdr-left{display:flex;align-items:center;gap:14px}
+.hdr-div{width:1px;height:28px;background:rgba(255,255,255,.25)}
+.hdr-title{font-size:15px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#fff}
+.hdr-sub{font-size:11px;color:rgba(255,255,255,.65);margin-top:1px}
+.hdr-btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:6px 14px;border-radius:var(--rsm);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;margin-left:8px}
+.wrap{max-width:1100px;margin:0 auto;padding:20px 16px}
+.card{background:var(--card);border-radius:var(--rad);border:var(--bd);padding:18px;margin-bottom:16px;box-shadow:0 1px 4px rgba(27,58,107,.06)}
+.card-title{font-size:13px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.07em;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.card-title::before{content:'';display:block;width:3px;height:16px;border-radius:2px;background:var(--sky)}
+.frow{margin-bottom:12px}
+.lbl{font-size:12px;font-weight:600;color:var(--tx2);margin-bottom:5px;display:block}
+.inp{width:100%;padding:10px 12px;border:var(--bd);border-radius:var(--rsm);font-size:14px;color:var(--tx);font-family:inherit}
+.inp:focus{outline:2px solid var(--sky);outline-offset:-1px}
+.btn{padding:8px 16px;border-radius:var(--rsm);border:var(--bd);background:transparent;color:var(--tx);font-size:13px;cursor:pointer;font-family:inherit}
+.btn-primary{background:var(--navy);color:#fff;border-color:var(--navy)}
+.btn-sm{padding:5px 12px;font-size:12px}
+
+/* KPIs */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+@media(max-width:600px){.kpi-grid{grid-template-columns:repeat(2,1fr)}}
+.kpi{background:var(--card);border-radius:var(--rad);border:var(--bd);padding:16px;box-shadow:0 1px 4px rgba(27,58,107,.06)}
+.kpi-val{font-size:28px;font-weight:800;line-height:1}
+.kpi-lbl{font-size:11px;color:var(--tx2);margin-top:4px;text-transform:uppercase;letter-spacing:.05em}
+
+/* FILTERS */
+.filters{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px}
+.fpill{padding:5px 13px;border-radius:20px;border:var(--bd);font-size:12px;cursor:pointer;background:var(--card);color:var(--tx2);font-family:inherit;font-weight:500;white-space:nowrap}
+.fpill.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+.fpill.morning.active{background:var(--morning);border-color:var(--morning)}
+.fpill.afternoon.active{background:var(--afternoon);border-color:var(--afternoon)}
+.fpill.evening.active{background:var(--evening);border-color:var(--evening)}
+.fpill.green.active{background:var(--green-team);border-color:var(--green-team)}
+.fpill.blue.active{background:var(--blue-team);border-color:var(--blue-team)}
+.fpill.yellow.active{background:var(--yellow-team);border-color:var(--yellow-team);color:#fff}
+
+/* RECORDS */
+.rec{background:var(--card);border-radius:var(--rad);border:var(--bd);margin-bottom:10px;overflow:hidden;box-shadow:0 1px 4px rgba(27,58,107,.06)}
+.rec-hdr{padding:14px 16px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;cursor:pointer}
+.rec-hdr:hover{background:#f7fafb}
+.rec-body{border-top:var(--bd);padding:14px 16px;display:none}
+.rec-body.open{display:block}
+.arrow{font-size:14px;color:var(--tx2);flex-shrink:0;transition:transform .2s;margin-top:2px}
+.arrow.open{transform:rotate(180deg)}
+
+/* SHIFT/TEAM BADGES */
+.badge{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;border:1px solid transparent;white-space:nowrap;display:inline-block}
+.badge-morning{background:#FFF4E6;color:var(--morning);border-color:#FFD49A}
+.badge-afternoon{background:#EBF5FF;color:var(--afternoon);border-color:#9DD2FF}
+.badge-evening{background:#EEF2F9;color:var(--evening);border-color:#9AAFD4}
+.badge-green{background:#EAFAF1;color:var(--green-team);border-color:#A9DFBF}
+.badge-blue{background:#EBF5FF;color:var(--blue-team);border-color:#9DD2FF}
+.badge-yellow{background:#FFFBEC;color:var(--yellow-team);border-color:#F5D000}
+.badge-navy{background:#EEF3FA;color:var(--navy);border-color:#C5D3E8}
+.badge-teal{background:#E8F9F9;color:#007B7D;border-color:#A0D8D9}
+
+/* STOCK CHIPS */
+.stock-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.chip{background:var(--bg);border:var(--bd);border-radius:var(--rsm);padding:8px 12px;flex:1;min-width:70px;text-align:center}
+.chip-val{font-size:18px;font-weight:700;color:var(--navy)}
+.chip-lbl{font-size:10px;color:var(--tx2);text-transform:uppercase;margin-top:1px}
+.chip.result{background:#EEF3FA;border-color:#C5D3E8}
+
+/* HANDOVER ARROW */
+.handover-flow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;padding:10px 12px;background:var(--bg);border-radius:var(--rsm);border:var(--bd);font-size:13px}
+.handover-flow .arrow-lbl{font-size:11px;color:var(--tx2);font-weight:600;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:2px}
+.handover-flow .val{font-weight:600;color:var(--navy)}
+
+/* PHOTOS */
+.photo-section{margin-top:10px}
+.photo-section-title{font-size:11px;font-weight:700;color:var(--tx2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}
+.photo-grid-dash{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:7px}
+.photo-item{border-radius:var(--rsm);overflow:hidden;aspect-ratio:1;border:2px solid var(--teal);cursor:pointer;transition:.15s}
+.photo-item:hover{transform:scale(1.04);border-color:var(--sky)}
+.photo-item img{width:100%;height:100%;object-fit:cover;display:block}
+.no-photo{font-size:12px;color:var(--tx2);font-style:italic;margin-top:8px}
+
+/* NOTES */
+.notes-box{margin-top:10px;padding:10px 12px;background:var(--bg);border-radius:var(--rsm);border:var(--bd);font-size:13px;line-height:1.5;border-top:2px solid var(--yellow)}
+.handover-flow-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}
+@media(max-width:500px){.handover-flow-grid{grid-template-columns:1fr}}
+.hf-col{background:var(--bg);border:var(--bd);border-radius:var(--rsm);padding:8px 12px}
+.hf-lbl{font-size:10px;font-weight:700;color:var(--tx2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px}
+.hf-val{font-size:13px;font-weight:600;color:var(--navy)}
+.hf-arrow{color:var(--sky);font-weight:700;margin:0 4px}
+
+/* LIGHTBOX */
+#lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:200;align-items:center;justify-content:center}
+#lightbox.open{display:flex}
+#lightbox img{max-width:92vw;max-height:90vh;border-radius:var(--rad);object-fit:contain}
+#lb-close{position:absolute;top:14px;right:18px;color:#fff;font-size:30px;cursor:pointer;background:none;border:none;line-height:1;font-weight:300}
+#lb-info{position:absolute;bottom:18px;color:rgba(255,255,255,.7);font-size:13px;text-align:center;padding:0 20px}
+
+/* EMAIL SETTINGS MODAL */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;align-items:center;justify-content:center}
+.overlay.open{display:flex}
+.modal{background:#fff;border-radius:var(--rad);padding:24px;width:min(440px,92vw);box-shadow:0 8px 40px rgba(0,0,0,.2)}
+.modal h3{font-size:16px;font-weight:700;color:var(--navy);margin-bottom:6px}
+.modal-sub{font-size:12px;color:var(--tx2);margin-bottom:16px}
+
+.empty{text-align:center;padding:3rem 1rem;color:var(--tx2)}
 
 </style>
 
@@ -307,9 +440,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
       <input type="hidden" id="shift" value="">
     </div>
 
-    <!-- Staff name + code -->
+    <!-- Staff name -->
     <div class="frow" style="margin-bottom:0">
-      <label class="lbl">Staff Name & Employee Code</label>
+      <label class="lbl">Staff Name &amp; Employee Code</label>
       <div style="display:grid;grid-template-columns:1fr auto;gap:8px">
         <input class="inp" id="staff" placeholder="Your full name" autocomplete="off" oninput="updateFromStaff()">
         <input class="inp" id="staff-code" placeholder="Emp. code" autocomplete="off" style="width:110px">
@@ -357,7 +490,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
         <div class="flow-box" id="from-staff-box" style="font-size:13px">–</div>
         <div class="flow-arrow">→</div>
         <div style="flex:1">
-          <div class="lbl" style="margin-bottom:6px">Receiving Staff Name & Code</div>
+          <div class="lbl" style="margin-bottom:6px">Receiving Staff Name &amp; Code</div>
           <div style="display:grid;grid-template-columns:1fr auto;gap:8px">
             <input class="inp" id="to-staff" placeholder="Receiving staff name" autocomplete="off">
             <input class="inp" id="to-staff-code" placeholder="Emp. code" autocomplete="off" style="width:110px">
@@ -367,44 +500,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
     </div>
   </div>
 
-  <!-- CATEGORY & BRAND -->
-  <div class="card">
-    <div class="card-title">Category & Brand</div>
-    <div class="row2">
-      <div class="frow">
-        <label class="lbl">Category</label>
-        <input class="inp" id="category" placeholder="e.g. Fragrances, Tobaccos" autocomplete="off">
-      </div>
-      <div class="frow">
-        <label class="lbl">Brand</label>
-        <input class="inp" id="brand" placeholder="e.g. Chanel, Dior, Marlboro" autocomplete="off">
-      </div>
+  <!-- CATEGORY, BRAND & STOCK COUNT -->
+  <div style="margin-bottom:16px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <div style="font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.07em">Category, Brand & Stock Count</div>
+      <button onclick="addItemRow()" style="padding:6px 16px;background:var(--navy);color:#fff;border:none;border-radius:var(--rsm);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">+ Add Row</button>
     </div>
-  </div>
-
-  <!-- STOCK COUNT -->
-  <div class="card">
-    <div class="card-title">Stock Count</div>
-    <div class="stock-grid">
-      <div class="stock-item">
-        <div class="stock-lbl">Display Stock</div>
-        <input class="stock-inp" id="display-stock" type="number" min="0" placeholder="0" oninput="calcHandover()">
-      </div>
-      <div class="stock-item">
-        <div class="stock-lbl">Delivery Stock</div>
-        <input class="stock-inp" id="delivery-stock" type="number" min="0" placeholder="0" oninput="calcHandover()">
-      </div>
-      <div class="stock-item">
-        <div class="stock-lbl">Sold</div>
-        <input class="stock-inp" id="sold" type="number" min="0" placeholder="0" oninput="calcHandover()">
-      </div>
-    </div>
-    <div class="formula-row">
-      <span style="font-size:12px;color:var(--tx2)">(Display + Delivery) − Sold =</span>
-      <span style="font-weight:700;color:var(--sky)">Handover Stock:</span>
-      <span class="handover-result" id="handover-val">–</span>
-      <span id="disc-badge"></span>
-    </div>
+    <div id="item-rows-wrap"></div>
   </div>
 
   <!-- PHOTO ATTACHMENTS -->
@@ -445,12 +547,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
 
 <script>
 // ── CONFIG (set by manager, never shown to staff) ──
-const RESEND_KEY = localStorage.getItem('cadf_resend_key') || '';
-const getRecipient = () => {
-  const raw = localStorage.getItem('cadf_recipient') || '';
-  // Support comma or semicolon separated emails
-  return raw.split(/[,;]/).map(e=>e.trim()).filter(e=>e);
-};
+const RESEND_KEY = localStorage.getItem('cadf_resend_key') || 're_dGbDGLew_CvoazEbN5YGjA5qLFxiSVzbe';
+const getRecipient = () => localStorage.getItem('cadf_recipient') || 'chokri.salmi@chalhoub.com';
 
 // ── DATE ──
 document.getElementById('hdr-date').textContent = new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
@@ -487,7 +585,7 @@ function selectTeam(val, el){
   el.classList.add('sel');
   // Update from-team box
   const fromBox=document.getElementById('from-team-box');
-  const icons={Green:'🟢',Blue:'🔵',Yellow:'🟡'};
+  const icons={Green:'🟢',Blue:'🔵',Yellow:'🟡',Red:'🔴'};
   fromBox.textContent=(icons[val]||'')+' '+val+' Team';
   fromBox.className='flow-box '+val.toLowerCase()+'-box';
   updateHandoverCard();
@@ -544,17 +642,58 @@ function updateFromStaff(){
   document.getElementById('from-staff-box').textContent=v||'–';
 }
 
-// ── STOCK CALC ──
-function calcHandover(){
-  const d=parseFloat(document.getElementById('display-stock').value)||0;
-  const dl=parseFloat(document.getElementById('delivery-stock').value)||0;
-  const s=parseFloat(document.getElementById('sold').value)||0;
-  const h=(d+dl)-s;
-  document.getElementById('handover-val').textContent=isNaN(h)?'–':h;
-  const badge=document.getElementById('disc-badge');
-  if(d||dl||s){
-    badge.innerHTML=h>=0?'<span class="disc-ok">✓ OK</span>':'<span class="disc-warn">⚠ Negative — check figures</span>';
-  }else badge.innerHTML='';
+// ── MULTI-ROW STOCK ──
+let rowId=0;
+function addStockRow(cat='',brand='',disp='',deliv='',sold=''){
+  rowId++;
+  const id=rowId;
+  const div=document.createElement('div');
+  div.className='sr-grid';div.id='sr-'+id;
+  div.innerHTML=`
+    <input class="inp" style="padding:7px 10px;font-size:13px" placeholder="Category" value="${cat}" oninput="recalc()">
+    <input class="inp" style="padding:7px 10px;font-size:13px" placeholder="Brand" value="${brand}" oninput="recalc()">
+    <input class="sn-inp" type="number" min="0" placeholder="0" value="${disp}" oninput="recalc()">
+    <input class="sn-inp" type="number" min="0" placeholder="0" value="${deliv}" oninput="recalc()">
+    <input class="sn-inp" type="number" min="0" placeholder="0" value="${sold}" oninput="recalc()">
+    <div class="hov-chip" id="hc-${id}">–</div>
+    <button class="del-btn" onclick="delRow(${id})">✕</button>`;
+  document.getElementById('stock-rows').appendChild(div);
+  recalc();
+}
+function delRow(id){
+  const el=document.getElementById('sr-'+id);
+  if(el)el.remove();
+  if(!document.getElementById('stock-rows').children.length)addStockRow();
+  recalc();
+}
+function recalc(){
+  let td=0,tdl=0,ts=0;
+  document.querySelectorAll('#stock-rows .sr-grid').forEach(row=>{
+    const ni=row.querySelectorAll('.sn-inp');
+    const d=parseFloat(ni[0]?.value)||0;
+    const dl=parseFloat(ni[1]?.value)||0;
+    const s=parseFloat(ni[2]?.value)||0;
+    const h=(d+dl)-s;
+    const chip=row.querySelector('[id^="hc-"]');
+    if(chip){chip.textContent=h;chip.className='hov-chip'+(h<0?' neg':'');}
+    td+=d;tdl+=dl;ts+=s;
+  });
+  document.getElementById('tot-display').textContent=td;
+  document.getElementById('tot-delivery').textContent=tdl;
+  document.getElementById('tot-sold').textContent=ts;
+  const th=td+tdl-ts;
+  const hEl=document.getElementById('tot-handover');
+  hEl.textContent=th;
+  hEl.style.color=th<0?'var(--red)':'var(--navy)';
+}
+function calcHandover(){recalc();}
+function getStockRows(){
+  return Array.from(document.querySelectorAll('#stock-rows .sr-grid')).map(row=>{
+    const ti=row.querySelectorAll('input:not(.sn-inp)');
+    const ni=row.querySelectorAll('.sn-inp');
+    const d=parseFloat(ni[0]?.value)||0,dl=parseFloat(ni[1]?.value)||0,s=parseFloat(ni[2]?.value)||0;
+    return{category:ti[0]?.value.trim()||'',brand:ti[1]?.value.trim()||'',display:d,delivery:dl,sold:s,handover:d+dl-s};
+  }).filter(r=>r.category||r.brand||r.display||r.delivery||r.sold);
 }
 
 // ── CONFIRM ──
@@ -565,46 +704,79 @@ function toggleConfirm(){
 }
 
 // ── SUBMIT ──
-function generateExcelContent(r){
-  const photoCount = r.photos && r.photos.length > 0
-    ? `${r.photos.length} photo(s) attached as separate files in this email`
-    : 'No photos attached';
+// ── ITEM ROWS (Category/Brand/Stock) ──
+let itemRowId = 0;
+function addItemRow(){
+  itemRowId++;
+  const id = itemRowId;
+  const wrap = document.getElementById('item-rows-wrap');
+  const div = document.createElement('div');
+  div.id = 'item-row-' + id;
+  div.style.cssText = 'position:relative;margin-bottom:12px;padding:14px;background:var(--card);border-radius:var(--rad);border:var(--bd);box-shadow:0 1px 4px rgba(27,58,107,.06)';
+  div.innerHTML = `
+    ${id > 1 ? `<button onclick="removeItemRow(${id})" style="position:absolute;top:10px;right:10px;background:transparent;border:1px solid var(--red);color:var(--red);border-radius:50%;width:22px;height:22px;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:inherit;padding:0">✕</button>` : ''}
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+      <div>
+        <label class="lbl">Category</label>
+        <input class="inp" id="category-${id}" placeholder="e.g. Fragrances, Tobaccos" autocomplete="off">
+      </div>
+      <div>
+        <label class="lbl">Brand</label>
+        <input class="inp" id="brand-${id}" placeholder="e.g. Chanel, Dior, Marlboro" autocomplete="off">
+      </div>
+    </div>
+    <div style="font-size:13px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px">Stock Count</div>
+    <div class="stock-grid">
+      <div class="stock-item">
+        <div class="stock-lbl">Display Stock</div>
+        <input class="stock-inp" id="display-${id}" type="number" min="0" placeholder="0" oninput="calcRow(${id})">
+      </div>
+      <div class="stock-item">
+        <div class="stock-lbl">Delivery Stock</div>
+        <input class="stock-inp" id="delivery-${id}" type="number" min="0" placeholder="0" oninput="calcRow(${id})">
+      </div>
+      <div class="stock-item">
+        <div class="stock-lbl">Sold</div>
+        <input class="stock-inp" id="sold-${id}" type="number" min="0" placeholder="0" oninput="calcRow(${id})">
+      </div>
+    </div>
+    <div class="formula-row" style="margin-top:10px">
+      <span style="font-size:12px;color:var(--tx2)">(Display + Delivery) − Sold =</span>
+      <span style="font-weight:700;color:var(--sky)">Handover Stock:</span>
+      <span class="handover-result" id="hov-${id}">–</span>
+      <span id="disc-${id}"></span>
+    </div>`;
+  wrap.appendChild(div);
+}
 
-  return `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
-<head><meta charset="UTF-8">
-<style>
-  table{border-collapse:collapse;font-family:Arial,sans-serif;font-size:11px}
-  th{background:#1B3A6B;color:#fff;padding:8px 12px;text-align:left;border:1px solid #ccc;white-space:nowrap}
-  td{padding:8px 12px;border:1px solid #ddd;vertical-align:middle}
-  .section{background:#EEF3FA;font-weight:bold;color:#1B3A6B;font-size:12px;padding:8px 12px}
-</style>
-</head><body>
-<h2 style="font-family:Arial;color:#1B3A6B;margin-bottom:4px">CADF Shift Handover Report</h2>
-<p style="font-family:Arial;font-size:12px;color:#666;margin-bottom:16px">${r.dateStr} at ${r.timeStr}</p>
-<table width="700">
-  <tr><td colspan="2" class="section">SHIFT INFORMATION</td></tr>
-  <tr><th>Terminal</th><td>${r.terminal||'–'}</td></tr>
-  <tr><th>Shift</th><td>${r.shift||'–'} Shift</td></tr>
-  <tr><th>Team</th><td>${r.team||'–'} Team</td></tr>
-  <tr><th>Staff Name</th><td>${r.fromStaff||r.staff||'–'}</td></tr>
-  <tr><td colspan="2" class="section">HANDOVER</td></tr>
-  <tr><th>Shift Handover</th><td>${r.fromShift||'–'} → ${r.toShift||'–'}</td></tr>
-  <tr><th>Team Handover</th><td>${r.fromTeam||r.team||'–'} Team → ${r.toTeam||'–'} Team</td></tr>
-  <tr><th>Staff Handover</th><td>${(r.fromStaff||r.staff||'–')}${r.fromStaffCode?' ('+r.fromStaffCode+')':''} → ${r.toStaff||'–'}${r.toStaffCode?' ('+r.toStaffCode+')':''}</td></tr>
-  <tr><td colspan="2" class="section">CATEGORY & BRAND</td></tr>
-  <tr><th>Category</th><td>${r.category||'–'}</td></tr>
-  <tr><th>Brand</th><td>${r.brand||'–'}</td></tr>
-  <tr><td colspan="2" class="section">STOCK COUNT</td></tr>
-  <tr><th>Display Stock</th><td>${r.display||0}</td></tr>
-  <tr><th>Delivery Stock</th><td>${r.delivery||0}</td></tr>
-  <tr><th>Sold</th><td>${r.sold||0}</td></tr>
-  <tr><th style="background:#1B3A6B">Handover Stock</th><td style="font-size:16px;font-weight:bold;color:#1B3A6B">${r.handover||0}</td></tr>
-  <tr><td colspan="2" class="section">COUNT PHOTOS</td></tr>
-  <tr><td colspan="2">${photoCount}</td></tr>
-  <tr><td colspan="2" class="section">NOTES</td></tr>
-  <tr><td colspan="2">${r.notes||'None'}</td></tr>
-</table>
-</body></html>`;
+function removeItemRow(id){
+  const el = document.getElementById('item-row-' + id);
+  if(el) el.remove();
+}
+
+function calcRow(id){
+  const d = parseFloat(document.getElementById('display-'+id)?.value)||0;
+  const dl = parseFloat(document.getElementById('delivery-'+id)?.value)||0;
+  const s = parseFloat(document.getElementById('sold-'+id)?.value)||0;
+  const h = (d+dl)-s;
+  const hEl = document.getElementById('hov-'+id);
+  const dEl = document.getElementById('disc-'+id);
+  if(hEl) hEl.textContent = isNaN(h) ? '–' : h;
+  if(dEl) dEl.innerHTML = (d||dl||s) ? (h>=0 ? '<span class="disc-ok">✓ OK</span>' : '<span class="disc-warn">⚠ Negative</span>') : '';
+}
+
+function getAllItemRows(){
+  const rows = [];
+  document.querySelectorAll('[id^="item-row-"]').forEach(row => {
+    const id = row.id.replace('item-row-','');
+    const cat = document.getElementById('category-'+id)?.value.trim()||'';
+    const brand = document.getElementById('brand-'+id)?.value.trim()||'';
+    const d = parseFloat(document.getElementById('display-'+id)?.value)||0;
+    const dl = parseFloat(document.getElementById('delivery-'+id)?.value)||0;
+    const s = parseFloat(document.getElementById('sold-'+id)?.value)||0;
+    rows.push({id, category:cat, brand, display:d, delivery:dl, sold:s, handover:d+dl-s});
+  });
+  return rows;
 }
 
 async function submitHandover(){
@@ -614,8 +786,6 @@ async function submitHandover(){
   const staff=document.getElementById('staff').value.trim();
   const toTeam=document.getElementById('to-team').value;
   const toStaff=document.getElementById('to-staff').value.trim();
-  const staffCode=document.getElementById('staff-code').value.trim();
-  const toStaffCode=document.getElementById('to-staff-code').value.trim();
   const display=document.getElementById('display-stock').value;
   const delivery=document.getElementById('delivery-stock').value;
   const sold=document.getElementById('sold').value;
@@ -627,12 +797,10 @@ async function submitHandover(){
   if(!staff){showStatus('err','Please enter your name.');return;}
   if(!toTeam){showStatus('err','Please select the team you are handing over to.');return;}
   if(!toStaff){showStatus('err','Please enter the receiving staff name.');return;}
-  if(!staffCode){showStatus('err','Please enter your employee code.');return;}
-  if(!toStaffCode){showStatus('err','Please enter the receiving staff employee code.');return;}
-  if(!display&&!delivery&&!sold){showStatus('err','Please enter stock counts.');return;}
+  if(stockRows.length===0||(!display&&!delivery&&!sold)){showStatus('err','Please add at least one stock count row.');return;}
   if(!document.getElementById('confirm-check').checked){showStatus('err','Please confirm the stock count before submitting.');return;}
 
-  const handover=(parseFloat(display)||0)+(parseFloat(delivery)||0)-(parseFloat(sold)||0);
+  const handover=display+delivery-sold;
   const now=new Date();
   const dateStr=now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   const timeStr=now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
@@ -644,9 +812,8 @@ async function submitHandover(){
   const brand=document.getElementById('brand').value.trim();
   const record={
     id:Date.now(),date:now.toISOString(),dateStr,timeStr,
-    terminal,team,shift,staff,staffCode,fromShift,toShift,
+    terminal,team,shift,staff,fromShift,toShift,
     fromTeam:team,toTeam,fromStaff:staff,toStaff,
-    fromStaffCode:staffCode,toStaffCode,
     category,brand,
     display:parseFloat(display)||0,
     delivery:parseFloat(delivery)||0,
@@ -677,20 +844,13 @@ HANDOVER
 ────────
 Shift:  ${fromShift} → ${toShift}
 Team:   ${team} Team → ${toTeam} Team
-Staff:  ${staff}${staffCode?' ('+staffCode+')':''} → ${toStaff}${toStaffCode?' ('+toStaffCode+')':''}
+Staff:  ${staff} → ${toStaff}
 
-CATEGORY & BRAND
-────────────────
-Category: ${category||'–'}
-Brand:    ${brand||'–'}
-
-STOCK COUNT
-───────────
-Display Stock:  ${display||0}
-Delivery Stock: ${delivery||0}
-Sold:           ${sold||0}
-────────────────
-Handover Stock: ${handover}
+STOCK COUNT BY CATEGORY
+───────────────────────
+${stockRows.map((r,i)=>`Row ${i+1}: ${r.category||'–'} / ${r.brand||'–'} | Display:${r.display} Delivery:${r.delivery} Sold:${r.sold} → Handover:${r.handover}`).join('\n')}
+───────────────────────
+TOTAL Handover Stock: ${handover}
 
 PHOTOS
 ──────
@@ -703,17 +863,7 @@ ${notes||'None'}
 Submitted via CADF Handover App`;
 
   try{
-    const key=localStorage.getItem('cadf_resend_key')||'';
-    // Generate Excel attachment
-    const excelContent = generateExcelContent(record);
-    const excelB64 = btoa(unescape(encodeURIComponent(excelContent)));
-
-    // Attach photos as separate JPEG files
-    const photoAttachments = (record.photos||[]).map((p, i) => ({
-      filename: `photo_${i+1}_${terminal}_${shift}_${team}.jpg`,
-      content: p.split(',')[1] // strip data:image/jpeg;base64, prefix
-    }));
-
+    const key=localStorage.getItem('cadf_resend_key')||'re_dGbDGLew_CvoazEbN5YGjA5qLFxiSVzbe';
     const res=await fetch('https://cadf-email-proxy.chokri-salmi.workers.dev',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
@@ -721,14 +871,7 @@ Submitted via CADF Handover App`;
         apiKey:key,
         to:getRecipient(),
         subject:`CADF Handover — ${shift} Shift — ${terminal} — ${team} Team — ${dateStr}`,
-        text:emailBody,
-        attachments:[
-          {
-            filename:`CADF_Handover_${terminal}_${shift}_${team}_${now.toISOString().slice(0,10)}.xls`,
-            content:excelB64
-          },
-          ...photoAttachments
-        ]
+        text:emailBody
       })
     });
     const data=await res.json();
@@ -752,17 +895,16 @@ function resetForm(){
     document.getElementById('team').value='';
     document.getElementById('shift').value='';
     document.getElementById('staff').value='';
-    document.getElementById('category').value='';
-    document.getElementById('brand').value='';
-    document.getElementById('staff-code').value='';
+    document.getElementById('stock-rows').innerHTML='';
+    rowId=0;
+    addStockRow();
+    addStockRow();
+    recalc();
     document.getElementById('to-team').value='';
     document.getElementById('to-staff').value='';
-    document.getElementById('to-staff-code').value='';
     document.getElementById('handover-card').style.display='none';
     document.querySelectorAll('#to-team-pills .team-pill').forEach(p=>p.classList.remove('sel'));
-    document.getElementById('display-stock').value='';
-    document.getElementById('delivery-stock').value='';
-    document.getElementById('sold').value='';
+
     document.getElementById('notes').value='';
     document.getElementById('confirm-check').checked=false;
     document.getElementById('handover-val').textContent='–';
@@ -1208,6 +1350,12 @@ function routePanel() {
   }
 }
 routePanel();
+if(document.getElementById('item-rows-wrap')){addItemRow();}
+// Init stock rows for staff panel
+if(document.getElementById('stock-rows')){
+  addStockRow();
+  addStockRow();
+}
 </script>
 
 <!-- STAFF SCRIPTS -->
@@ -1369,11 +1517,12 @@ async function submitHandover(){
   const toStaff=document.getElementById('to-staff').value.trim();
   const staffCode=document.getElementById('staff-code').value.trim();
   const toStaffCode=document.getElementById('to-staff-code').value.trim();
-  const category=document.getElementById('category').value.trim();
-  const brand=document.getElementById('brand').value.trim();
-  const display=document.getElementById('display-stock').value;
-  const delivery=document.getElementById('delivery-stock').value;
-  const sold=document.getElementById('sold').value;
+  const stockRows = getStockRows();
+  const category = stockRows.map(r=>r.category).filter(Boolean).join(', ') || '–';
+  const brand = stockRows.map(r=>r.brand).filter(Boolean).join(', ') || '–';
+  const display = stockRows.reduce((a,r)=>a+r.display,0);
+  const delivery = stockRows.reduce((a,r)=>a+r.delivery,0);
+  const sold = stockRows.reduce((a,r)=>a+r.sold,0);
   const notes=document.getElementById('notes').value.trim();
 
   if(!terminal){showStatus('err','Please select a terminal.');return;}
@@ -1384,10 +1533,10 @@ async function submitHandover(){
   if(!toStaff){showStatus('err','Please enter the receiving staff name.');return;}
   if(!staffCode){showStatus('err','Please enter your employee code.');return;}
   if(!toStaffCode){showStatus('err','Please enter the receiving staff employee code.');return;}
-  if(!display&&!delivery&&!sold){showStatus('err','Please enter stock counts.');return;}
+  if(stockRows.length===0){showStatus('err','Please add at least one stock count row.');return;}
   if(!document.getElementById('confirm-check').checked){showStatus('err','Please confirm the stock count before submitting.');return;}
 
-  const handover=(parseFloat(display)||0)+(parseFloat(delivery)||0)-(parseFloat(sold)||0);
+  const handover=(display)+(delivery)-(sold);
   const now=new Date();
   const dateStr=now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   const timeStr=now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
@@ -1399,7 +1548,7 @@ async function submitHandover(){
     terminal,team,shift,staff,staffCode,fromShift,toShift,
     fromTeam:team,toTeam,fromStaff:staff,toStaff,
     fromStaffCode:staffCode,toStaffCode,
-    category,brand,
+    category,brand,stockRows,
     display:parseFloat(display)||0,
     delivery:parseFloat(delivery)||0,
     sold:parseFloat(sold)||0,
@@ -1429,18 +1578,12 @@ Shift:  ${fromShift} → ${toShift}
 Team:   ${team} Team → ${toTeam} Team
 Staff:  ${staff}${staffCode?' ('+staffCode+')':''} → ${toStaff}${toStaffCode?' ('+toStaffCode+')':''}
 
-CATEGORY & BRAND
-────────────────
-Category: ${category||'–'}
-Brand:    ${brand||'–'}
-
-STOCK COUNT
-───────────
-Display Stock:  ${display||0}
-Delivery Stock: ${delivery||0}
-Sold:           ${sold||0}
-────────────────
-Handover Stock: ${handover}
+STOCK COUNT BY CATEGORY
+───────────────────────
+${stockRows.map((r,i)=>`Row ${i+1}: ${r.category||'–'} / ${r.brand||'–'}
+  Display: ${r.display} | Delivery: ${r.delivery} | Sold: ${r.sold} | Handover: ${r.handover}`).join('\n')}
+───────────────────────
+TOTAL Handover Stock: ${handover}
 
 PHOTOS
 ──────
@@ -1499,15 +1642,14 @@ function resetForm(){
     document.getElementById('team').value='';
     document.getElementById('shift').value='';
     document.getElementById('staff').value='';
-    document.getElementById('category').value='';
-    document.getElementById('brand').value='';
+    document.getElementById('stock-rows').innerHTML='';
+    rowCount=0;
+    addStockRow();
     document.getElementById('staff-code').value='';
     document.getElementById('to-team').value='';
     document.getElementById('to-staff').value='';
     document.getElementById('to-staff-code').value='';
-    document.getElementById('display-stock').value='';
-    document.getElementById('delivery-stock').value='';
-    document.getElementById('sold').value='';
+
     document.getElementById('notes').value='';
     document.getElementById('confirm-check').checked=false;
     document.getElementById('handover-val').textContent='–';
