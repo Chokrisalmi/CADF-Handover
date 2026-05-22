@@ -105,7 +105,7 @@ select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns
 .btn-submit.sent{background:#27AE60}
 
 textarea.inp{min-height:80px;resize:vertical;line-height:1.5}
-.sr-grid{display:grid;grid-template-columns:1fr 1fr 68px 68px 60px 68px 26px;gap:5px;margin-bottom:5px;align-items:center}
+/*.sr-grid-removed*/.sr-grid-x{display:grid;grid-template-columns:1fr 1fr 68px 68px 60px 68px 26px;gap:5px;margin-bottom:5px;align-items:center}
 .sn-inp{width:100%;padding:7px 4px;border:var(--bd);border-radius:var(--rsm);font-size:13px;font-weight:600;color:var(--navy);font-family:inherit;text-align:center;background:#fff}
 .sn-inp:focus{outline:2px solid var(--sky);outline-offset:-1px}
 .hov-chip{border-radius:var(--rsm);padding:7px 2px;font-size:13px;font-weight:800;text-align:center;background:#EEF3FA;border:1px solid #C5D3E8;color:var(--navy)}
@@ -502,9 +502,32 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
 
   <!-- CATEGORY, BRAND & STOCK COUNT -->
   <div style="margin-bottom:16px">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-      <div style="font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.07em">Category, Brand & Stock Count</div>
-      <button onclick="addItemRow()" style="padding:6px 16px;background:var(--navy);color:#fff;border:none;border-radius:var(--rsm);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">+ Add Row</button>
+
+    <!-- Saved catalog management -->
+    <div class="card" style="margin-bottom:10px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div class="card-title" style="margin:0">Saved Categories &amp; Brands</div>
+        <button type="button" onclick="showAddCatalogForm()" style="padding:5px 12px;background:var(--navy);color:#fff;border:none;border-radius:var(--rsm);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">+ Add</button>
+      </div>
+      <div id="catalog-list" style="margin-bottom:8px"></div>
+      <!-- Add new catalog item form (hidden by default) -->
+      <div id="catalog-form" style="display:none;background:var(--bg);border-radius:var(--rsm);padding:10px;border:var(--bd)">
+        <div class="row2" style="margin-bottom:8px">
+          <div><label class="lbl">Category</label>
+            <input class="inp" id="new-cat" placeholder="e.g. Fragrances" autocomplete="off"></div>
+          <div><label class="lbl">Brand</label>
+            <input class="inp" id="new-brd" placeholder="e.g. Chanel" autocomplete="off"></div>
+        </div>
+        <div style="display:flex;gap:8px;justify-content:flex-end">
+          <button type="button" onclick="hideCatalogForm()" style="padding:5px 14px;background:transparent;border:var(--bd);border-radius:var(--rsm);font-size:12px;cursor:pointer;font-family:inherit">Cancel</button>
+          <button type="button" onclick="saveCatalogItem()" style="padding:5px 14px;background:var(--navy);color:#fff;border:none;border-radius:var(--rsm);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stock count rows (auto-populated from saved catalog) -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+      <div class="card-title" style="margin:0">Stock Count</div>
     </div>
     <div id="item-rows-wrap"></div>
   </div>
@@ -642,50 +665,7 @@ function updateFromStaff(){
   document.getElementById('from-staff-box').textContent=v||'–';
 }
 
-// ── MULTI-ROW STOCK ──
-let rowId=0;
-function addStockRow(cat='',brand='',disp='',deliv='',sold=''){
-  rowId++;
-  const id=rowId;
-  const div=document.createElement('div');
-  div.className='sr-grid';div.id='sr-'+id;
-  div.innerHTML=`
-    <input class="inp" style="padding:7px 10px;font-size:13px" placeholder="Category" value="${cat}" oninput="recalc()">
-    <input class="inp" style="padding:7px 10px;font-size:13px" placeholder="Brand" value="${brand}" oninput="recalc()">
-    <input class="sn-inp" type="number" min="0" placeholder="0" value="${disp}" oninput="recalc()">
-    <input class="sn-inp" type="number" min="0" placeholder="0" value="${deliv}" oninput="recalc()">
-    <input class="sn-inp" type="number" min="0" placeholder="0" value="${sold}" oninput="recalc()">
-    <div class="hov-chip" id="hc-${id}">–</div>
-    <button class="del-btn" onclick="delRow(${id})">✕</button>`;
-  document.getElementById('stock-rows').appendChild(div);
-  recalc();
-}
-function delRow(id){
-  const el=document.getElementById('sr-'+id);
-  if(el)el.remove();
-  if(!document.getElementById('stock-rows').children.length)addStockRow();
-  recalc();
-}
-function recalc(){
-  let td=0,tdl=0,ts=0;
-  document.querySelectorAll('#stock-rows .sr-grid').forEach(row=>{
-    const ni=row.querySelectorAll('.sn-inp');
-    const d=parseFloat(ni[0]?.value)||0;
-    const dl=parseFloat(ni[1]?.value)||0;
-    const s=parseFloat(ni[2]?.value)||0;
-    const h=(d+dl)-s;
-    const chip=row.querySelector('[id^="hc-"]');
-    if(chip){chip.textContent=h;chip.className='hov-chip'+(h<0?' neg':'');}
-    td+=d;tdl+=dl;ts+=s;
-  });
-  document.getElementById('tot-display').textContent=td;
-  document.getElementById('tot-delivery').textContent=tdl;
-  document.getElementById('tot-sold').textContent=ts;
-  const th=td+tdl-ts;
-  const hEl=document.getElementById('tot-handover');
-  hEl.textContent=th;
-  hEl.style.color=th<0?'var(--red)':'var(--navy)';
-}
+
 function calcHandover(){recalc();}
 function getStockRows(){
   return Array.from(document.querySelectorAll('#stock-rows .sr-grid')).map(row=>{
@@ -704,80 +684,225 @@ function toggleConfirm(){
 }
 
 // ── SUBMIT ──
-// ── ITEM ROWS (Category/Brand/Stock) ──
+
+// ── SAVED CATALOG & ITEM ROWS ──
 let itemRowId = 0;
-function addItemRow(){
-  itemRowId++;
-  const id = itemRowId;
+
+// Load saved catalog from localStorage
+function getCatalog() {
+  try { return JSON.parse(localStorage.getItem('cadf_catalog') || '[]'); } catch(e) { return []; }
+}
+function saveCatalog(cat) {
+  localStorage.setItem('cadf_catalog', JSON.stringify(cat));
+}
+
+// Render the saved catalog list
+function renderCatalogList() {
+  const catalog = getCatalog();
+  const el = document.getElementById('catalog-list');
+  if (!el) return;
+  if (!catalog.length) {
+    el.innerHTML = '<div style="font-size:12px;color:var(--tx2);text-align:center;padding:8px">No items saved yet. Click + Add to add your first category &amp; brand.</div>';
+    return;
+  }
+  // Group by category
+  const grouped = {};
+  const order = [];
+  catalog.forEach(function(item, i) {
+    if (!grouped[item.category]) { grouped[item.category] = []; order.push(item.category); }
+    grouped[item.category].push({ brand: item.brand, index: i });
+  });
+  let html2 = '';
+  order.forEach(function(cat) {
+    html2 += '<div style="margin-bottom:8px">'
+      + '<div style="font-size:10px;font-weight:800;color:var(--navy);text-transform:uppercase;letter-spacing:.07em;padding:3px 8px;background:#EEF3FA;border-radius:4px;margin-bottom:4px">' + cat + '</div>';
+    grouped[cat].forEach(function(item) {
+      html2 += '<div style="display:flex;align-items:center;justify-content:space-between;padding:5px 8px;background:var(--bg);border-radius:var(--rsm);margin-bottom:3px;border:var(--bd)">'
+        + '<span style="font-size:12px;color:var(--tx2)">🏷️ ' + item.brand + '</span>'
+        + '<button type="button" onclick="removeCatalogItem(' + item.index + ')" style="background:transparent;border:none;color:var(--red);font-size:16px;cursor:pointer;padding:0 4px;line-height:1">&times;</button>'
+        + '</div>';
+    });
+    html2 += '</div>';
+  });
+  el.innerHTML = html2;
+}
+
+function showAddCatalogForm() {
+  document.getElementById('catalog-form').style.display = 'block';
+  document.getElementById('new-cat').focus();
+}
+function hideCatalogForm() {
+  document.getElementById('catalog-form').style.display = 'none';
+  document.getElementById('new-cat').value = '';
+  document.getElementById('new-brd').value = '';
+}
+function saveCatalogItem() {
+  const cat = document.getElementById('new-cat').value.trim();
+  const brd = document.getElementById('new-brd').value.trim();
+  if (!cat || !brd) { alert('Please enter both Category and Brand.'); return; }
+  const catalog = getCatalog();
+  catalog.push({ category: cat, brand: brd });
+  saveCatalog(catalog);
+  hideCatalogForm();
+  renderCatalogList();
+  buildStockRows();
+}
+function removeCatalogItem(index) {
+  if (!confirm('Remove this item from the saved list?')) return;
+  const catalog = getCatalog();
+  catalog.splice(index, 1);
+  saveCatalog(catalog);
+  renderCatalogList();
+  buildStockRows();
+}
+
+// Build stock count rows grouped by category
+// Shows previous shift handover as locked reference above each row
+function buildStockRows() {
   const wrap = document.getElementById('item-rows-wrap');
-  const div = document.createElement('div');
-  div.id = 'item-row-' + id;
-  div.style.cssText = 'position:relative;margin-bottom:12px;padding:14px;background:var(--card);border-radius:var(--rad);border:var(--bd);box-shadow:0 1px 4px rgba(27,58,107,.06)';
-  div.innerHTML = `
-    ${id > 1 ? `<button onclick="removeItemRow(${id})" style="position:absolute;top:10px;right:10px;background:transparent;border:1px solid var(--red);color:var(--red);border-radius:50%;width:22px;height:22px;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:inherit;padding:0">✕</button>` : ''}
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
-      <div>
-        <label class="lbl">Category</label>
-        <input class="inp" id="category-${id}" placeholder="e.g. Fragrances, Tobaccos" autocomplete="off">
-      </div>
-      <div>
-        <label class="lbl">Brand</label>
-        <input class="inp" id="brand-${id}" placeholder="e.g. Chanel, Dior, Marlboro" autocomplete="off">
-      </div>
-    </div>
-    <div style="font-size:13px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px">Stock Count</div>
-    <div class="stock-grid">
-      <div class="stock-item">
-        <div class="stock-lbl">Display Stock</div>
-        <input class="stock-inp" id="display-${id}" type="number" min="0" placeholder="0" oninput="calcRow(${id})">
-      </div>
-      <div class="stock-item">
-        <div class="stock-lbl">Delivery Stock</div>
-        <input class="stock-inp" id="delivery-${id}" type="number" min="0" placeholder="0" oninput="calcRow(${id})">
-      </div>
-      <div class="stock-item">
-        <div class="stock-lbl">Sold</div>
-        <input class="stock-inp" id="sold-${id}" type="number" min="0" placeholder="0" oninput="calcRow(${id})">
-      </div>
-    </div>
-    <div class="formula-row" style="margin-top:10px">
-      <span style="font-size:12px;color:var(--tx2)">(Display + Delivery) − Sold =</span>
-      <span style="font-weight:700;color:var(--sky)">Handover Stock:</span>
-      <span class="handover-result" id="hov-${id}">–</span>
-      <span id="disc-${id}"></span>
-    </div>`;
-  wrap.appendChild(div);
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  itemRowId = 0;
+  const catalog = getCatalog();
+  if (!catalog.length) {
+    wrap.innerHTML = '<div style="font-size:12px;color:var(--tx2);text-align:center;padding:12px;background:var(--card);border-radius:var(--rad);border:var(--bd)">Add categories &amp; brands above — stock count rows will appear here automatically.</div>';
+    return;
+  }
+
+  // Get previous handover for selected terminal
+  const terminal = document.getElementById('terminal') ? document.getElementById('terminal').value : '';
+  let prevHandover = null;
+  if (terminal) {
+    try { prevHandover = JSON.parse(localStorage.getItem('cadf_last_handover_' + terminal)); } catch(e) {}
+  }
+
+  // Build prev handover lookup: category+brand -> handover qty
+  const prevMap = {};
+  if (prevHandover && prevHandover.rows) {
+    prevHandover.rows.forEach(function(r) {
+      prevMap[(r.category + '|' + r.brand).toLowerCase()] = r;
+    });
+  }
+
+  // Group catalog by category
+  const grouped = {};
+  const order = [];
+  catalog.forEach(function(item) {
+    if (!grouped[item.category]) { grouped[item.category] = []; order.push(item.category); }
+    grouped[item.category].push(item.brand);
+  });
+
+  // Build one card per category
+  order.forEach(function(category) {
+    const brands = grouped[category];
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.style.marginBottom = '12px';
+
+    let innerHtml = '<div style="font-size:13px;font-weight:800;color:var(--navy);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid var(--sky)">'
+      + category + '</div>';
+
+    brands.forEach(function(brand) {
+      itemRowId++;
+      const id = itemRowId;
+      const key = (category + '|' + brand).toLowerCase();
+      const prev = prevMap[key];
+
+      // Previous handover reference (locked, read-only)
+      let prevHtml = '';
+      if (prevHandover && prev !== undefined) {
+        const qty = prev ? prev.handover : 0;
+        const color = qty < 0 ? '#E8344A' : qty === 0 ? '#aaa' : '#1B3A6B';
+        prevHtml = '<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:#EEF3FA;border-radius:6px;margin-bottom:10px;border:1px solid #C5D3E8">'
+          + '<span style="font-size:10px;font-weight:700;color:#5a7080;text-transform:uppercase;letter-spacing:.06em">Previous handover (' + (prevHandover.shift||'') + ' — ' + (prevHandover.team||'') + ' Team — ' + (prevHandover.time||'') + '):</span>'
+          + '<span style="font-size:16px;font-weight:800;color:' + color + ';margin-left:auto">' + qty + '</span>'
+          + '<span style="font-size:10px;color:#5a7080">units</span>'
+          + '<span style="font-size:9px;color:#aaa;margin-left:4px">🔒</span>'
+          + '</div>';
+      }
+
+      innerHtml +=
+        '<div style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid #E0E8F0">'
+        + '<div style="font-size:12px;font-weight:600;color:var(--tx2);margin-bottom:8px">🏷️ ' + brand + '</div>'
+        + prevHtml
+        + '<div class="stock-grid">'
+        +   '<div class="stock-item"><div class="stock-lbl">Display Stock</div>'
+        +     '<input class="stock-inp" id="dsp-' + id + '" type="number" min="0" value="0" oninput="calcRow(' + id + ')"></div>'
+        +   '<div class="stock-item"><div class="stock-lbl">Delivery Stock</div>'
+        +     '<input class="stock-inp" id="dlv-' + id + '" type="number" min="0" value="0" oninput="calcRow(' + id + ')"></div>'
+        +   '<div class="stock-item"><div class="stock-lbl">Sold</div>'
+        +     '<input class="stock-inp" id="sld-' + id + '" type="number" min="0" value="0" oninput="calcRow(' + id + ')"></div>'
+        + '</div>'
+        + '<div class="formula-row" style="margin-top:8px">'
+        +   '<span style="font-size:11px;color:var(--tx2)">(Display + Delivery) &minus; Sold =</span>'
+        +   '<span style="font-weight:700;color:var(--sky);font-size:12px">Handover:</span>'
+        +   '<span class="handover-result" id="hov-' + id + '">0</span>'
+        +   '<span id="dsc-' + id + '"></span>'
+        + '</div>'
+        + '</div>';
+    });
+
+    card.innerHTML = innerHtml;
+    wrap.appendChild(card);
+  });
 }
 
-function removeItemRow(id){
-  const el = document.getElementById('item-row-' + id);
-  if(el) el.remove();
+// Rebuild rows when terminal changes (to load correct previous handover)
+document.addEventListener('DOMContentLoaded', function() {
+  const termSelect = document.getElementById('terminal');
+  if (termSelect) {
+    termSelect.addEventListener('change', function() {
+      buildStockRows();
+    });
+  }
+});
+
+function addItemRow(category, brand) {
+  // Used only internally by buildStockRows
+  buildStockRows();
 }
 
-function calcRow(id){
-  const d = parseFloat(document.getElementById('display-'+id)?.value)||0;
-  const dl = parseFloat(document.getElementById('delivery-'+id)?.value)||0;
-  const s = parseFloat(document.getElementById('sold-'+id)?.value)||0;
-  const h = (d+dl)-s;
-  const hEl = document.getElementById('hov-'+id);
-  const dEl = document.getElementById('disc-'+id);
-  if(hEl) hEl.textContent = isNaN(h) ? '–' : h;
-  if(dEl) dEl.innerHTML = (d||dl||s) ? (h>=0 ? '<span class="disc-ok">✓ OK</span>' : '<span class="disc-warn">⚠ Negative</span>') : '';
+function calcRow(id) {
+  const d  = parseFloat(document.getElementById('dsp-' + id) ? document.getElementById('dsp-' + id).value : 0) || 0;
+  const dl = parseFloat(document.getElementById('dlv-' + id) ? document.getElementById('dlv-' + id).value : 0) || 0;
+  const s  = parseFloat(document.getElementById('sld-' + id) ? document.getElementById('sld-' + id).value : 0) || 0;
+  const h  = (d + dl) - s;
+  const hEl = document.getElementById('hov-' + id);
+  const dEl = document.getElementById('dsc-' + id);
+  if (hEl) hEl.textContent = h;
+  if (dEl) dEl.innerHTML = (d || dl || s)
+    ? (h >= 0 ? '<span class="disc-ok">&#10003; OK</span>' : '<span class="disc-warn">&#9888; Negative</span>')
+    : '';
 }
 
-function getAllItemRows(){
+function getAllItemRows() {
+  const catalog = getCatalog();
+  // Group catalog by category to match how rows were built
+  const grouped = {};
+  const order = [];
+  catalog.forEach(function(item) {
+    if (!grouped[item.category]) { grouped[item.category] = []; order.push(item.category); }
+    grouped[item.category].push(item.brand);
+  });
   const rows = [];
-  document.querySelectorAll('[id^="item-row-"]').forEach(row => {
-    const id = row.id.replace('item-row-','');
-    const cat = document.getElementById('category-'+id)?.value.trim()||'';
-    const brand = document.getElementById('brand-'+id)?.value.trim()||'';
-    const d = parseFloat(document.getElementById('display-'+id)?.value)||0;
-    const dl = parseFloat(document.getElementById('delivery-'+id)?.value)||0;
-    const s = parseFloat(document.getElementById('sold-'+id)?.value)||0;
-    rows.push({id, category:cat, brand, display:d, delivery:dl, sold:s, handover:d+dl-s});
+  let rowNum = 0;
+  order.forEach(function(category) {
+    grouped[category].forEach(function(brand) {
+      rowNum++;
+      const d  = parseFloat(document.getElementById('dsp-' + rowNum) ? document.getElementById('dsp-' + rowNum).value : 0) || 0;
+      const dl = parseFloat(document.getElementById('dlv-' + rowNum) ? document.getElementById('dlv-' + rowNum).value : 0) || 0;
+      const s  = parseFloat(document.getElementById('sld-' + rowNum) ? document.getElementById('sld-' + rowNum).value : 0) || 0;
+      rows.push({ category: category, brand: brand, display: d, delivery: dl, sold: s, handover: d + dl - s });
+    });
   });
   return rows;
 }
+
+// Init on DOM ready
+document.addEventListener('DOMContentLoaded', function() {
+  renderCatalogList();
+  buildStockRows();
+});
 
 async function submitHandover(){
   const terminal=document.getElementById('terminal').value;
@@ -786,29 +911,23 @@ async function submitHandover(){
   const staff=document.getElementById('staff').value.trim();
   const toTeam=document.getElementById('to-team').value;
   const toStaff=document.getElementById('to-staff').value.trim();
-  const staffCode=document.getElementById('staff-code').value.trim();
-  const toStaffCode=document.getElementById('to-staff-code').value.trim();
+  const staffCode=document.getElementById('staff-code')?document.getElementById('staff-code').value.trim():'';
+  const toStaffCode=document.getElementById('to-staff-code')?document.getElementById('to-staff-code').value.trim():'';
+  const display=document.getElementById('display-stock').value;
+  const delivery=document.getElementById('delivery-stock').value;
+  const sold=document.getElementById('sold').value;
   const notes=document.getElementById('notes').value.trim();
 
-  // Validation with clear messages
-  if(!terminal){showStatus('err','⚠️ Please select a Terminal.');window.scrollTo({top:0,behavior:'smooth'});return;}
-  if(!team){showStatus('err','⚠️ Please select your Team (Green / Blue / Yellow / Red).');window.scrollTo({top:0,behavior:'smooth'});return;}
-  if(!shift){showStatus('err','⚠️ Please select your Shift (Morning / Afternoon / Evening).');window.scrollTo({top:0,behavior:'smooth'});return;}
-  if(!staff){showStatus('err','⚠️ Please enter your Staff Name.');return;}
-  if(!staffCode){showStatus('err','⚠️ Please enter your Employee Code.');return;}
-  if(!toTeam){showStatus('err','⚠️ Please select the Handover To Team.');return;}
+  if(!terminal){showStatus('err','Please select a terminal.');return;}
+  if(!team){showStatus('err','Please select a team.');return;}
+  if(!shift){showStatus('err','Please select a shift.');return;}
+  if(!staff){showStatus('err','Please enter your name.');return;}
+  if(!toTeam){showStatus('err','Please select the team you are handing over to.');return;}
   if(!toStaff){showStatus('err','⚠️ Please enter the Receiving Staff Name.');return;}
+  if(!staffCode){showStatus('err','⚠️ Please enter your Employee Code.');return;}
   if(!toStaffCode){showStatus('err','⚠️ Please enter the Receiving Staff Employee Code.');return;}
-
-  const allRows = getAllItemRows();
-  const category = allRows.map(r=>r.category).filter(Boolean).join(', ') || '–';
-  const brand = allRows.map(r=>r.brand).filter(Boolean).join(', ') || '–';
-  const display = allRows.reduce((a,r)=>a+r.display,0);
-  const delivery = allRows.reduce((a,r)=>a+r.delivery,0);
-  const sold = allRows.reduce((a,r)=>a+r.sold,0);
-
-  if(!allRows.length||(display===0&&delivery===0&&sold===0)){showStatus('err','⚠️ Please enter stock counts in at least one row.');return;}
-  if(!document.getElementById('confirm-check').checked){showStatus('err','⚠️ Please tick the confirmation checkbox before submitting.');return;}
+  if(stockRows.length===0||(!display&&!delivery&&!sold)){showStatus('err','Please add at least one stock count row.');return;}
+  if(!document.getElementById('confirm-check').checked){showStatus('err','Please confirm the stock count before submitting.');return;}
 
   const handover=display+delivery-sold;
   const now=new Date();
@@ -834,6 +953,14 @@ async function submitHandover(){
   const all=JSON.parse(localStorage.getItem('cadf_handovers')||'[]');
   all.unshift(record);
   localStorage.setItem('cadf_handovers',JSON.stringify(all.slice(0,200)));
+  // Save last handover stock per terminal for next shift reference
+  if(terminal && allRows.length){
+    const lastHandover = {
+      shift: selShift, team: team, staff: staff, time: timeStr, date: dateStr,
+      rows: allRows.map(function(r){ return {category:r.category, brand:r.brand, handover:r.handover}; })
+    };
+    localStorage.setItem('cadf_last_handover_'+terminal, JSON.stringify(lastHandover));
+  }
 
   const btn=document.getElementById('submit-btn');
   const lbl=document.getElementById('submit-label');
@@ -1360,7 +1487,6 @@ function routePanel() {
   }
 }
 routePanel();
-if(document.getElementById('item-rows-wrap')){addItemRow();}
 // Init stock rows for staff panel
 if(document.getElementById('stock-rows')){
   addStockRow();
@@ -1525,6 +1651,8 @@ async function submitHandover(){
   const staff=document.getElementById('staff').value.trim();
   const toTeam=document.getElementById('to-team').value;
   const toStaff=document.getElementById('to-staff').value.trim();
+  const staffCode=document.getElementById('staff-code')?document.getElementById('staff-code').value.trim():'';
+  const toStaffCode=document.getElementById('to-staff-code')?document.getElementById('to-staff-code').value.trim():'';
   const staffCode=document.getElementById('staff-code').value.trim();
   const toStaffCode=document.getElementById('to-staff-code').value.trim();
   const stockRows = getStockRows();
@@ -1540,10 +1668,12 @@ async function submitHandover(){
   if(!shift){showStatus('err','Please select a shift.');return;}
   if(!staff){showStatus('err','Please enter your name.');return;}
   if(!toTeam){showStatus('err','Please select the team you are handing over to.');return;}
-  if(!toStaff){showStatus('err','Please enter the receiving staff name.');return;}
+  if(!toStaff){showStatus('err','⚠️ Please enter the Receiving Staff Name.');return;}
+  if(!staffCode){showStatus('err','⚠️ Please enter your Employee Code.');return;}
+  if(!toStaffCode){showStatus('err','⚠️ Please enter the Receiving Staff Employee Code.');return;}
   if(!staffCode){showStatus('err','Please enter your employee code.');return;}
   if(!toStaffCode){showStatus('err','Please enter the receiving staff employee code.');return;}
-
+  if(stockRows.length===0){showStatus('err','Please add at least one stock count row.');return;}
   if(!document.getElementById('confirm-check').checked){showStatus('err','Please confirm the stock count before submitting.');return;}
 
   const handover=(display)+(delivery)-(sold);
@@ -1558,7 +1688,7 @@ async function submitHandover(){
     terminal,team,shift,staff,staffCode,fromShift,toShift,
     fromTeam:team,toTeam,fromStaff:staff,toStaff,
     fromStaffCode:staffCode,toStaffCode,
-    category,brand,stockRows:allRows,
+    category,brand,stockRows,
     display:parseFloat(display)||0,
     delivery:parseFloat(delivery)||0,
     sold:parseFloat(sold)||0,
@@ -1568,6 +1698,14 @@ async function submitHandover(){
   const all=JSON.parse(localStorage.getItem('cadf_handovers')||'[]');
   all.unshift(record);
   localStorage.setItem('cadf_handovers',JSON.stringify(all.slice(0,200)));
+  // Save last handover stock per terminal for next shift reference
+  if(terminal && allRows.length){
+    const lastHandover = {
+      shift: selShift, team: team, staff: staff, time: timeStr, date: dateStr,
+      rows: allRows.map(function(r){ return {category:r.category, brand:r.brand, handover:r.handover}; })
+    };
+    localStorage.setItem('cadf_last_handover_'+terminal, JSON.stringify(lastHandover));
+  }
 
   const btn=document.getElementById('submit-btn');
   const lbl=document.getElementById('submit-label');
