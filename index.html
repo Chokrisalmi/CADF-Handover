@@ -5,2113 +5,929 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>CADF — Shift Handover</title>
-
-<!-- STAFF FORM STYLES -->
 <style>
-
-*{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --navy:#1B3A6B;--sky:#2B8FD4;--teal:#00B5B8;
-  --yellow:#F5D000;--red:#E8344A;
-  --morning:#FF8C00;--afternoon:#2B8FD4;--evening:#1B3A6B;
-  --green-team:#27AE60;--blue-team:#2B8FD4;--yellow-team:#F5D000;
-  --bg:#F4F7FB;--card:#fff;--tx:#1a2a3a;--tx2:#5a7080;
-  --bd:1px solid #E0E8F0;--rad:12px;--rsm:8px;
+:root {
+  --bg: #eef1f7;
+  --card: #ffffff;
+  --border: #d1d9e6;
+  --accent: #1e4db7;
+  --accent-lt: #e8eef9;
+  --text: #1a2340;
+  --muted: #6b7a99;
+  --navy: #1e3a6e;
+  --green: #16a34a; --green-bg: #dcfce7; --green-bd: #86efac;
+  --blue:  #1d4ed8; --blue-bg:  #dbeafe; --blue-bd:  #93c5fd;
+  --yell:  #ca8a04; --yell-bg:  #fef9c3; --yell-bd:  #fde047;
+  --red:   #dc2626; --red-bg:   #fee2e2; --red-bd:   #fca5a5;
 }
-body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;padding-bottom:40px}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* PANELS */
+#staff-panel,#mgr-panel{display:none;}
+#staff-panel.active,#mgr-panel.active{display:block;}
 
 /* HEADER */
-.hdr{background:var(--navy);padding:0 20px;position:sticky;top:0;z-index:50;box-shadow:0 2px 12px rgba(27,58,107,.35)}
-.hdr-inner{max-width:680px;margin:0 auto;display:flex;align-items:center;gap:14px;padding:12px 0}
-.hdr-logo{height:38px;width:auto}
-.hdr-div{width:1px;height:28px;background:rgba(255,255,255,.25)}
-.hdr-title{font-size:15px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#fff}
-.hdr-sub{font-size:11px;color:rgba(255,255,255,.65);margin-top:1px}
+.hdr{background:var(--navy);height:56px;padding:0 20px;display:flex;align-items:center;gap:0;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.2);}
+.hdr-logo{font-size:18px;font-weight:900;color:#fff;letter-spacing:.5px;}
+.hdr-sep{width:1px;height:26px;background:rgba(255,255,255,.3);margin:0 14px;}
+.hdr-title{font-size:13px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:.8px;}
+.hdr-date{font-size:11px;color:rgba(255,255,255,.65);margin-left:10px;}
+.hdr-badge{margin-left:auto;background:#2d5fd6;color:#fff;font-size:12px;font-weight:700;padding:5px 14px;border-radius:20px;white-space:nowrap;display:none;}
 
-/* SHIFT BADGE on header */
-.shift-badge{margin-left:auto;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;color:#fff;display:none}
-.shift-badge.morning{background:var(--morning)}
-.shift-badge.afternoon{background:var(--afternoon)}
-.shift-badge.evening{background:var(--evening)}
+/* LAYOUT */
+.wrap{max-width:860px;margin:0 auto;padding:20px 16px 80px;}
 
-.wrap{max-width:680px;margin:0 auto;padding:20px 16px}
-.card{background:var(--card);border-radius:var(--rad);border:var(--bd);padding:20px;margin-bottom:16px;box-shadow:0 1px 4px rgba(27,58,107,.06)}
-.card-title{font-size:13px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.07em;margin-bottom:14px;display:flex;align-items:center;gap:8px}
-.card-title::before{content:'';display:block;width:3px;height:16px;border-radius:2px;background:var(--sky)}
-.frow{margin-bottom:14px}
-.lbl{font-size:12px;font-weight:600;color:var(--tx2);margin-bottom:5px;display:block}
-.inp{width:100%;padding:10px 12px;border:var(--bd);border-radius:var(--rsm);font-size:14px;color:var(--tx);background:#fff;font-family:inherit;transition:.15s}
-.inp:focus{outline:2px solid var(--sky);outline-offset:-1px}
-select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235a7080' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
-.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+/* CARD */
+.card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:22px;margin-bottom:14px;box-shadow:0 1px 3px rgba(30,58,110,.06);}
+.ct{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.9px;color:var(--text);margin-bottom:18px;display:flex;align-items:center;gap:8px;}
+.ct::before{content:'';width:4px;height:15px;background:var(--accent);border-radius:2px;flex-shrink:0;}
+.ct-row{justify-content:space-between;}
 
-/* SHIFT SELECTOR — colored pills */
-.shift-pills{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
-.shift-pill{padding:12px 8px;border-radius:var(--rsm);border:2px solid transparent;cursor:pointer;text-align:center;font-size:13px;font-weight:600;font-family:inherit;background:var(--bg);color:var(--tx2);transition:.15s}
-.shift-pill.morning.sel{background:#FFF4E6;border-color:var(--morning);color:var(--morning)}
-.shift-pill.afternoon.sel{background:#EBF5FF;border-color:var(--afternoon);color:var(--afternoon)}
-.shift-pill.evening.sel{background:#EEF2F9;border-color:var(--evening);color:var(--evening)}
-.shift-pill:hover{background:#f0f4f8}
+/* FORM */
+.fl{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:5px;}
+select,input[type=text],input[type=number],textarea{width:100%;background:#fff;border:1.5px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;padding:10px 13px;outline:none;font-family:inherit;transition:border-color .15s,box-shadow .15s;}
+select:focus,input:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(30,77,183,.1);}
+select option{background:#fff;}
+textarea{resize:vertical;min-height:76px;}
+.fr{margin-bottom:14px;}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 
-/* TEAM PILLS */
-.team-pills{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
-.team-pill{padding:10px 8px;border-radius:var(--rsm);border:2px solid transparent;cursor:pointer;text-align:center;font-size:13px;font-weight:700;font-family:inherit;background:var(--bg);color:var(--tx2);transition:.15s}
-.team-pill.green.sel{background:#EAFAF1;border-color:var(--green-team);color:var(--green-team)}
-.team-pill.blue.sel{background:#EBF5FF;border-color:var(--blue-team);color:var(--blue-team)}
-.team-pill.yellow.sel{background:#FFFBEC;border-color:#c4a800;color:#8a7000}
-.team-pill.red-team.sel{background:#FDEDEC;border-color:#C0392B;color:#C0392B}
+/* PILLS */
+.pg{display:flex;flex-wrap:wrap;gap:8px;}
+.pill{flex:1;min-width:100px;padding:10px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;text-align:center;border:1.5px solid var(--border);background:#fff;color:var(--muted);transition:all .12s;user-select:none;}
+.pill.p-green{border-color:var(--green-bd);color:var(--green);}
+.pill.p-green.on{background:var(--green-bg);border-color:var(--green);box-shadow:0 0 0 2px var(--green);}
+.pill.p-blue{border-color:var(--blue-bd);color:var(--blue);}
+.pill.p-blue.on{background:var(--blue-bg);border-color:var(--blue);box-shadow:0 0 0 2px var(--blue);}
+.pill.p-yell{border-color:var(--yell-bd);color:var(--yell);}
+.pill.p-yell.on{background:var(--yell-bg);border-color:var(--yell);box-shadow:0 0 0 2px var(--yell);}
+.pill.p-red{border-color:var(--red-bd);color:var(--red);}
+.pill.p-red.on{background:var(--red-bg);border-color:var(--red);box-shadow:0 0 0 2px var(--red);}
+.pill.p-shift{border-color:var(--border);color:var(--muted);}
+.pill.p-shift.on{background:var(--accent-lt);border-color:var(--accent);color:var(--accent);box-shadow:0 0 0 2px var(--accent);}
 
-/* HANDOVER FROM/TO */
-.handover-arrow{display:flex;align-items:center;gap:8px;margin-bottom:14px}
-.handover-arrow .inp{flex:1}
-.arrow-icon{font-size:20px;flex-shrink:0;color:var(--sky)}
+/* SUMMARY BOXES */
+.sum-grid{display:grid;grid-template-columns:1fr 28px 1fr;align-items:start;gap:6px;margin-bottom:14px;}
+.sum-lbl{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px;}
+.sum-box{background:var(--accent-lt);border:1.5px solid #c3d4f5;border-radius:8px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--text);min-height:42px;display:flex;align-items:center;justify-content:center;text-align:center;}
+.sum-arr{display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:18px;padding-top:22px;}
 
-/* STOCK */
-.stock-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
-.stock-item{background:var(--bg);border-radius:var(--rsm);border:var(--bd);padding:12px}
-.stock-lbl{font-size:11px;font-weight:600;color:var(--tx2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em}
-.stock-inp{width:100%;border:none;background:transparent;font-size:22px;font-weight:700;color:var(--navy);font-family:inherit;text-align:center;padding:4px 0}
-.stock-inp:focus{outline:none}
-.formula-row{background:#EEF5FB;border:1px solid #C5DDF0;border-radius:var(--rsm);padding:10px 14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px;margin-top:10px}
-.handover-result{font-size:20px;font-weight:800;color:var(--navy)}
-.disc-ok{color:#27AE60;font-weight:600}
-.disc-warn{color:var(--red);font-weight:600}
+/* BUTTONS */
+.btn{padding:9px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;border:1.5px solid transparent;transition:all .12s;}
+.btn-p{background:var(--accent);color:#fff;border-color:var(--accent);}
+.btn-p:hover{background:#163d99;}
+.btn-s{background:#fff;color:var(--text);border-color:var(--border);}
+.btn-s:hover{border-color:var(--accent);color:var(--accent);}
+.btn-d{background:var(--red-bg);color:var(--red);border-color:var(--red-bd);}
+.btn-d:hover{background:var(--red);color:#fff;}
+.btn-sm{padding:5px 11px;font-size:12px;}
+.btn-full{width:100%;padding:13px;font-size:14px;font-weight:700;}
+.btn-sub{width:100%;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;}
+.btn-sub:hover{background:#163d99;}
+.btn-sub:disabled{opacity:.45;cursor:not-allowed;}
+.btn-row{display:flex;gap:8px;justify-content:flex-end;}
 
 /* PHOTOS */
-.photo-zone{border:2px dashed #C5DDF0;border-radius:var(--rad);padding:22px;text-align:center;cursor:pointer;background:#F7FBFF;transition:.2s}
-.photo-zone:hover,.photo-zone.has{border-color:var(--teal);background:#EFF9F9;border-style:solid}
-.photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px;margin-top:10px}
-.photo-thumb{position:relative;border-radius:var(--rsm);overflow:hidden;aspect-ratio:1;border:2px solid var(--teal)}
-.photo-thumb img{width:100%;height:100%;object-fit:cover;display:block}
-.photo-del{position:absolute;top:3px;right:3px;background:rgba(232,52,74,.9);color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700;line-height:1}
-.photo-count-badge{background:var(--teal);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;display:inline-block;margin-top:8px}
+.ph-area{border:2px dashed var(--border);border-radius:10px;padding:24px;text-align:center;cursor:pointer;background:var(--bg);transition:all .15s;}
+.ph-area:hover{border-color:var(--accent);background:var(--accent-lt);}
+.ph-icon{font-size:28px;margin-bottom:6px;}
+.ph-text{font-size:14px;font-weight:600;margin-bottom:3px;}
+.ph-sub{font-size:12px;color:var(--muted);}
+.ph-acts{display:flex;gap:8px;margin-top:10px;}
+.ph-acts .btn{flex:1;}
+.ph-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:6px;margin-top:10px;}
+.ph-thumb{position:relative;aspect-ratio:1;border-radius:8px;overflow:hidden;border:2px solid var(--border);}
+.ph-thumb img{width:100%;height:100%;object-fit:cover;}
+.ph-rm{position:absolute;top:3px;right:3px;width:20px;height:20px;background:rgba(0,0,0,.6);border:none;border-radius:50%;color:#fff;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+#fileInput,#cameraInput{display:none;}
 
-/* CONFIRM */
-.confirm-row{display:flex;align-items:flex-start;gap:10px;padding:12px;background:#FFFBEC;border:1px solid var(--yellow);border-radius:var(--rsm);margin-bottom:14px;cursor:pointer}
-.confirm-row input{width:18px;height:18px;margin-top:1px;flex-shrink:0;accent-color:var(--navy);cursor:pointer}
-.confirm-row label{font-size:13px;color:var(--tx);cursor:pointer;line-height:1.4}
+/* CHECKBOX */
+.chk-row{display:flex;align-items:flex-start;gap:10px;padding:13px 14px;background:var(--bg);border-radius:9px;border:1.5px solid var(--border);cursor:pointer;}
+.chk-row input{width:17px;height:17px;margin-top:2px;accent-color:var(--accent);flex-shrink:0;}
+.chk-lbl{font-size:13px;line-height:1.5;}
 
-/* STATUS */
-.status-bar{padding:12px 16px;border-radius:var(--rsm);font-size:13px;font-weight:600;display:none;margin-bottom:16px;align-items:center;gap:8px}
-.status-bar.show{display:flex}
-.status-bar.ok{background:#EAFAF1;border:1px solid #27AE60;color:#1a6e3a}
-.status-bar.err{background:#FEF0F0;border:1px solid var(--red);color:#8b1a1a}
+/* STOCK COUNT */
+.sc-cat{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin:14px 0 6px;}
+.sc-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #eef0f5;}
+.sc-row:last-child{border-bottom:none;}
+.sc-name{flex:1;font-size:14px;font-weight:600;}
+.sc-open{font-size:11px;color:var(--muted);margin-top:2px;}
+.sc-open span{color:var(--accent);font-weight:700;}
+.cnt-btn{width:32px;height:32px;border-radius:7px;border:1.5px solid var(--border);background:#fff;color:var(--text);font-size:16px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .12s;}
+.cnt-btn:hover{background:var(--accent);border-color:var(--accent);color:#fff;}
+.cnt-inp{width:64px;text-align:center;padding:6px 4px;font-size:14px;font-weight:700;background:var(--bg);border:1.5px solid var(--border);border-radius:7px;}
+.rm-btn{width:28px;height:28px;border-radius:6px;border:1px solid var(--red-bd);background:var(--red-bg);color:var(--red);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 
-/* SUBMIT BTN */
-.btn-submit{width:100%;padding:15px;background:var(--navy);color:#fff;border:none;border-radius:var(--rsm);font-size:15px;font-weight:700;cursor:pointer;letter-spacing:.04em;display:flex;align-items:center;justify-content:center;gap:10px;font-family:inherit;transition:.2s}
-.btn-submit:hover:not(:disabled){background:#254d8f}
-.btn-submit:disabled{background:#aaa;cursor:not-allowed}
-.btn-submit.sending{background:var(--sky)}
-.btn-submit.sent{background:#27AE60}
+/* CATALOG LIST */
+.cl-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid #eef0f5;font-size:13px;}
+.cl-row:last-child{border-bottom:none;}
+.cl-name{flex:1;font-weight:500;}
 
-textarea.inp{min-height:80px;resize:vertical;line-height:1.5}
-/*.sr-grid-removed*/.sr-grid-x{display:grid;grid-template-columns:1fr 1fr 68px 68px 60px 68px 26px;gap:5px;margin-bottom:5px;align-items:center}
-.sn-inp{width:100%;padding:7px 4px;border:var(--bd);border-radius:var(--rsm);font-size:13px;font-weight:600;color:var(--navy);font-family:inherit;text-align:center;background:#fff}
-.sn-inp:focus{outline:2px solid var(--sky);outline-offset:-1px}
-.hov-chip{border-radius:var(--rsm);padding:7px 2px;font-size:13px;font-weight:800;text-align:center;background:#EEF3FA;border:1px solid #C5D3E8;color:var(--navy)}
-.hov-chip.neg{background:#FEF0F0;border-color:var(--red);color:var(--red)}
-.del-btn{width:22px;height:22px;border-radius:50%;background:transparent;border:1px solid #E0E8F0;color:var(--tx2);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;padding:0}
-.del-btn:hover{border-color:var(--red);color:var(--red)}
+/* EMPTY */
+.empty{text-align:center;padding:40px 16px;color:var(--muted);}
+.empty-ico{font-size:32px;margin-bottom:10px;}
+.empty-txt{font-size:14px;font-weight:600;}
 
-/* FLOW ROWS */
-.flow-row{display:flex;align-items:center;gap:10px}
-.flow-box{flex:1;background:var(--bg);border:var(--bd);border-radius:var(--rsm);padding:10px 14px;font-size:14px;font-weight:600;color:var(--navy);text-align:center;min-width:0}
-.flow-arrow{font-size:20px;color:var(--sky);flex-shrink:0;font-weight:700}
-.flow-box.morning-box{background:#FFF4E6;border-color:#FFD49A;color:var(--morning)}
-.flow-box.afternoon-box{background:#EBF5FF;border-color:#9DD2FF;color:var(--afternoon)}
-.flow-box.evening-box{background:#EEF2F9;border-color:#9AAFD4;color:var(--evening)}
-.flow-box.green-box{background:#EAFAF1;border-color:#A9DFBF;color:var(--green-team)}
-.flow-box.blue-box{background:#EBF5FF;border-color:#9DD2FF;color:var(--blue-team)}
-.flow-box.yellow-box{background:#FFFBEC;border-color:#F5D000;color:var(--yellow-team)}
-.flow-box.red-box{background:#FDEDEC;border-color:#E6A89A;color:#C0392B}
+/* PREV HANDOVER */
+.prev-box{background:var(--accent-lt);border:1.5px solid #c3d4f5;border-radius:9px;padding:12px 14px;margin-bottom:14px;}
+.prev-ttl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--accent);margin-bottom:8px;}
+.prev-row{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(30,77,183,.1);font-size:13px;}
+.prev-row:last-child{border-bottom:none;}
+.prev-qty{font-weight:700;color:var(--accent);}
 
-</style>
+/* TOAST */
+#toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(80px);background:#fff;border:1.5px solid var(--border);color:var(--text);padding:12px 22px;border-radius:9px;font-size:13px;font-weight:600;z-index:9999;transition:transform .25s;box-shadow:0 4px 18px rgba(30,58,110,.14);max-width:88vw;text-align:center;}
+#toast.show{transform:translateX(-50%) translateY(0);}
+#toast.ok{border-color:var(--green);color:var(--green);}
+#toast.err{border-color:var(--red);color:var(--red);}
 
-<!-- MANAGER STYLES -->
-<style>
-/* Manager panel — hidden by default */
-#mgr-panel { display:none }
-#staff-panel { display:block }
+/* MANAGER */
+.mgr-login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg);padding:20px;}
+.mgr-login-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:36px 28px;width:100%;max-width:360px;box-shadow:0 4px 20px rgba(30,58,110,.1);}
+.mgr-logo-big{width:52px;height:52px;background:var(--navy);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;color:#fff;margin:0 auto 18px;}
+.mgr-ttl{font-size:20px;font-weight:800;text-align:center;margin-bottom:4px;}
+.mgr-sub{font-size:13px;color:var(--muted);text-align:center;margin-bottom:24px;}
+.login-err{background:#fee2e2;color:#991b1b;padding:9px 13px;border-radius:7px;font-size:13px;font-weight:600;margin-bottom:13px;display:none;}
 
-*{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --navy:#1B3A6B;--sky:#2B8FD4;--teal:#00B5B8;
-  --yellow:#F5D000;--red:#E8344A;
-  --morning:#FF8C00;--afternoon:#2B8FD4;--evening:#1B3A6B;
-  --green-team:#27AE60;--blue-team:#2B8FD4;--yellow-team:#c4a800;
-  --bg:#F4F7FB;--card:#fff;--tx:#1a2a3a;--tx2:#5a7080;
-  --bd:1px solid #E0E8F0;--rad:12px;--rsm:8px;
+.mgr-main{display:none;}
+.mgr-hdr{background:var(--navy);height:56px;padding:0 18px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.2);}
+.mgr-hdr-logo{font-size:16px;font-weight:900;color:#fff;}
+.mgr-hdr-sep{width:1px;height:22px;background:rgba(255,255,255,.3);}
+.mgr-hdr-ttl{font-size:12px;font-weight:700;color:rgba(255,255,255,.9);text-transform:uppercase;letter-spacing:.7px;flex:1;}
+.mgr-hdr-btns{display:flex;gap:7px;}
+.mgr-hdr-btns .btn{font-size:12px;padding:6px 12px;background:rgba(255,255,255,.15);color:#fff;border-color:rgba(255,255,255,.3);}
+.mgr-hdr-btns .btn:hover{background:rgba(255,255,255,.28);}
+.mgr-wrap{max-width:1060px;margin:0 auto;padding:20px 16px 50px;}
+
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:18px;}
+.kpi-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:16px;box-shadow:0 1px 3px rgba(30,58,110,.05);}
+.kpi-val{font-size:30px;font-weight:800;color:var(--accent);margin-bottom:3px;}
+.kpi-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);}
+
+.flt-bar{background:#fff;border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:16px;}
+.flt-row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;}
+.flt-row .fr{margin-bottom:0;min-width:130px;flex:1;}
+
+.rec-card{background:#fff;border:1px solid var(--border);border-radius:10px;margin-bottom:9px;overflow:hidden;}
+.rec-hdr{padding:13px 15px;display:flex;align-items:center;gap:10px;cursor:pointer;}
+.rec-hdr:hover{background:var(--bg);}
+.rec-term{background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:5px;}
+.rec-shift{font-size:10px;font-weight:600;padding:3px 8px;border-radius:5px;background:var(--bg);color:var(--muted);border:1px solid var(--border);}
+.rec-team{font-size:12px;font-weight:700;}
+.rec-info{flex:1;}
+.rec-staff{font-size:13px;font-weight:700;}
+.rec-time{font-size:11px;color:var(--muted);margin-top:1px;}
+.rec-chev{color:var(--muted);font-size:13px;transition:transform .2s;}
+.rec-card.open .rec-chev{transform:rotate(180deg);}
+.rec-body{display:none;padding:14px;border-top:1px solid #eef0f5;background:var(--bg);}
+.rec-card.open .rec-body{display:block;}
+.det-sec{background:#fff;border:1px solid #eef0f5;border-radius:8px;padding:12px;margin-bottom:10px;}
+.det-ttl{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:8px;}
+.det-tbl{width:100%;border-collapse:collapse;font-size:13px;}
+.det-tbl td{padding:5px 3px;border-bottom:1px solid #eef0f5;}
+.det-tbl td:first-child{color:var(--muted);width:38%;}
+.det-tbl td:last-child{font-weight:600;}
+.det-tbl tr:last-child td{border-bottom:none;}
+.rec-photos{display:flex;gap:6px;flex-wrap:wrap;}
+.rec-ph{width:68px;height:68px;border-radius:7px;object-fit:cover;cursor:pointer;border:2px solid var(--border);}
+.rec-ph:hover{border-color:var(--accent);}
+.cmt-area{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:7px;padding:9px 11px;font-size:13px;color:var(--text);resize:vertical;min-height:56px;font-family:inherit;outline:none;}
+.cmt-area:focus{border-color:var(--accent);}
+
+#lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9998;align-items:center;justify-content:center;}
+#lightbox.open{display:flex;}
+#lightbox img{max-width:95vw;max-height:95vh;border-radius:9px;object-fit:contain;}
+#lb-close{position:absolute;top:14px;right:18px;font-size:30px;color:#fff;cursor:pointer;background:none;border:none;}
+
+#email-modal{display:none;position:fixed;inset:0;background:rgba(30,58,110,.35);z-index:9000;align-items:center;justify-content:center;padding:14px;}
+#email-modal.open{display:flex;}
+.modal-box{background:#fff;border:1px solid var(--border);border-radius:14px;padding:26px;width:100%;max-width:480px;box-shadow:0 8px 36px rgba(30,58,110,.16);}
+.modal-ttl{font-size:16px;font-weight:800;margin-bottom:18px;}
+
+@media(max-width:560px){
+  .fg{grid-template-columns:1fr;}
+  .flt-row{flex-direction:column;}
+  .kpi-grid{grid-template-columns:repeat(2,1fr);}
+  .pill{min-width:80px;font-size:12px;padding:9px 10px;}
+  .mgr-hdr-btns .btn{padding:5px 8px;font-size:11px;}
 }
-body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh}
-#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--navy)}
-.login-card{background:#fff;border-radius:var(--rad);padding:32px;width:min(360px,90vw);box-shadow:0 8px 40px rgba(0,0,0,.25)}
-.login-logo{font-size:28px;font-weight:900;color:var(--navy);letter-spacing:-.5px;margin-bottom:4px}
-.login-sub{font-size:13px;color:var(--tx2);margin-bottom:24px}
-#dashboard{display:none}
-.hdr{background:var(--navy);padding:0 20px;position:sticky;top:0;z-index:50;box-shadow:0 2px 12px rgba(27,58,107,.35)}
-.hdr-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:12px 0}
-.hdr-left{display:flex;align-items:center;gap:14px}
-.hdr-div{width:1px;height:28px;background:rgba(255,255,255,.25)}
-.hdr-title{font-size:15px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#fff}
-.hdr-sub{font-size:11px;color:rgba(255,255,255,.65);margin-top:1px}
-.hdr-btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:6px 14px;border-radius:var(--rsm);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;margin-left:8px}
-.wrap{max-width:1100px;margin:0 auto;padding:20px 16px}
-.card{background:var(--card);border-radius:var(--rad);border:var(--bd);padding:18px;margin-bottom:16px;box-shadow:0 1px 4px rgba(27,58,107,.06)}
-.card-title{font-size:13px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.07em;margin-bottom:14px;display:flex;align-items:center;gap:8px}
-.card-title::before{content:'';display:block;width:3px;height:16px;border-radius:2px;background:var(--sky)}
-.frow{margin-bottom:12px}
-.lbl{font-size:12px;font-weight:600;color:var(--tx2);margin-bottom:5px;display:block}
-.inp{width:100%;padding:10px 12px;border:var(--bd);border-radius:var(--rsm);font-size:14px;color:var(--tx);font-family:inherit}
-.inp:focus{outline:2px solid var(--sky);outline-offset:-1px}
-.btn{padding:8px 16px;border-radius:var(--rsm);border:var(--bd);background:transparent;color:var(--tx);font-size:13px;cursor:pointer;font-family:inherit}
-.btn-primary{background:var(--navy);color:#fff;border-color:var(--navy)}
-.btn-sm{padding:5px 12px;font-size:12px}
-
-/* KPIs */
-.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
-@media(max-width:600px){.kpi-grid{grid-template-columns:repeat(2,1fr)}}
-.kpi{background:var(--card);border-radius:var(--rad);border:var(--bd);padding:16px;box-shadow:0 1px 4px rgba(27,58,107,.06)}
-.kpi-val{font-size:28px;font-weight:800;line-height:1}
-.kpi-lbl{font-size:11px;color:var(--tx2);margin-top:4px;text-transform:uppercase;letter-spacing:.05em}
-
-/* FILTERS */
-.filters{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px}
-.fpill{padding:5px 13px;border-radius:20px;border:var(--bd);font-size:12px;cursor:pointer;background:var(--card);color:var(--tx2);font-family:inherit;font-weight:500;white-space:nowrap}
-.fpill.active{background:var(--navy);color:#fff;border-color:var(--navy)}
-.fpill.morning.active{background:var(--morning);border-color:var(--morning)}
-.fpill.afternoon.active{background:var(--afternoon);border-color:var(--afternoon)}
-.fpill.evening.active{background:var(--evening);border-color:var(--evening)}
-.fpill.green.active{background:var(--green-team);border-color:var(--green-team)}
-.fpill.blue.active{background:var(--blue-team);border-color:var(--blue-team)}
-.fpill.yellow.active{background:var(--yellow-team);border-color:var(--yellow-team);color:#fff}
-
-/* RECORDS */
-.rec{background:var(--card);border-radius:var(--rad);border:var(--bd);margin-bottom:10px;overflow:hidden;box-shadow:0 1px 4px rgba(27,58,107,.06)}
-.rec-hdr{padding:14px 16px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;cursor:pointer}
-.rec-hdr:hover{background:#f7fafb}
-.rec-body{border-top:var(--bd);padding:14px 16px;display:none}
-.rec-body.open{display:block}
-.arrow{font-size:14px;color:var(--tx2);flex-shrink:0;transition:transform .2s;margin-top:2px}
-.arrow.open{transform:rotate(180deg)}
-
-/* SHIFT/TEAM BADGES */
-.badge{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;border:1px solid transparent;white-space:nowrap;display:inline-block}
-.badge-morning{background:#FFF4E6;color:var(--morning);border-color:#FFD49A}
-.badge-afternoon{background:#EBF5FF;color:var(--afternoon);border-color:#9DD2FF}
-.badge-evening{background:#EEF2F9;color:var(--evening);border-color:#9AAFD4}
-.badge-green{background:#EAFAF1;color:var(--green-team);border-color:#A9DFBF}
-.badge-blue{background:#EBF5FF;color:var(--blue-team);border-color:#9DD2FF}
-.badge-yellow{background:#FFFBEC;color:var(--yellow-team);border-color:#F5D000}
-.badge-navy{background:#EEF3FA;color:var(--navy);border-color:#C5D3E8}
-.badge-teal{background:#E8F9F9;color:#007B7D;border-color:#A0D8D9}
-
-/* STOCK CHIPS */
-.stock-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
-.chip{background:var(--bg);border:var(--bd);border-radius:var(--rsm);padding:8px 12px;flex:1;min-width:70px;text-align:center}
-.chip-val{font-size:18px;font-weight:700;color:var(--navy)}
-.chip-lbl{font-size:10px;color:var(--tx2);text-transform:uppercase;margin-top:1px}
-.chip.result{background:#EEF3FA;border-color:#C5D3E8}
-
-/* HANDOVER ARROW */
-.handover-flow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;padding:10px 12px;background:var(--bg);border-radius:var(--rsm);border:var(--bd);font-size:13px}
-.handover-flow .arrow-lbl{font-size:11px;color:var(--tx2);font-weight:600;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:2px}
-.handover-flow .val{font-weight:600;color:var(--navy)}
-
-/* PHOTOS */
-.photo-section{margin-top:10px}
-.photo-section-title{font-size:11px;font-weight:700;color:var(--tx2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}
-.photo-grid-dash{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:7px}
-.photo-item{border-radius:var(--rsm);overflow:hidden;aspect-ratio:1;border:2px solid var(--teal);cursor:pointer;transition:.15s}
-.photo-item:hover{transform:scale(1.04);border-color:var(--sky)}
-.photo-item img{width:100%;height:100%;object-fit:cover;display:block}
-.no-photo{font-size:12px;color:var(--tx2);font-style:italic;margin-top:8px}
-
-/* NOTES */
-.notes-box{margin-top:10px;padding:10px 12px;background:var(--bg);border-radius:var(--rsm);border:var(--bd);font-size:13px;line-height:1.5;border-top:2px solid var(--yellow)}
-.handover-flow-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}
-@media(max-width:500px){.handover-flow-grid{grid-template-columns:1fr}}
-.hf-col{background:var(--bg);border:var(--bd);border-radius:var(--rsm);padding:8px 12px}
-.hf-lbl{font-size:10px;font-weight:700;color:var(--tx2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px}
-.hf-val{font-size:13px;font-weight:600;color:var(--navy)}
-.hf-arrow{color:var(--sky);font-weight:700;margin:0 4px}
-
-/* LIGHTBOX */
-#lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:200;align-items:center;justify-content:center}
-#lightbox.open{display:flex}
-#lightbox img{max-width:92vw;max-height:90vh;border-radius:var(--rad);object-fit:contain}
-#lb-close{position:absolute;top:14px;right:18px;color:#fff;font-size:30px;cursor:pointer;background:none;border:none;line-height:1;font-weight:300}
-#lb-info{position:absolute;bottom:18px;color:rgba(255,255,255,.7);font-size:13px;text-align:center;padding:0 20px}
-
-/* EMAIL SETTINGS MODAL */
-.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;align-items:center;justify-content:center}
-.overlay.open{display:flex}
-.modal{background:#fff;border-radius:var(--rad);padding:24px;width:min(440px,92vw);box-shadow:0 8px 40px rgba(0,0,0,.2)}
-.modal h3{font-size:16px;font-weight:700;color:var(--navy);margin-bottom:6px}
-.modal-sub{font-size:12px;color:var(--tx2);margin-bottom:16px}
-
-.empty{text-align:center;padding:3rem 1rem;color:var(--tx2)}
-
-</style>
-
-<!-- MANAGER STYLES -->
-<style>
-/* Manager panel — hidden by default */
-#mgr-panel { display:none }
-#staff-panel { display:block }
-
-*{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --navy:#1B3A6B;--sky:#2B8FD4;--teal:#00B5B8;
-  --yellow:#F5D000;--red:#E8344A;
-  --morning:#FF8C00;--afternoon:#2B8FD4;--evening:#1B3A6B;
-  --green-team:#27AE60;--blue-team:#2B8FD4;--yellow-team:#c4a800;--red-team:#C0392B;
-  --bg:#F4F7FB;--card:#fff;--tx:#1a2a3a;--tx2:#5a7080;
-  --bd:1px solid #E0E8F0;--rad:12px;--rsm:8px;
-}
-body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh}
-#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--navy)}
-.login-card{background:#fff;border-radius:var(--rad);padding:32px;width:min(360px,90vw);box-shadow:0 8px 40px rgba(0,0,0,.25)}
-.login-logo{font-size:28px;font-weight:900;color:var(--navy);letter-spacing:-.5px;margin-bottom:4px}
-.login-sub{font-size:13px;color:var(--tx2);margin-bottom:24px}
-#dashboard{display:none}
-.hdr{background:var(--navy);padding:0 20px;position:sticky;top:0;z-index:50;box-shadow:0 2px 12px rgba(27,58,107,.35)}
-.hdr-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:12px 0}
-.hdr-left{display:flex;align-items:center;gap:14px}
-.hdr-div{width:1px;height:28px;background:rgba(255,255,255,.25)}
-.hdr-title{font-size:15px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#fff}
-.hdr-sub{font-size:11px;color:rgba(255,255,255,.65);margin-top:1px}
-.hdr-btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:6px 14px;border-radius:var(--rsm);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;margin-left:8px}
-.wrap{max-width:1100px;margin:0 auto;padding:20px 16px}
-.card{background:var(--card);border-radius:var(--rad);border:var(--bd);padding:18px;margin-bottom:16px;box-shadow:0 1px 4px rgba(27,58,107,.06)}
-.card-title{font-size:13px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.07em;margin-bottom:14px;display:flex;align-items:center;gap:8px}
-.card-title::before{content:'';display:block;width:3px;height:16px;border-radius:2px;background:var(--sky)}
-.frow{margin-bottom:12px}
-.lbl{font-size:12px;font-weight:600;color:var(--tx2);margin-bottom:5px;display:block}
-.inp{width:100%;padding:10px 12px;border:var(--bd);border-radius:var(--rsm);font-size:14px;color:var(--tx);font-family:inherit}
-.inp:focus{outline:2px solid var(--sky);outline-offset:-1px}
-.btn{padding:8px 16px;border-radius:var(--rsm);border:var(--bd);background:transparent;color:var(--tx);font-size:13px;cursor:pointer;font-family:inherit}
-.btn-primary{background:var(--navy);color:#fff;border-color:var(--navy)}
-.btn-sm{padding:5px 12px;font-size:12px}
-
-/* KPIs */
-.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
-@media(max-width:600px){.kpi-grid{grid-template-columns:repeat(2,1fr)}}
-.kpi{background:var(--card);border-radius:var(--rad);border:var(--bd);padding:16px;box-shadow:0 1px 4px rgba(27,58,107,.06)}
-.kpi-val{font-size:28px;font-weight:800;line-height:1}
-.kpi-lbl{font-size:11px;color:var(--tx2);margin-top:4px;text-transform:uppercase;letter-spacing:.05em}
-
-/* FILTERS */
-.filters{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px}
-.fpill{padding:5px 13px;border-radius:20px;border:var(--bd);font-size:12px;cursor:pointer;background:var(--card);color:var(--tx2);font-family:inherit;font-weight:500;white-space:nowrap}
-.fpill.active{background:var(--navy);color:#fff;border-color:var(--navy)}
-.fpill.morning.active{background:var(--morning);border-color:var(--morning)}
-.fpill.afternoon.active{background:var(--afternoon);border-color:var(--afternoon)}
-.fpill.evening.active{background:var(--evening);border-color:var(--evening)}
-.fpill.green.active{background:var(--green-team);border-color:var(--green-team)}
-.fpill.blue.active{background:var(--blue-team);border-color:var(--blue-team)}
-.fpill.yellow.active{background:var(--yellow-team);border-color:var(--yellow-team);color:#fff}
-.fpill.red-team.active{background:#C0392B;border-color:#C0392B;color:#fff}
-
-/* RECORDS */
-.rec{background:var(--card);border-radius:var(--rad);border:var(--bd);margin-bottom:10px;overflow:hidden;box-shadow:0 1px 4px rgba(27,58,107,.06)}
-.rec-hdr{padding:14px 16px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;cursor:pointer}
-.rec-hdr:hover{background:#f7fafb}
-.rec-body{border-top:var(--bd);padding:14px 16px;display:none}
-.rec-body.open{display:block}
-.arrow{font-size:14px;color:var(--tx2);flex-shrink:0;transition:transform .2s;margin-top:2px}
-.arrow.open{transform:rotate(180deg)}
-
-/* SHIFT/TEAM BADGES */
-.badge{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;border:1px solid transparent;white-space:nowrap;display:inline-block}
-.badge-morning{background:#FFF4E6;color:var(--morning);border-color:#FFD49A}
-.badge-afternoon{background:#EBF5FF;color:var(--afternoon);border-color:#9DD2FF}
-.badge-evening{background:#EEF2F9;color:var(--evening);border-color:#9AAFD4}
-.badge-green{background:#EAFAF1;color:var(--green-team);border-color:#A9DFBF}
-.badge-blue{background:#EBF5FF;color:var(--blue-team);border-color:#9DD2FF}
-.badge-yellow{background:#FFFBEC;color:var(--yellow-team);border-color:#F5D000}
-.badge-red{background:#FDEDEC;color:#C0392B;border-color:#E6A89A}
-.badge-navy{background:#EEF3FA;color:var(--navy);border-color:#C5D3E8}
-.badge-teal{background:#E8F9F9;color:#007B7D;border-color:#A0D8D9}
-
-/* STOCK CHIPS */
-.stock-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
-.chip{background:var(--bg);border:var(--bd);border-radius:var(--rsm);padding:8px 12px;flex:1;min-width:70px;text-align:center}
-.chip-val{font-size:18px;font-weight:700;color:var(--navy)}
-.chip-lbl{font-size:10px;color:var(--tx2);text-transform:uppercase;margin-top:1px}
-.chip.result{background:#EEF3FA;border-color:#C5D3E8}
-
-/* HANDOVER ARROW */
-.handover-flow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;padding:10px 12px;background:var(--bg);border-radius:var(--rsm);border:var(--bd);font-size:13px}
-.handover-flow .arrow-lbl{font-size:11px;color:var(--tx2);font-weight:600;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:2px}
-.handover-flow .val{font-weight:600;color:var(--navy)}
-
-/* PHOTOS */
-.photo-section{margin-top:10px}
-.photo-section-title{font-size:11px;font-weight:700;color:var(--tx2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}
-.photo-grid-dash{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:7px}
-.photo-item{border-radius:var(--rsm);overflow:hidden;aspect-ratio:1;border:2px solid var(--teal);cursor:pointer;transition:.15s}
-.photo-item:hover{transform:scale(1.04);border-color:var(--sky)}
-.photo-item img{width:100%;height:100%;object-fit:cover;display:block}
-.no-photo{font-size:12px;color:var(--tx2);font-style:italic;margin-top:8px}
-
-/* NOTES */
-.notes-box{margin-top:10px;padding:10px 12px;background:var(--bg);border-radius:var(--rsm);border:var(--bd);font-size:13px;line-height:1.5;border-top:2px solid var(--yellow)}
-.handover-flow-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}
-@media(max-width:500px){.handover-flow-grid{grid-template-columns:1fr}}
-.hf-col{background:var(--bg);border:var(--bd);border-radius:var(--rsm);padding:8px 12px}
-.hf-lbl{font-size:10px;font-weight:700;color:var(--tx2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px}
-.hf-val{font-size:13px;font-weight:600;color:var(--navy)}
-.hf-arrow{color:var(--sky);font-weight:700;margin:0 4px}
-
-/* LIGHTBOX */
-#lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:200;align-items:center;justify-content:center}
-#lightbox.open{display:flex}
-#lightbox img{max-width:92vw;max-height:90vh;border-radius:var(--rad);object-fit:contain}
-#lb-close{position:absolute;top:14px;right:18px;color:#fff;font-size:30px;cursor:pointer;background:none;border:none;line-height:1;font-weight:300}
-#lb-info{position:absolute;bottom:18px;color:rgba(255,255,255,.7);font-size:13px;text-align:center;padding:0 20px}
-
-/* EMAIL SETTINGS MODAL */
-.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;align-items:center;justify-content:center}
-.overlay.open{display:flex}
-.modal{background:#fff;border-radius:var(--rad);padding:24px;width:min(440px,92vw);box-shadow:0 8px 40px rgba(0,0,0,.2)}
-.modal h3{font-size:16px;font-weight:700;color:var(--navy);margin-bottom:6px}
-.modal-sub{font-size:12px;color:var(--tx2);margin-bottom:16px}
-
-.empty{text-align:center;padding:3rem 1rem;color:var(--tx2)}
-
 </style>
 </head>
 <body>
 
-<!-- ═══ STAFF PANEL ═══ -->
+<!-- ═══════════════ STAFF PANEL ═══════════════ -->
 <div id="staff-panel">
 
-
-<div class="hdr">
-  <div class="hdr-inner">
-    <div style="font-size:22px;font-weight:900;color:#fff;letter-spacing:-.5px">CADF</div>
-    <div class="hdr-div"></div>
-    <div>
-      <div class="hdr-title">Shift Handover</div>
-      <div class="hdr-sub" id="hdr-date"></div>
-    </div>
-    <div class="shift-badge" id="shift-badge"></div>
-  </div>
-</div>
-
-<div class="wrap">
-  <div class="status-bar" id="status-bar"></div>
-
-  <!-- SHIFT INFO -->
-  <div class="card">
-    <div class="card-title">Shift Information</div>
-
-    <!-- Terminal -->
-    <div class="frow">
-      <label class="lbl">Terminal</label>
-      <select class="inp" id="terminal">
-        <option value="">Select terminal</option>
-        <option>Terminal 1</option>
-        <option>Terminal 2</option>
-        <option>Terminal 3</option>
-      </select>
-    </div>
-
-    <!-- Team pills -->
-    <div class="frow">
-      <label class="lbl">Team</label>
-      <div class="team-pills">
-        <button class="team-pill green" onclick="selectTeam('Green',this)">🟢 Green</button>
-        <button class="team-pill blue"  onclick="selectTeam('Blue',this)">🔵 Blue</button>
-        <button class="team-pill yellow" onclick="selectTeam('Yellow',this)">🟡 Yellow</button>
-        <button class="team-pill red-team" onclick="selectTeam('Red',this)">🔴 Red</button>
-      </div>
-      <input type="hidden" id="team" value="">
-    </div>
-
-    <!-- Shift pills -->
-    <div class="frow">
-      <label class="lbl">Shift</label>
-      <div class="shift-pills">
-        <button class="shift-pill morning"   onclick="selectShift('Morning',this)">🌅 Morning</button>
-        <button class="shift-pill afternoon" onclick="selectShift('Afternoon',this)">☀️ Afternoon</button>
-        <button class="shift-pill evening"   onclick="selectShift('Evening',this)">🌙 Evening</button>
-      </div>
-      <input type="hidden" id="shift" value="">
-    </div>
-
-    <!-- Staff name -->
-    <div class="frow" style="margin-bottom:0">
-      <label class="lbl">Staff Name &amp; Employee Code</label>
-      <div style="display:grid;grid-template-columns:1fr auto;gap:8px">
-        <input class="inp" id="staff" placeholder="Your full name" autocomplete="off" oninput="updateFromStaff()">
-        <input class="inp" id="staff-code" placeholder="Emp. code" autocomplete="off" style="width:110px">
-      </div>
-    </div>
+  <div class="hdr">
+    <span class="hdr-logo">CADF</span>
+    <span class="hdr-sep"></span>
+    <span class="hdr-title">Shift Handover</span>
+    <span class="hdr-date" id="hdr-date"></span>
+    <span class="hdr-badge" id="hdr-badge"></span>
   </div>
 
-  <!-- HANDOVER FROM / TO — auto-filled from selections -->
-  <div class="card" id="handover-card" style="display:none">
-    <div class="card-title">Handover Summary</div>
+  <div class="wrap">
 
-    <!-- Shift flow -->
-    <div style="margin-bottom:14px">
-      <div class="lbl">Shift Handover</div>
-      <div class="flow-row" id="shift-flow-row">
-        <div class="flow-box" id="from-shift-box">–</div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-box" id="to-shift-box">–</div>
+    <!-- Shift Information -->
+    <div class="card">
+      <div class="ct">Shift Information</div>
+
+      <div class="fr">
+        <label class="fl">Terminal</label>
+        <select id="terminal">
+          <option value="">Select terminal</option>
+          <option>Terminal 1</option>
+          <option>Terminal 2</option>
+          <option>Terminal 3</option>
+        </select>
       </div>
-    </div>
 
-    <!-- Team flow -->
-    <div style="margin-bottom:14px">
-      <div class="lbl">Team Handover</div>
-      <div class="flow-row">
-        <div class="flow-box" id="from-team-box">–</div>
-        <div class="flow-arrow">→</div>
-        <div style="flex:1">
-          <div class="lbl" style="margin-bottom:6px">Handover To Team</div>
-          <div class="team-pills" style="margin-bottom:0" id="to-team-pills">
-            <button class="team-pill green" onclick="selectToTeam('Green',this)">🟢 Green</button>
-            <button class="team-pill blue"  onclick="selectToTeam('Blue',this)">🔵 Blue</button>
-            <button class="team-pill yellow" onclick="selectToTeam('Yellow',this)">🟡 Yellow</button>
-            <button class="team-pill red-team" onclick="selectToTeam('Red',this)">🔴 Red</button>
-          </div>
-          <input type="hidden" id="to-team" value="">
+      <div class="fr">
+        <label class="fl">Team</label>
+        <div class="pg" id="team-pills">
+          <button class="pill p-green" data-val="Green">🟢 Green</button>
+          <button class="pill p-blue"  data-val="Blue">🔵 Blue</button>
+          <button class="pill p-yell"  data-val="Yellow">🟡 Yellow</button>
+          <button class="pill p-red"   data-val="Red">🔴 Red</button>
+        </div>
+      </div>
+
+      <div class="fr">
+        <label class="fl">Shift</label>
+        <div class="pg" id="shift-pills">
+          <button class="pill p-shift" data-val="Morning">🌅 Morning</button>
+          <button class="pill p-shift" data-val="Afternoon">☀️ Afternoon</button>
+          <button class="pill p-shift" data-val="Evening">🌙 Evening</button>
+        </div>
+      </div>
+
+      <div class="fr" style="margin-bottom:0">
+        <label class="fl">Staff Name &amp; Employee Code</label>
+        <div class="fg">
+          <input type="text" id="staff-name" placeholder="Full name">
+          <input type="text" id="staff-code" placeholder="Employee code">
         </div>
       </div>
     </div>
 
-    <!-- Staff flow -->
-    <div>
-      <div class="lbl">Staff Handover</div>
-      <div class="flow-row">
-        <div class="flow-box" id="from-staff-box" style="font-size:13px">–</div>
-        <div class="flow-arrow">→</div>
-        <div style="flex:1">
-          <div class="lbl" style="margin-bottom:6px">Receiving Staff Name &amp; Code</div>
-          <div style="display:grid;grid-template-columns:1fr auto;gap:8px">
-            <input class="inp" id="to-staff" placeholder="Receiving staff name" autocomplete="off">
-            <input class="inp" id="to-staff-code" placeholder="Emp. code" autocomplete="off" style="width:110px">
+    <!-- Handover Summary -->
+    <div class="card">
+      <div class="ct">Handover Summary</div>
+
+      <!-- Shift row -->
+      <div style="margin-bottom:14px">
+        <div class="sum-lbl">Shift Handover</div>
+        <div class="sum-grid">
+          <div>
+            <div class="sum-box" id="sum-shift-from">–</div>
+          </div>
+          <div class="sum-arr">→</div>
+          <div>
+            <div class="sum-box" id="sum-shift-to">–</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Team row -->
+      <div style="margin-bottom:14px">
+        <div class="sum-lbl">Team Handover</div>
+        <div class="sum-grid" style="align-items:start">
+          <div>
+            <div class="sum-box" id="sum-team-from">–</div>
+          </div>
+          <div class="sum-arr">→</div>
+          <div>
+            <div class="sum-lbl" style="margin-bottom:5px">Handover To Team</div>
+            <div class="pg" id="to-team-pills">
+              <button class="pill p-green" data-val="Green">🟢 Green</button>
+              <button class="pill p-blue"  data-val="Blue">🔵 Blue</button>
+              <button class="pill p-yell"  data-val="Yellow">🟡 Yellow</button>
+              <button class="pill p-red"   data-val="Red">🔴 Red</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Staff row -->
+      <div>
+        <div class="sum-lbl">Staff Handover</div>
+        <div class="sum-grid" style="align-items:start">
+          <div>
+            <div class="sum-box" id="sum-staff-from">–</div>
+          </div>
+          <div class="sum-arr">→</div>
+          <div>
+            <div class="sum-lbl" style="margin-bottom:5px">Receiving Staff &amp; Code</div>
+            <div class="fg">
+              <input type="text" id="recv-name" placeholder="Full name">
+              <input type="text" id="recv-code" placeholder="Employee code">
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- CATEGORY, BRAND & STOCK COUNT -->
-  <div style="margin-bottom:16px">
-
-    <!-- Saved catalog management -->
-    <div class="card" style="margin-bottom:10px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-        <div class="card-title" style="margin:0">Saved Categories &amp; Brands</div>
-        <button type="button" onclick="showAddCatalogForm()" style="padding:5px 12px;background:var(--navy);color:#fff;border:none;border-radius:var(--rsm);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">+ Add</button>
+    <!-- Categories & Brands -->
+    <div class="card">
+      <div class="ct ct-row">
+        <span style="display:flex;align-items:center;gap:8px">
+          <span style="display:inline-block;width:4px;height:15px;background:var(--accent);border-radius:2px"></span>
+          Categories &amp; Brands
+        </span>
+        <button class="btn btn-s btn-sm" id="btn-manage">⚙ Manage</button>
       </div>
-      <div id="catalog-list" style="margin-bottom:8px"></div>
-      <!-- Add new catalog item form (hidden by default) -->
-      <div id="catalog-form" style="display:none;background:var(--bg);border-radius:var(--rsm);padding:10px;border:var(--bd)">
-        <div class="row2" style="margin-bottom:8px">
-          <div><label class="lbl">Category</label>
-            <input class="inp" id="new-cat" placeholder="e.g. Fragrances" autocomplete="off"></div>
-          <div><label class="lbl">Brand</label>
-            <input class="inp" id="new-brd" placeholder="e.g. Chanel" autocomplete="off"></div>
+
+      <div class="fg" style="margin-bottom:10px">
+        <div>
+          <label class="fl">Category</label>
+          <select id="dd-cat"><option value="">Select category…</option></select>
         </div>
-        <div style="display:flex;gap:8px;justify-content:flex-end">
-          <button type="button" onclick="hideCatalogForm()" style="padding:5px 14px;background:transparent;border:var(--bd);border-radius:var(--rsm);font-size:12px;cursor:pointer;font-family:inherit">Cancel</button>
-          <button type="button" onclick="saveCatalogItem()" style="padding:5px 14px;background:var(--navy);color:#fff;border:none;border-radius:var(--rsm);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">Save</button>
+        <div>
+          <label class="fl">Brand</label>
+          <select id="dd-brand" disabled><option value="">Select brand…</option></select>
         </div>
       </div>
+      <button class="btn btn-p btn-full" id="btn-add-count">+ Add to Stock Count</button>
+
+      <!-- Manage panel -->
+      <div id="manage-panel" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
+        <div class="fr">
+          <div class="fg">
+            <div>
+              <label class="fl">New Category</label>
+              <input type="text" id="new-cat" placeholder="e.g. Fragrances" list="cat-datalist">
+              <datalist id="cat-datalist"></datalist>
+            </div>
+            <div>
+              <label class="fl">New Brand</label>
+              <input type="text" id="new-brand" placeholder="e.g. Chanel">
+            </div>
+          </div>
+        </div>
+        <div class="btn-row" style="margin-bottom:14px">
+          <button class="btn btn-s btn-sm" id="btn-close-manage">Close</button>
+          <button class="btn btn-p btn-sm" id="btn-save-brand">Save Entry</button>
+        </div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:8px">Saved Catalog</div>
+        <div id="catalog-list"></div>
+      </div>
     </div>
 
-    <!-- Stock count rows (auto-populated from saved catalog) -->
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-      <div class="card-title" style="margin:0">Stock Count</div>
+    <!-- Stock Count -->
+    <div class="card">
+      <div class="ct">Stock Count</div>
+      <div id="prev-ref"></div>
+      <div id="stock-list">
+        <div class="empty">
+          <div class="empty-ico">📦</div>
+          <div class="empty-txt">Select a category &amp; brand above,<br>then tap "+ Add to Stock Count"</div>
+        </div>
+      </div>
     </div>
-    <div id="item-rows-wrap"></div>
-  </div>
 
-  <!-- PHOTO ATTACHMENTS -->
-  <div class="card">
-    <div class="card-title">Count Photos</div>
-    <p style="font-size:12px;color:var(--tx2);margin-bottom:12px">Attach photos of the stock count — visible on the manager dashboard.</p>
-    <div class="photo-zone" id="photo-zone" onclick="document.getElementById('photo-fi').click()">
-      <div style="font-size:36px;margin-bottom:6px">📷</div>
-      <div style="font-size:13px;color:var(--tx2);font-weight:500">Tap to add photos</div>
-      <div style="font-size:11px;color:#9ab0be;margin-top:3px">Camera · Photo library · Max 5 photos</div>
+    <!-- Photos -->
+    <div class="card">
+      <div class="ct">Count Photos</div>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:12px">Attach photos of the stock count — visible on the manager dashboard.</p>
+      <div class="ph-area" id="ph-area">
+        <div class="ph-icon">📷</div>
+        <div class="ph-text">Tap to add photos</div>
+        <div class="ph-sub">Camera · Library · Max 5 photos</div>
+      </div>
+      <div class="ph-acts">
+        <button class="btn btn-s" id="btn-lib">📁 From Library</button>
+        <button class="btn btn-s" id="btn-cam">📷 Take Photo</button>
+      </div>
+      <div class="ph-grid" id="ph-grid"></div>
+      <input type="file" id="fileInput" accept="image/*" multiple>
+      <input type="file" id="camInput" accept="image/*" capture="environment">
     </div>
-    <input type="file" id="photo-fi" accept="image/*" multiple style="display:none" onchange="handlePhotos(this)">
-    <div class="photo-grid" id="photo-grid"></div>
-    <div id="photo-count-badge"></div>
-    <div style="display:flex;gap:8px;margin-top:10px">
-      <button onclick="document.getElementById('photo-fi').removeAttribute('capture');document.getElementById('photo-fi').click()" style="flex:1;padding:8px;background:var(--bg);border:var(--bd);border-radius:var(--rsm);font-size:12px;font-weight:600;color:var(--sky);cursor:pointer;font-family:inherit">📁 From Library</button>
-      <button onclick="document.getElementById('photo-fi').setAttribute('capture','environment');document.getElementById('photo-fi').click()" style="flex:1;padding:8px;background:var(--bg);border:var(--bd);border-radius:var(--rsm);font-size:12px;font-weight:600;color:var(--sky);cursor:pointer;font-family:inherit">📷 Take Photo</button>
+
+    <!-- Notes -->
+    <div class="card">
+      <div class="ct">Notes &amp; Issues</div>
+      <textarea id="notes" placeholder="Optional — any issues or observations for the next team…"></textarea>
     </div>
-  </div>
 
-  <!-- NOTES -->
-  <div class="card">
-    <div class="card-title">Notes & Issues</div>
-    <textarea class="inp" id="notes" placeholder="Any issues, discrepancies, or notes for the incoming shift…"></textarea>
-  </div>
+    <!-- Submit -->
+    <div class="card">
+      <label class="chk-row" style="margin-bottom:12px">
+        <input type="checkbox" id="chk-confirm">
+        <span class="chk-lbl">I confirm the stock count is accurate and this handover report is ready to submit.</span>
+      </label>
+      <button class="btn-sub" id="btn-submit" disabled>📤 Submit Handover &amp; Send Email</button>
+    </div>
 
-  <!-- CONFIRM -->
-  <div class="confirm-row" onclick="toggleConfirm()" style="cursor:pointer;user-select:none;-webkit-user-select:none">
-    <input type="checkbox" id="confirm-check" onclick="event.stopPropagation()" style="width:22px;height:22px;flex-shrink:0;accent-color:var(--navy);cursor:pointer;margin-top:0">
-    <label for="confirm-check" style="cursor:pointer;font-size:14px;line-height:1.5">I confirm the stock count is accurate and this handover report is ready to submit.</label>
   </div>
-
-  <button class="btn-submit" id="submit-btn" onclick="submitHandover()">
-    <span id="submit-icon">📤</span>
-    <span id="submit-label">Submit Handover & Send Email</span>
-  </button>
 </div>
 
-<script>
-// ── CONFIG (set by manager, never shown to staff) ──
-const RESEND_KEY = localStorage.getItem('cadf_resend_key') || 're_dGbDGLew_CvoazEbN5YGjA5qLFxiSVzbe';
-const getRecipient = () => localStorage.getItem('cadf_recipient') || 'chokri.salmi@chalhoub.com';
 
-// ── DATE ──
-document.getElementById('hdr-date').textContent = new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-
-// ── SHIFT PILLS ──
-let selShift='', selTeam='';
-const NEXT_SHIFT={Morning:'Afternoon',Afternoon:'Evening',Evening:'Morning'};
-
-function selectShift(val, el){
-  selShift=val;
-  document.getElementById('shift').value=val;
-  document.querySelectorAll('.shift-pill').forEach(p=>p.classList.remove('sel'));
-  el.classList.add('sel');
-  // Header badge
-  const badge=document.getElementById('shift-badge');
-  badge.textContent=val+' Shift';
-  badge.className='shift-badge '+val.toLowerCase();
-  badge.style.display='block';
-  // Update flow boxes
-  const nextShift=NEXT_SHIFT[val]||'';
-  const fromBox=document.getElementById('from-shift-box');
-  const toBox=document.getElementById('to-shift-box');
-  fromBox.textContent='🌅 '+val+' Shift';
-  fromBox.className='flow-box '+val.toLowerCase()+'-box';
-  toBox.textContent=(nextShift==='Morning'?'🌅':nextShift==='Afternoon'?'☀️':'🌙')+' '+nextShift+' Shift';
-  toBox.className='flow-box '+nextShift.toLowerCase()+'-box';
-  updateHandoverCard();
-}
-
-function selectTeam(val, el){
-  selTeam=val;
-  document.getElementById('team').value=val;
-  document.querySelectorAll('.team-pill:not(#to-team-pills .team-pill)').forEach(p=>p.classList.remove('sel'));
-  el.classList.add('sel');
-  // Update from-team box
-  const fromBox=document.getElementById('from-team-box');
-  const icons={Green:'🟢',Blue:'🔵',Yellow:'🟡',Red:'🔴'};
-  fromBox.textContent=(icons[val]||'')+' '+val+' Team';
-  fromBox.className='flow-box '+val.toLowerCase()+'-box';
-  updateHandoverCard();
-}
-
-function selectToTeam(val, el){
-  document.getElementById('to-team').value=val;
-  document.querySelectorAll('#to-team-pills .team-pill').forEach(p=>p.classList.remove('sel'));
-  el.classList.add('sel');
-}
-
-function updateHandoverCard(){
-  const card=document.getElementById('handover-card');
-  if(selShift||selTeam) card.style.display='block';
-  // Update from-staff box live
-  const staffVal=document.getElementById('staff').value.trim();
-  if(staffVal){
-    const fromStaff=document.getElementById('from-staff-box');
-    fromStaff.textContent=staffVal;
-  }
-}
-
-// ── PHOTOS ──
-let photos=[];
-function handlePhotos(input){
-  Array.from(input.files).forEach(f=>{
-    if(photos.length>=5){alert('Max 5 photos');return;}
-    if(f.size>5*1024*1024){alert('Max 5MB per photo');return;}
-    const canvas=document.createElement('canvas'),img=new Image();
-    img.onload=()=>{
-      const MAX=1200;let w=img.width,h=img.height;
-      if(w>h){if(w>MAX){h=Math.round(h*MAX/w);w=MAX;}}else{if(h>MAX){w=Math.round(w*MAX/h);h=MAX;}}
-      canvas.width=w;canvas.height=h;
-      canvas.getContext('2d').drawImage(img,0,0,w,h);
-      photos.push(canvas.toDataURL('image/jpeg',.82));
-      renderPhotos();
-    };
-    img.src=URL.createObjectURL(f);
-  });
-  input.value='';
-}
-function renderPhotos(){
-  document.getElementById('photo-grid').innerHTML=photos.map((p,i)=>`
-    <div class="photo-thumb"><img src="${p}">
-    <button class="photo-del" onclick="removePhoto(${i})">✕</button></div>`).join('');
-  document.getElementById('photo-count-badge').innerHTML=photos.length
-    ?`<span class="photo-count-badge" style="background:var(--teal);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;display:inline-block;margin-top:8px">✅ ${photos.length} photo${photos.length>1?'s':''} attached</span>`:'';
-  document.getElementById('photo-zone').className='photo-zone'+(photos.length?' has':'');
-}
-function removePhoto(i){photos.splice(i,1);renderPhotos();}
-
-function updateFromStaff(){
-  const v=document.getElementById('staff').value.trim();
-  document.getElementById('from-staff-box').textContent=v||'–';
-}
-
-
-function calcHandover(){recalc();}
-function getStockRows(){
-  return Array.from(document.querySelectorAll('#stock-rows .sr-grid')).map(row=>{
-    const ti=row.querySelectorAll('input:not(.sn-inp)');
-    const ni=row.querySelectorAll('.sn-inp');
-    const d=parseFloat(ni[0]?.value)||0,dl=parseFloat(ni[1]?.value)||0,s=parseFloat(ni[2]?.value)||0;
-    return{category:ti[0]?.value.trim()||'',brand:ti[1]?.value.trim()||'',display:d,delivery:dl,sold:s,handover:d+dl-s};
-  }).filter(r=>r.category||r.brand||r.display||r.delivery||r.sold);
-}
-
-// ── CONFIRM ──
-function toggleConfirm(){
-  const cb = document.getElementById('confirm-check');
-  cb.checked = !cb.checked;
-  cb.dispatchEvent(new Event('change'));
-}
-
-// ── SUBMIT ──
-
-// ── SAVED CATALOG & ITEM ROWS ──
-let itemRowId = 0;
-
-// Load saved catalog from localStorage
-function getCatalog() {
-  try { return JSON.parse(localStorage.getItem('cadf_catalog') || '[]'); } catch(e) { return []; }
-}
-function saveCatalog(cat) {
-  localStorage.setItem('cadf_catalog', JSON.stringify(cat));
-}
-
-// Render the saved catalog list
-function renderCatalogList() {
-  const catalog = getCatalog();
-  const el = document.getElementById('catalog-list');
-  if (!el) return;
-  if (!catalog.length) {
-    el.innerHTML = '<div style="font-size:12px;color:var(--tx2);text-align:center;padding:8px">No items saved yet. Click + Add to add your first category &amp; brand.</div>';
-    return;
-  }
-  // Group by category
-  const grouped = {};
-  const order = [];
-  catalog.forEach(function(item, i) {
-    if (!grouped[item.category]) { grouped[item.category] = []; order.push(item.category); }
-    grouped[item.category].push({ brand: item.brand, index: i });
-  });
-  let html2 = '';
-  order.forEach(function(cat) {
-    html2 += '<div style="margin-bottom:8px">'
-      + '<div style="font-size:10px;font-weight:800;color:var(--navy);text-transform:uppercase;letter-spacing:.07em;padding:3px 8px;background:#EEF3FA;border-radius:4px;margin-bottom:4px">' + cat + '</div>';
-    grouped[cat].forEach(function(item) {
-      html2 += '<div style="display:flex;align-items:center;justify-content:space-between;padding:5px 8px;background:var(--bg);border-radius:var(--rsm);margin-bottom:3px;border:var(--bd)">'
-        + '<span style="font-size:12px;color:var(--tx2)">🏷️ ' + item.brand + '</span>'
-        + '<button type="button" onclick="removeCatalogItem(' + item.index + ')" style="background:transparent;border:none;color:var(--red);font-size:16px;cursor:pointer;padding:0 4px;line-height:1">&times;</button>'
-        + '</div>';
-    });
-    html2 += '</div>';
-  });
-  el.innerHTML = html2;
-}
-
-function showAddCatalogForm() {
-  document.getElementById('catalog-form').style.display = 'block';
-  document.getElementById('new-cat').focus();
-}
-function hideCatalogForm() {
-  document.getElementById('catalog-form').style.display = 'none';
-  document.getElementById('new-cat').value = '';
-  document.getElementById('new-brd').value = '';
-}
-function saveCatalogItem() {
-  const cat = document.getElementById('new-cat').value.trim();
-  const brd = document.getElementById('new-brd').value.trim();
-  if (!cat || !brd) { alert('Please enter both Category and Brand.'); return; }
-  const catalog = getCatalog();
-  catalog.push({ category: cat, brand: brd });
-  saveCatalog(catalog);
-  hideCatalogForm();
-  renderCatalogList();
-  buildStockRows();
-}
-function removeCatalogItem(index) {
-  if (!confirm('Remove this item from the saved list?')) return;
-  const catalog = getCatalog();
-  catalog.splice(index, 1);
-  saveCatalog(catalog);
-  renderCatalogList();
-  buildStockRows();
-}
-
-// Build stock count rows grouped by category
-// Shows previous shift handover as locked reference above each row
-function buildStockRows() {
-  const wrap = document.getElementById('item-rows-wrap');
-  if (!wrap) return;
-  wrap.innerHTML = '';
-  itemRowId = 0;
-  const catalog = getCatalog();
-  if (!catalog.length) {
-    wrap.innerHTML = '<div style="font-size:12px;color:var(--tx2);text-align:center;padding:12px;background:var(--card);border-radius:var(--rad);border:var(--bd)">Add categories &amp; brands above — stock count rows will appear here automatically.</div>';
-    return;
-  }
-
-  // Get previous handover for selected terminal
-  const terminal = document.getElementById('terminal') ? document.getElementById('terminal').value : '';
-  let prevHandover = null;
-  if (terminal) {
-    try { prevHandover = JSON.parse(localStorage.getItem('cadf_last_handover_' + terminal)); } catch(e) {}
-  }
-
-  // Build prev handover lookup: category+brand -> handover qty
-  const prevMap = {};
-  if (prevHandover && prevHandover.rows) {
-    prevHandover.rows.forEach(function(r) {
-      prevMap[(r.category + '|' + r.brand).toLowerCase()] = r;
-    });
-  }
-
-  // Group catalog by category
-  const grouped = {};
-  const order = [];
-  catalog.forEach(function(item) {
-    if (!grouped[item.category]) { grouped[item.category] = []; order.push(item.category); }
-    grouped[item.category].push(item.brand);
-  });
-
-  // Build one card per category
-  order.forEach(function(category) {
-    const brands = grouped[category];
-    const card = document.createElement('div');
-    card.className = 'card';
-    card.style.marginBottom = '12px';
-
-    let innerHtml = '<div style="font-size:13px;font-weight:800;color:var(--navy);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid var(--sky)">'
-      + category + '</div>';
-
-    brands.forEach(function(brand) {
-      itemRowId++;
-      const id = itemRowId;
-      const key = (category + '|' + brand).toLowerCase();
-      const prev = prevMap[key];
-
-      // Previous handover reference (locked, read-only)
-      let prevHtml = '';
-      if (prevHandover && prev !== undefined) {
-        const qty = prev ? prev.handover : 0;
-        const color = qty < 0 ? '#E8344A' : qty === 0 ? '#aaa' : '#1B3A6B';
-        prevHtml = '<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:#EEF3FA;border-radius:6px;margin-bottom:10px;border:1px solid #C5D3E8">'
-          + '<span style="font-size:10px;font-weight:700;color:#5a7080;text-transform:uppercase;letter-spacing:.06em">Previous handover (' + (prevHandover.shift||'') + ' — ' + (prevHandover.team||'') + ' Team — ' + (prevHandover.time||'') + '):</span>'
-          + '<span style="font-size:16px;font-weight:800;color:' + color + ';margin-left:auto">' + qty + '</span>'
-          + '<span style="font-size:10px;color:#5a7080">units</span>'
-          + '<span style="font-size:9px;color:#aaa;margin-left:4px">🔒</span>'
-          + '</div>';
-      }
-
-      innerHtml +=
-        '<div style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid #E0E8F0">'
-        + '<div style="font-size:12px;font-weight:600;color:var(--tx2);margin-bottom:8px">🏷️ ' + brand + '</div>'
-        + prevHtml
-        + '<div class="stock-grid">'
-        +   '<div class="stock-item"><div class="stock-lbl">Display Stock</div>'
-        +     '<input class="stock-inp" id="dsp-' + id + '" type="number" min="0" value="0" oninput="calcRow(' + id + ')"></div>'
-        +   '<div class="stock-item"><div class="stock-lbl">Delivery Stock</div>'
-        +     '<input class="stock-inp" id="dlv-' + id + '" type="number" min="0" value="0" oninput="calcRow(' + id + ')"></div>'
-        +   '<div class="stock-item"><div class="stock-lbl">Sold</div>'
-        +     '<input class="stock-inp" id="sld-' + id + '" type="number" min="0" value="0" oninput="calcRow(' + id + ')"></div>'
-        + '</div>'
-        + '<div class="formula-row" style="margin-top:8px">'
-        +   '<span style="font-size:11px;color:var(--tx2)">(Display + Delivery) &minus; Sold =</span>'
-        +   '<span style="font-weight:700;color:var(--sky);font-size:12px">Handover:</span>'
-        +   '<span class="handover-result" id="hov-' + id + '">0</span>'
-        +   '<span id="dsc-' + id + '"></span>'
-        + '</div>'
-        + '</div>';
-    });
-
-    card.innerHTML = innerHtml;
-    wrap.appendChild(card);
-  });
-}
-
-// Rebuild rows when terminal changes (to load correct previous handover)
-document.addEventListener('DOMContentLoaded', function() {
-  const termSelect = document.getElementById('terminal');
-  if (termSelect) {
-    termSelect.addEventListener('change', function() {
-      buildStockRows();
-    });
-  }
-});
-
-function addItemRow(category, brand) {
-  // Used only internally by buildStockRows
-  buildStockRows();
-}
-
-function calcRow(id) {
-  const d  = parseFloat(document.getElementById('dsp-' + id) ? document.getElementById('dsp-' + id).value : 0) || 0;
-  const dl = parseFloat(document.getElementById('dlv-' + id) ? document.getElementById('dlv-' + id).value : 0) || 0;
-  const s  = parseFloat(document.getElementById('sld-' + id) ? document.getElementById('sld-' + id).value : 0) || 0;
-  const h  = (d + dl) - s;
-  const hEl = document.getElementById('hov-' + id);
-  const dEl = document.getElementById('dsc-' + id);
-  if (hEl) hEl.textContent = h;
-  if (dEl) dEl.innerHTML = (d || dl || s)
-    ? (h >= 0 ? '<span class="disc-ok">&#10003; OK</span>' : '<span class="disc-warn">&#9888; Negative</span>')
-    : '';
-}
-
-function getAllItemRows() {
-  const catalog = getCatalog();
-  // Group catalog by category to match how rows were built
-  const grouped = {};
-  const order = [];
-  catalog.forEach(function(item) {
-    if (!grouped[item.category]) { grouped[item.category] = []; order.push(item.category); }
-    grouped[item.category].push(item.brand);
-  });
-  const rows = [];
-  let rowNum = 0;
-  order.forEach(function(category) {
-    grouped[category].forEach(function(brand) {
-      rowNum++;
-      const d  = parseFloat(document.getElementById('dsp-' + rowNum) ? document.getElementById('dsp-' + rowNum).value : 0) || 0;
-      const dl = parseFloat(document.getElementById('dlv-' + rowNum) ? document.getElementById('dlv-' + rowNum).value : 0) || 0;
-      const s  = parseFloat(document.getElementById('sld-' + rowNum) ? document.getElementById('sld-' + rowNum).value : 0) || 0;
-      rows.push({ category: category, brand: brand, display: d, delivery: dl, sold: s, handover: d + dl - s });
-    });
-  });
-  return rows;
-}
-
-// Init on DOM ready
-document.addEventListener('DOMContentLoaded', function() {
-  renderCatalogList();
-  buildStockRows();
-});
-
-async function submitHandover(){
-  const terminal=document.getElementById('terminal').value;
-  const team=document.getElementById('team').value;
-  const shift=document.getElementById('shift').value;
-  const staff=document.getElementById('staff').value.trim();
-  const toTeam=document.getElementById('to-team').value;
-  const toStaff=document.getElementById('to-staff').value.trim();
-  const staffCode=document.getElementById('staff-code')?document.getElementById('staff-code').value.trim():'';
-  const toStaffCode=document.getElementById('to-staff-code')?document.getElementById('to-staff-code').value.trim():'';
-  const display=document.getElementById('display-stock').value;
-  const delivery=document.getElementById('delivery-stock').value;
-  const sold=document.getElementById('sold').value;
-  const notes=document.getElementById('notes').value.trim();
-
-  if(!terminal){showStatus('err','Please select a terminal.');return;}
-  if(!team){showStatus('err','Please select a team.');return;}
-  if(!shift){showStatus('err','Please select a shift.');return;}
-  if(!staff){showStatus('err','Please enter your name.');return;}
-  if(!toTeam){showStatus('err','Please select the team you are handing over to.');return;}
-  if(!toStaff){showStatus('err','⚠️ Please enter the Receiving Staff Name.');return;}
-  if(!staffCode){showStatus('err','⚠️ Please enter your Employee Code.');return;}
-  if(!toStaffCode){showStatus('err','⚠️ Please enter the Receiving Staff Employee Code.');return;}
-  if(stockRows.length===0||(!display&&!delivery&&!sold)){showStatus('err','Please add at least one stock count row.');return;}
-  if(!document.getElementById('confirm-check').checked){showStatus('err','Please confirm the stock count before submitting.');return;}
-
-  const handover=display+delivery-sold;
-  const now=new Date();
-  const dateStr=now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-  const timeStr=now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
-
-  // Save to localStorage for manager dashboard
-  const fromShift=selShift+' Shift';
-  const toShift=NEXT_SHIFT[selShift]?NEXT_SHIFT[selShift]+' Shift':'–';
-  const category=document.getElementById('category').value;
-  const brand=document.getElementById('brand').value.trim();
-  const record={
-    id:Date.now(),date:now.toISOString(),dateStr,timeStr,
-    terminal,team,shift,staff,fromShift,toShift,
-    fromTeam:team,toTeam,fromStaff:staff,toStaff,
-    category,brand,
-    display:parseFloat(display)||0,
-    delivery:parseFloat(delivery)||0,
-    sold:parseFloat(sold)||0,
-    handover,notes,
-    photos:[...photos]
-  };
-  const all=JSON.parse(localStorage.getItem('cadf_handovers')||'[]');
-  all.unshift(record);
-  localStorage.setItem('cadf_handovers',JSON.stringify(all.slice(0,200)));
-  // Save last handover stock per terminal for next shift reference
-  if(terminal && allRows.length){
-    const lastHandover = {
-      shift: selShift, team: team, staff: staff, time: timeStr, date: dateStr,
-      rows: allRows.map(function(r){ return {category:r.category, brand:r.brand, handover:r.handover}; })
-    };
-    localStorage.setItem('cadf_last_handover_'+terminal, JSON.stringify(lastHandover));
-  }
-
-  const btn=document.getElementById('submit-btn');
-  const lbl=document.getElementById('submit-label');
-  btn.disabled=true;btn.className='btn-submit sending';
-  lbl.textContent='Sending…';
-
-  const photoNote=photos.length>0?`${photos.length} photo(s) attached — view in manager dashboard`:'No photos attached';
-
-  const emailBody=`CADF Shift Handover Report
-════════════════════════════════
-Date:      ${dateStr} at ${timeStr}
-Terminal:  ${terminal}
-Team:      ${team} Team
-Shift:     ${shift} Shift
-Staff:     ${staff}
-
-HANDOVER
-────────
-Shift:  ${fromShift} → ${toShift}
-Team:   ${team} Team → ${toTeam} Team
-Staff:  ${staff} → ${toStaff}
-
-STOCK COUNT BY CATEGORY
-───────────────────────
-${stockRows.map((r,i)=>`Row ${i+1}: ${r.category||'–'} / ${r.brand||'–'} | Display:${r.display} Delivery:${r.delivery} Sold:${r.sold} → Handover:${r.handover}`).join('\n')}
-───────────────────────
-TOTAL Handover Stock: ${handover}
-
-PHOTOS
-──────
-${photoNote}
-
-NOTES
-─────
-${notes||'None'}
-════════════════════════════════
-Submitted via CADF Handover App`;
-
-  try{
-    const key=localStorage.getItem('cadf_resend_key')||'re_dGbDGLew_CvoazEbN5YGjA5qLFxiSVzbe';
-    const res=await fetch('https://cadf-email-proxy.chokri-salmi.workers.dev',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        apiKey:key,
-        to:getRecipient(),
-        subject:`CADF Handover — ${shift} Shift — ${terminal} — ${team} Team — ${dateStr}`,
-        text:emailBody
-      })
-    });
-    const data=await res.json();
-    if(data.id){
-      btn.className='btn-submit sent';lbl.textContent='✅ Handover submitted & email sent!';
-      showStatus('ok',`✅ Handover saved and email sent successfully.`);
-      resetForm();
-    }else{
-      throw new Error(data.message||data.name||'Unknown error');
-    }
-  }catch(e){
-    // Still saved locally even if email fails
-    btn.disabled=false;btn.className='btn-submit';lbl.textContent='Submit Handover & Send Email';
-    showStatus('err',`Handover saved to dashboard. Email failed: ${e.message}`);
-  }
-}
-
-function resetForm(){
-  setTimeout(()=>{
-    document.getElementById('terminal').value='';
-    document.getElementById('team').value='';
-    document.getElementById('shift').value='';
-    document.getElementById('staff').value='';
-    document.getElementById('stock-rows').innerHTML='';
-    rowId=0;
-    addStockRow();
-    addStockRow();
-    recalc();
-    document.getElementById('to-team').value='';
-    document.getElementById('to-staff').value='';
-    document.getElementById('handover-card').style.display='none';
-    document.querySelectorAll('#to-team-pills .team-pill').forEach(p=>p.classList.remove('sel'));
-
-    document.getElementById('notes').value='';
-    document.getElementById('confirm-check').checked=false;
-    document.getElementById('handover-val').textContent='–';
-    document.getElementById('disc-badge').innerHTML='';
-    document.getElementById('shift-badge').style.display='none';
-    document.querySelectorAll('.shift-pill,.team-pill').forEach(p=>p.classList.remove('sel'));
-    selShift='';selTeam='';
-    photos=[];renderPhotos();
-    const btn=document.getElementById('submit-btn');
-    btn.disabled=false;btn.className='btn-submit';
-    document.getElementById('submit-label').textContent='Submit Handover & Send Email';
-  },3000);
-}
-
-function showStatus(type,msg){
-  const bar=document.getElementById('status-bar');
-  bar.className=`status-bar show ${type}`;
-  bar.innerHTML=(type==='ok'?'✅ ':'⚠️ ')+msg;
-  bar.scrollIntoView({behavior:'smooth',block:'nearest'});
-  setTimeout(()=>bar.classList.remove('show'),8000);
-}
-</script>
-
-</div>
-
-<!-- ═══ MANAGER PANEL ═══ -->
+<!-- ═══════════════ MANAGER PANEL ═══════════════ -->
 <div id="mgr-panel">
 
+  <!-- Login -->
+  <div id="mgr-login" class="mgr-login-wrap">
+    <div class="mgr-login-card">
+      <div class="mgr-logo-big">C</div>
+      <div class="mgr-ttl">CADF</div>
+      <div class="mgr-sub">Manager Dashboard — Shift Handover</div>
+      <div class="login-err" id="login-err">Incorrect credentials.</div>
+      <div class="fr">
+        <label class="fl">Username</label>
+        <input type="text" id="mgr-user" placeholder="Username">
+      </div>
+      <div class="fr">
+        <label class="fl">Password</label>
+        <input type="text" id="mgr-pass" placeholder="Password">
+      </div>
+      <button class="btn btn-p btn-full" id="btn-login">Sign In</button>
+    </div>
+  </div>
 
-<!-- LOGIN -->
-<div id="login-screen">
-<div class="login-card">
-  <div class="login-logo">CADF</div>
-  <div class="login-sub">Manager Dashboard — Shift Handover</div>
-  <div class="frow"><label class="lbl">Username</label><input class="inp" id="u" type="text" autocomplete="off" placeholder="Username"></div>
-  <div class="frow"><label class="lbl">Password</label><input class="inp" id="p" type="password" placeholder="Password" onkeydown="if(event.key==='Enter')login()"></div>
-  <button class="btn btn-primary" style="width:100%;padding:12px;font-size:14px;margin-top:4px" onclick="login()">Sign In</button>
-  <div id="login-err" style="color:var(--red);font-size:12px;margin-top:8px;display:none">Incorrect credentials.</div>
-</div>
-</div>
-
-<!-- DASHBOARD -->
-<div id="dashboard">
-<div class="hdr">
-  <div class="hdr-inner">
-    <div class="hdr-left">
-      <div style="font-size:22px;font-weight:900;color:#fff;letter-spacing:-.5px">CADF</div>
-      <div class="hdr-div"></div>
-      <div>
-        <div class="hdr-title">Manager Dashboard</div>
-        <div class="hdr-sub" id="hdr-date"></div>
+  <!-- Dashboard -->
+  <div id="mgr-main" class="mgr-main">
+    <div class="mgr-hdr">
+      <span class="mgr-hdr-logo">CADF</span>
+      <span class="mgr-hdr-sep"></span>
+      <span class="mgr-hdr-ttl">Manager Dashboard</span>
+      <div class="mgr-hdr-btns">
+        <button class="btn" id="btn-email-set">⚙️ Email</button>
+        <button class="btn" id="btn-export">📥 Export</button>
+        <button class="btn" id="btn-signout">Sign Out</button>
       </div>
     </div>
-    <div>
-      <button class="hdr-btn" onclick="openEmailSettings()">⚙️ Email Settings</button>
-      <button class="hdr-btn" onclick="exportExcel()" style="background:rgba(39,174,96,.25);border-color:rgba(39,174,96,.5)">📥 Export Excel</button>
-      <button class="hdr-btn" onclick="logout()">Sign Out</button>
+
+    <div class="mgr-wrap">
+      <div class="kpi-grid" id="kpi-grid">
+        <div class="kpi-card"><div class="kpi-val" id="kpi-total">0</div><div class="kpi-lbl">Total</div></div>
+        <div class="kpi-card"><div class="kpi-val" id="kpi-today">0</div><div class="kpi-lbl">Today</div></div>
+        <div class="kpi-card"><div class="kpi-val" id="kpi-am">0</div><div class="kpi-lbl">Morning</div></div>
+        <div class="kpi-card"><div class="kpi-val" id="kpi-pm">0</div><div class="kpi-lbl">Afternoon</div></div>
+        <div class="kpi-card"><div class="kpi-val" id="kpi-ev">0</div><div class="kpi-lbl">Evening</div></div>
+      </div>
+
+      <div class="flt-bar">
+        <div class="ct" style="margin-bottom:12px">Filter Records</div>
+        <div class="flt-row">
+          <div class="fr"><label class="fl">Shift</label>
+            <select id="f-shift"><option value="">All Shifts</option><option>Morning</option><option>Afternoon</option><option>Evening</option></select>
+          </div>
+          <div class="fr"><label class="fl">Terminal</label>
+            <select id="f-term"><option value="">All Terminals</option><option>Terminal 1</option><option>Terminal 2</option><option>Terminal 3</option></select>
+          </div>
+          <div class="fr"><label class="fl">Team</label>
+            <select id="f-team"><option value="">All Teams</option><option>Green</option><option>Blue</option><option>Yellow</option><option>Red</option></select>
+          </div>
+          <div class="fr" style="display:flex;align-items:flex-end">
+            <button class="btn btn-d btn-sm" id="btn-clear-all">Clear All Records</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="rec-list"></div>
     </div>
   </div>
-</div>
-
-<div class="wrap">
-  <!-- KPIs -->
-  <div class="kpi-grid" id="kpi-grid"></div>
-
-  <!-- FILTERS -->
-  <div class="card">
-    <div class="card-title">Filter Records</div>
-    <div style="font-size:11px;font-weight:700;color:var(--tx2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">Shift</div>
-    <div class="filters" id="shift-filters"></div>
-    <div style="font-size:11px;font-weight:700;color:var(--tx2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;margin-top:10px">Terminal</div>
-    <div class="filters" id="terminal-filters"></div>
-    <div style="font-size:11px;font-weight:700;color:var(--tx2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;margin-top:10px">Team</div>
-    <div class="filters" id="team-filters"></div>
-  </div>
-
-  <!-- RECORDS -->
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-    <div style="font-size:13px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.07em">Handover Records <span id="rec-count" style="font-weight:400;color:var(--tx2);font-size:12px;text-transform:none;letter-spacing:0"></span></div>
-    <button class="btn btn-sm" onclick="clearAll()" style="color:var(--red);border-color:var(--red)">Clear All</button>
-  </div>
-  <div id="records-list"></div>
-</div>
-</div>
-
-<!-- EMAIL SETTINGS MODAL -->
-<div class="overlay" id="email-modal">
-<div class="modal">
-  <h3>⚙️ Email Settings</h3>
-  <div class="modal-sub">Configure where handover reports are sent. Only visible to managers.</div>
-  <div class="frow">
-    <label class="lbl">Recipient Email (receives all reports)</label>
-    <input class="inp" id="cfg-recipient" type="email" placeholder="manager@cadf.ae">
-  </div>
-  <div class="frow">
-    <label class="lbl">Resend API Key</label>
-    <input class="inp" id="cfg-key" placeholder="re_xxxxxxxxxxxxxxxxxxxx">
-    <div style="font-size:11px;color:var(--tx2);margin-top:5px">Free at <strong>resend.com</strong> — 3,000 emails/month. Get your key from API Keys section.</div>
-  </div>
-  <div id="email-status" style="font-size:12px;margin-bottom:10px;display:none"></div>
-  <div style="display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap">
-    <button class="btn btn-sm" onclick="testEmail()">📧 Send Test Email</button>
-    <div style="display:flex;gap:8px">
-      <button class="btn btn-sm" onclick="closeEmailModal()">Cancel</button>
-      <button class="btn btn-sm btn-primary" onclick="saveEmailSettings()">Save</button>
-    </div>
-  </div>
-</div>
 </div>
 
 <!-- LIGHTBOX -->
-<div id="lightbox" onclick="closeLightbox()">
-  <button id="lb-close" onclick="closeLightbox()">✕</button>
+<div id="lightbox">
+  <button id="lb-close">✕</button>
   <img id="lb-img" src="" alt="">
-  <div id="lb-info"></div>
 </div>
 
+<!-- EMAIL MODAL -->
+<div id="email-modal">
+  <div class="modal-box">
+    <div class="modal-ttl">⚙️ Email Settings</div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:16px">Configure where handover reports are sent. Only visible to managers.</p>
+    <div class="fr">
+      <label class="fl">Recipient Email(s)</label>
+      <input type="text" id="set-emails" placeholder="manager@example.com; another@example.com">
+    </div>
+    <div class="fr">
+      <label class="fl">Resend API Key</label>
+      <input type="text" id="set-key" placeholder="re_...">
+      <div style="font-size:11px;color:var(--muted);margin-top:5px">Free at <b>resend.com</b> — 3,000 emails/month.</div>
+    </div>
+    <div class="btn-row" style="margin-bottom:10px">
+      <button class="btn btn-s btn-sm" id="btn-test-email">📧 Send Test</button>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-s" id="btn-email-cancel">Cancel</button>
+      <button class="btn btn-p" id="btn-email-save">Save</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
 <script>
-const CREDS={user:'CADF',pass:'Chalhoub2026'};
-let fShift='All',fTerminal='All',fTeam='All';
+// ─── UTILS ───────────────────────────────────────
+const $ = id => document.getElementById(id);
+const LS = {
+  get: k => { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } },
+  set: (k,v) => localStorage.setItem(k, JSON.stringify(v)),
+  del: k => localStorage.removeItem(k)
+};
+function toast(msg, type='', ms=3000) {
+  const t=$('toast'); t.textContent=msg; t.className='show '+type;
+  clearTimeout(t._t); t._t=setTimeout(()=>t.className='',ms);
+}
+const shiftNext = s => ({Morning:'Afternoon',Afternoon:'Evening',Evening:'Morning'}[s]||'');
+const teamCol = t => ({Green:'var(--green)',Blue:'var(--blue)',Yellow:'var(--yell)',Red:'var(--red)'}[t]||'var(--muted)');
+const fmtDate = ts => new Date(ts).toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+const isToday = ts => { const d=new Date(ts),n=new Date(); return d.getDate()===n.getDate()&&d.getMonth()===n.getMonth()&&d.getFullYear()===n.getFullYear(); };
+const esc = s => String(s).replace(/'/g,"\\'").replace(/"/g,'&quot;');
 
-function login(){
-  const u=document.getElementById('u').value.trim();
-  const p=document.getElementById('p').value;
-  if(u===CREDS.user&&p===CREDS.pass){
-    document.getElementById('login-screen').style.display='none';
-    document.getElementById('dashboard').style.display='block';
-    document.getElementById('hdr-date').textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-    render();
-  }else{
-    document.getElementById('login-err').style.display='block';
+// ─── ROUTING ─────────────────────────────────────
+function route() {
+  $('staff-panel').classList.remove('active');
+  $('mgr-panel').classList.remove('active');
+  if (location.hash === '#manager') {
+    $('mgr-panel').classList.add('active');
+    initMgr();
+  } else {
+    $('staff-panel').classList.add('active');
+    initStaff();
   }
 }
-function logout(){
-  document.getElementById('login-screen').style.display='flex';
-  document.getElementById('dashboard').style.display='none';
-  document.getElementById('u').value='';
-  document.getElementById('p').value='';
+window.addEventListener('hashchange', route);
+route();
+
+// ─── STAFF STATE ─────────────────────────────────
+let selTeam='', selShift='', selToTeam='';
+let catalog=[], counts={}, photos=[], activeItems=[];
+
+function initStaff() {
+  catalog = LS.get('cadf_catalog') || [];
+  $('hdr-date').textContent = new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  buildCatDropdown();
+  renderSummary();
+  renderPrevRef();
 }
 
-function getAll(){return JSON.parse(localStorage.getItem('cadf_handovers')||'[]');}
-
-function render(){renderKPIs();renderFilters();renderRecords();}
-
-function renderKPIs(){
-  const all=getAll();
-  const today=new Date().toISOString().slice(0,10);
-  const todayRecs=all.filter(r=>r.date.slice(0,10)===today);
-  const withPhotos=all.filter(r=>r.photos&&r.photos.length>0).length;
-  const totalStock=all.reduce((a,r)=>a+(r.handover||0),0);
-  document.getElementById('kpi-grid').innerHTML=`
-    <div class="kpi"><div class="kpi-val" style="color:var(--navy)">${all.length}</div><div class="kpi-lbl">Total Records</div></div>
-    <div class="kpi"><div class="kpi-val" style="color:var(--teal)">${todayRecs.length}</div><div class="kpi-lbl">Today</div></div>
-    <div class="kpi"><div class="kpi-val" style="color:var(--sky)">${totalStock}</div><div class="kpi-lbl">Total Handover Stock</div></div>
-    <div class="kpi"><div class="kpi-val" style="color:#27AE60">${withPhotos}</div><div class="kpi-lbl">With Photos</div></div>`;
-}
-
-function renderFilters(){
-  const shiftOpts=[{v:'All',cls:''},{v:'Morning',cls:'morning'},{v:'Afternoon',cls:'afternoon'},{v:'Evening',cls:'evening'}];
-  document.getElementById('shift-filters').innerHTML=shiftOpts.map(o=>
-    `<button class="fpill${o.cls?' '+o.cls:''}${o.v===fShift?' active':''}" onclick="setFShift('${o.v}')">${o.v==='Morning'?'🌅 ':o.v==='Afternoon'?'☀️ ':o.v==='Evening'?'🌙 ':''}${o.v}</button>`
-  ).join('');
-  const termOpts=['All','Terminal 1','Terminal 2','Terminal 3'];
-  document.getElementById('terminal-filters').innerHTML=termOpts.map(o=>
-    `<button class="fpill${o===fTerminal?' active':''}" onclick="setFTerminal('${o}')">${o}</button>`
-  ).join('');
-  const teamOpts=[{v:'All',cls:''},{v:'Green',cls:'green'},{v:'Blue',cls:'blue'},{v:'Yellow',cls:'yellow'},{v:'Red',cls:'red-team'}];
-  document.getElementById('team-filters').innerHTML=teamOpts.map(o=>
-    `<button class="fpill${o.cls?' '+o.cls:''}${o.v===fTeam?' active':''}" onclick="setFTeam('${o.v}')">${o.v==='Green'?'🟢 ':o.v==='Blue'?'🔵 ':o.v==='Yellow'?'🟡 ':o.v==='Red'?'🔴 ':''}${o.v}</button>`
-  ).join('');
-}
-function setFShift(v){fShift=v;render();}
-function setFTerminal(v){fTerminal=v;render();}
-function setFTeam(v){fTeam=v;render();}
-
-function renderRecords(){
-  let recs=getAll();
-  if(fShift!=='All') recs=recs.filter(r=>r.shift===fShift);
-  if(fTerminal!=='All') recs=recs.filter(r=>r.terminal===fTerminal);
-  if(fTeam!=='All') recs=recs.filter(r=>r.team===fTeam);
-  document.getElementById('rec-count').textContent=`(${recs.length} record${recs.length!==1?'s':''})`;
-
-  if(!recs.length){
-    document.getElementById('records-list').innerHTML=`<div class="empty"><div style="font-size:44px;margin-bottom:10px">📋</div><div style="font-weight:600">No records yet</div><div style="font-size:13px;margin-top:4px">Records appear here after staff submit handovers.</div></div>`;
-    return;
-  }
-
-  document.getElementById('records-list').innerHTML=recs.map((r,i)=>{
-    const shiftCls=r.shift?r.shift.toLowerCase():'navy';
-    const rawTeamCls=r.team?r.team.toLowerCase():'navy';
-    const teamCls=rawTeamCls==='red'?'red':rawTeamCls;
-    const hasPhotos=r.photos&&r.photos.length>0;
-    return `<div class="rec">
-      <div class="rec-hdr" onclick="toggleRec(${i})">
-        <div style="flex:1">
-          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:5px">
-            <span style="font-size:14px;font-weight:700">${r.staff||'Unknown'}</span>
-            ${r.staffCode?`<span style="font-size:11px;background:var(--color-background-secondary);color:var(--tx2);border:0.5px solid var(--color-border-tertiary);padding:2px 8px;border-radius:12px;font-weight:600">${r.staffCode}</span>`:''}
-            ${hasPhotos?`<span class="badge badge-teal">📷 ${r.photos.length} photo${r.photos.length>1?'s':''}</span>`:''}
-            ${r.mgrComment?`<span class="badge" style="background:#FFFBEC;color:#8a7000;border:1px solid #F5D000">⚠️ Commented</span>`:''}
-          </div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap">
-            <span class="badge badge-navy">${r.terminal||'–'}</span>
-            <span class="badge badge-${shiftCls}">${r.shift||'–'} Shift</span>
-            <span class="badge badge-${teamCls}">${r.team||'–'} Team</span>
-            <span class="badge badge-navy">📦 ${r.handover}</span>
-            ${r.category?`<span class="badge badge-navy">${r.category}</span>`:''}
-            ${r.brand?`<span class="badge badge-teal">${r.brand}</span>`:''}
-          </div>
-          <div style="font-size:11px;color:var(--tx2);margin-top:4px">${r.dateStr||''} at ${r.timeStr||''}</div>
-        </div>
-        <div class="arrow" id="arr-${i}">▼</div>
-      </div>
-      <div class="rec-body" id="body-${i}">
-        <div class="handover-flow-grid">
-          <div class="hf-col">
-            <div class="hf-lbl">Shift</div>
-            <div class="hf-val">${r.fromShift||r.shift||'–'} <span class="hf-arrow">→</span> ${r.toShift||'–'}</div>
-          </div>
-          <div class="hf-col">
-            <div class="hf-lbl">Team</div>
-            <div class="hf-val">${r.fromTeam||r.team||'–'} <span class="hf-arrow">→</span> ${r.toTeam||'–'}</div>
-          </div>
-          <div class="hf-col">
-            <div class="hf-lbl">Staff</div>
-            <div class="hf-val">${r.fromStaff||r.staff||'–'} <span class="hf-arrow">→</span> ${r.toStaff||'–'}</div>
-          </div>
-        </div>
-        ${(r.category||r.brand)?`<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
-          ${r.category?`<span class="badge badge-navy">📦 ${r.category}</span>`:''}
-          ${r.brand?`<span class="badge badge-teal">🏷️ ${r.brand}</span>`:''}
-          ${hasPhotos?`<div style="display:flex;gap:3px;margin-top:5px;flex-wrap:wrap">${r.photos.slice(0,3).map(p=>`<img src="${p}" style="width:36px;height:36px;object-fit:cover;border-radius:4px;border:1.5px solid var(--teal)">`).join('')}${r.photos.length>3?`<div style="width:36px;height:36px;border-radius:4px;background:var(--teal);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">+${r.photos.length-3}</div>`:''}</div>`:''}
-        </div>`:''}
-        <div class="stock-row">
-          <div class="chip"><div class="chip-val">${r.display}</div><div class="chip-lbl">Display</div></div>
-          <div class="chip"><div class="chip-val">${r.delivery}</div><div class="chip-lbl">Delivery</div></div>
-          <div class="chip"><div class="chip-val">${r.sold}</div><div class="chip-lbl">Sold</div></div>
-          <div class="chip result"><div class="chip-val">${r.handover}</div><div class="chip-lbl">Handover</div></div>
-        </div>
-        ${hasPhotos?`<div class="photo-section">
-          <div class="photo-section-title">📷 Count Photos (${r.photos.length})</div>
-          <div class="photo-grid-dash">${r.photos.map((p,pi)=>`<div class="photo-item" onclick="openLightbox('${p}','Photo ${pi+1} — ${r.staff} — ${r.shift} Shift')"><img src="${p}" loading="lazy"></div>`).join('')}</div>
-        </div>`:`<div class="no-photo">No photos attached</div>`}
-        ${r.notes?`<div class="notes-box"><strong style="font-size:11px;color:var(--tx2);text-transform:uppercase;letter-spacing:.05em">Notes:</strong><br>${r.notes}</div>`:''}
-        
-        <!-- MANAGER COMMENT -->
-        <div style="margin-top:12px;background:#FFFBEC;border:1px solid #F5D000;border-radius:var(--rsm);padding:12px">
-          <div style="font-size:11px;font-weight:700;color:#8a7000;text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">⚠️ Manager Comment</div>
-          <textarea id="mgr-comment-${r.id}" rows="2" placeholder="Add your investigation comment here…" style="width:100%;padding:8px 10px;border:1px solid #E0E8F0;border-radius:var(--rsm);font-size:13px;font-family:inherit;resize:vertical;background:#fff">${r.mgrComment||''}</textarea>
-          <div style="display:flex;justify-content:flex-end;margin-top:6px">
-            <button onclick="saveMgrComment('${r.id}')" style="padding:6px 16px;background:#1B3A6B;color:#fff;border:none;border-radius:var(--rsm);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">💾 Save Comment</button>
-          </div>
-          ${r.mgrComment?`<div style="font-size:10px;color:#8a7000;margin-top:4px">Last saved: ${r.mgrCommentDate||''}</div>`:''}
-        </div>
-
-        <div style="margin-top:12px;text-align:right">
-          <button class="btn btn-sm" onclick="deleteRec(${r.id})" style="color:var(--red);border-color:var(--red)">Delete</button>
-        </div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function toggleRec(i){
-  const body=document.getElementById(`body-${i}`);
-  const arr=document.getElementById(`arr-${i}`);
-  const open=body.classList.toggle('open');
-  arr.classList.toggle('open',open);
-}
-function deleteRec(id){
-  if(!confirm('Delete this record?'))return;
-  let all=getAll().filter(r=>r.id!==id);
-  localStorage.setItem('cadf_handovers',JSON.stringify(all));
-  render();
-}
-function clearAll(){
-  if(!confirm('Delete ALL handover records? This cannot be undone.'))return;
-  localStorage.removeItem('cadf_handovers');
-  render();
-}
-
-// ── EMAIL SETTINGS (manager only) ──
-function openEmailSettings(){
-  document.getElementById('cfg-recipient').value=localStorage.getItem('cadf_recipient')||'';
-  document.getElementById('cfg-key').value=localStorage.getItem('cadf_resend_key')||'';
-  document.getElementById('email-status').style.display='none';
-  document.getElementById('email-modal').classList.add('open');
-}
-function closeEmailModal(){document.getElementById('email-modal').classList.remove('open');}
-function saveEmailSettings(){
-  const r=document.getElementById('cfg-recipient').value.trim();
-  const k=document.getElementById('cfg-key').value.trim();
-  if(r)localStorage.setItem('cadf_recipient',r);
-  if(k)localStorage.setItem('cadf_resend_key',k);
-  closeEmailModal();
-  showToast('✅ Email settings saved');
-}
-async function testEmail(){
-  const r=document.getElementById('cfg-recipient').value.trim();
-  const k=document.getElementById('cfg-key').value.trim();
-  if(!r||!k){alert('Please fill in both fields first.');return;}
-  const st=document.getElementById('email-status');
-  st.style.display='block';st.style.color='var(--sky)';st.textContent='Sending test email…';
-  try{
-    const res=await fetch('https://cadf-email-proxy.chokri-salmi.workers.dev',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        apiKey:k,
-        to:r,
-        subject:'CADF Handover — Test Email',
-        text:'This is a test email from CADF Shift Handover system. Email is configured correctly!'
-      })
+// ─── PILLS ───────────────────────────────────────
+function setupPills(groupId, onSelect) {
+  document.querySelectorAll('#'+groupId+' .pill').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('#'+groupId+' .pill').forEach(b => b.classList.remove('on'));
+      this.classList.add('on');
+      onSelect(this.dataset.val);
     });
-    const d=await res.json();
-    if(d.id){st.style.color='#27AE60';st.textContent='✅ Test email sent successfully!';}
-    else throw new Error(d.message||'Failed');
-  }catch(e){
-    st.style.color='var(--red)';st.textContent='❌ Failed: '+e.message;
-  }
+  });
+}
+setupPills('team-pills', v => { selTeam=v; renderSummary(); renderPrevRef(); });
+setupPills('shift-pills', v => { selShift=v; renderSummary(); renderPrevRef(); renderStock(); updateBadge(); });
+setupPills('to-team-pills', v => { selToTeam=v; renderSummary(); });
+
+function updateBadge() {
+  const b=$('hdr-badge'), emoji={Morning:'🌅',Afternoon:'☀️',Evening:'🌙'};
+  if (selShift) { b.textContent=(emoji[selShift]||'')+' '+selShift+' Shift'; b.style.display='block'; }
+  else b.style.display='none';
 }
 
-function exportExcel(){
-  let recs = getAll();
-  if(fShift!=='All') recs=recs.filter(r=>r.shift===fShift);
-  if(fTerminal!=='All') recs=recs.filter(r=>r.terminal===fTerminal);
-  if(fTeam!=='All') recs=recs.filter(r=>r.team===fTeam);
+// ─── SUMMARY ─────────────────────────────────────
+function renderSummary() {
+  const emoji={Morning:'🌅',Afternoon:'☀️',Evening:'🌙'};
+  const te={Green:'🟢',Blue:'🔵',Yellow:'🟡',Red:'🔴'};
+  $('sum-shift-from').textContent = selShift ? emoji[selShift]+' '+selShift+' Shift' : '–';
+  $('sum-shift-to').textContent   = selShift ? (emoji[shiftNext(selShift)]||'')+' '+shiftNext(selShift)+' Shift' : '–';
+  $('sum-team-from').textContent  = selTeam  ? te[selTeam]+' '+selTeam+' Team' : '–';
+  $('sum-team-from').style.color  = selTeam  ? teamCol(selTeam) : 'var(--text)';
+  const n=$('staff-name').value.trim(), c=$('staff-code').value.trim();
+  $('sum-staff-from').textContent = [n,c].filter(Boolean).join(' · ') || '–';
+}
+['staff-name','staff-code','recv-name','recv-code'].forEach(id => $(id).addEventListener('input', renderSummary));
+$('terminal').addEventListener('change', () => { renderSummary(); renderPrevRef(); renderStock(); });
 
-  if(!recs.length){showToast('No records to export');return;}
-
-  // Build HTML table for Excel (supports embedded images via data URIs)
-  const imgSize = 80; // px
-
-  let tableRows = recs.map(r => {
-    const photoCell = r.photos && r.photos.length > 0
-      ? r.photos.slice(0,3).map(p =>
-          `<img src="${p}" width="${imgSize}" height="${imgSize}" style="object-fit:cover;margin:2px;border-radius:4px">`
-        ).join('')
-      : 'No photos';
-
-    return `<tr>
-      <td>${r.dateStr||''}</td>
-      <td>${r.timeStr||''}</td>
-      <td>${r.terminal||''}</td>
-      <td>${r.shift||''} Shift</td>
-      <td>${r.team||''} Team</td>
-      <td>${r.staff||''}</td>
-      <td>${r.toStaff||''}</td>
-      <td>${r.toTeam||''} Team</td>
-      <td>${r.category||''}</td>
-      <td>${r.brand||''}</td>
-      <td style="text-align:center">${r.display||0}</td>
-      <td style="text-align:center">${r.delivery||0}</td>
-      <td style="text-align:center">${r.sold||0}</td>
-      <td style="text-align:center;font-weight:bold">${r.handover||0}</td>
-      <td>${r.notes||''}</td>
-      <td style="text-align:center">${photoCell}</td>
-    </tr>`;
-  }).join('');
-
-  const now = new Date();
-  const dateStr = now.toLocaleDateString('en-GB');
-
-  const excelHtml = `
-    <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
-    <head><meta charset="UTF-8">
-    <style>
-      table{border-collapse:collapse;font-family:Arial,sans-serif;font-size:11px}
-      th{background:#1B3A6B;color:#fff;padding:8px 10px;text-align:left;white-space:nowrap;border:1px solid #ccc}
-      td{padding:6px 10px;border:1px solid #ddd;vertical-align:middle}
-      tr:nth-child(even) td{background:#f5f8fc}
-      img{border-radius:4px}
-    </style>
-    </head><body>
-    <h2 style="font-family:Arial;color:#1B3A6B">CADF Shift Handover Report — ${dateStr}</h2>
-    <table>
-      <thead><tr>
-        <th>Date</th><th>Time</th><th>Terminal</th><th>Shift</th><th>From Team</th>
-        <th>From Staff</th><th>To Staff</th><th>To Team</th>
-        <th>Category</th><th>Brand</th>
-        <th>Display</th><th>Delivery</th><th>Sold</th><th>Handover Stock</th>
-        <th>Notes</th><th>Photos</th>
-      </tr></thead>
-      <tbody>${tableRows}</tbody>
-    </table>
-    </body></html>`;
-
-  const blob = new Blob([excelHtml], {type:'application/vnd.ms-excel;charset=utf-8'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `CADF_Handover_${now.toISOString().slice(0,10)}.xls`;
-  document.body.appendChild(a);
-  a.click();
-  setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(url);},200);
-  showToast('✅ Excel file downloaded');
+// ─── PREVIOUS SHIFT REFERENCE ────────────────────
+function renderPrevRef() {
+  const term=$('terminal').value;
+  if (!term||!selShift) { $('prev-ref').innerHTML=''; return; }
+  const prev=LS.get('cadf_last_'+term);
+  if (!prev||prev.shift!==selShift) { $('prev-ref').innerHTML=''; return; }
+  const grp={};
+  (prev.stockCount||[]).forEach(({brand,count,cat})=>{ if(!grp[cat])grp[cat]=[]; grp[cat].push({brand,count}); });
+  let h=`<div class="prev-box"><div class="prev-ttl">⬆ Opening Stock — Previous ${prev.shift} (${prev.team} Team)</div>`;
+  Object.entries(grp).forEach(([cat,brands])=>{
+    h+=`<div style="font-size:11px;font-weight:700;color:var(--muted);margin:6px 0 3px;text-transform:uppercase">${cat}</div>`;
+    brands.forEach(({brand,count})=>{ h+=`<div class="prev-row"><span>${brand}</span><span class="prev-qty">${count}</span></div>`; });
+  });
+  h+='</div>';
+  $('prev-ref').innerHTML=h;
 }
 
-function saveMgrComment(id){
-  const textarea = document.getElementById('mgr-comment-'+id);
-  if(!textarea) return;
-  const comment = textarea.value.trim();
-  const all = getAll();
-  const rec = all.find(r=>String(r.id)===String(id));
-  if(!rec) return;
-  rec.mgrComment = comment;
-  rec.mgrCommentDate = new Date().toLocaleString('en-GB',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
-  localStorage.setItem('cadf_handovers', JSON.stringify(all));
-  showToast('✅ Manager comment saved');
-  render();
+// ─── CATALOG ─────────────────────────────────────
+$('btn-manage').addEventListener('click', () => {
+  const p=$('manage-panel'), open=p.style.display!=='none';
+  p.style.display=open?'none':'block';
+  if(!open){ updateDatalist(); renderCatalogList(); }
+});
+$('btn-close-manage').addEventListener('click', () => $('manage-panel').style.display='none');
+
+$('btn-save-brand').addEventListener('click', () => {
+  const cat=$('new-cat').value.trim(), brand=$('new-brand').value.trim();
+  if(!cat||!brand){ toast('Enter both category and brand','err'); return; }
+  if(catalog.find(c=>c.cat.toLowerCase()===cat.toLowerCase()&&c.brand.toLowerCase()===brand.toLowerCase())){ toast('Already exists','err'); return; }
+  catalog.push({cat,brand});
+  LS.set('cadf_catalog',catalog);
+  $('new-cat').value=''; $('new-brand').value='';
+  updateDatalist(); renderCatalogList(); buildCatDropdown();
+  toast('Saved ✓','ok');
+});
+
+function updateDatalist() {
+  const cats=[...new Set(catalog.map(c=>c.cat))];
+  $('cat-datalist').innerHTML=cats.map(c=>`<option value="${c}">`).join('');
 }
 
-function showToast(msg){
-  const t=document.createElement('div');
-  t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a2a3a;color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:600;z-index:999';
-  t.textContent=msg;
-  document.body.appendChild(t);
-  setTimeout(()=>t.remove(),3000);
+function renderCatalogList() {
+  if(!catalog.length){ $('catalog-list').innerHTML='<div style="font-size:13px;color:var(--muted);padding:8px 0">No entries yet.</div>'; return; }
+  const grp={};
+  catalog.forEach(({cat,brand})=>{ if(!grp[cat])grp[cat]=[]; grp[cat].push(brand); });
+  let h='';
+  Object.entries(grp).forEach(([cat,brands])=>{
+    h+=`<div style="font-size:12px;font-weight:700;color:var(--text);margin:8px 0 4px">${cat}</div>`;
+    brands.forEach(b=>{ h+=`<div class="cl-row"><span class="cl-name">${b}</span><button class="btn btn-d btn-sm" onclick="removeBrand('${esc(cat)}','${esc(b)}')">Remove</button></div>`; });
+  });
+  $('catalog-list').innerHTML=h;
 }
 
-function openLightbox(src,info){
-  document.getElementById('lb-img').src=src;
-  document.getElementById('lb-info').textContent=info;
-  document.getElementById('lightbox').classList.add('open');
-}
-function closeLightbox(){
-  document.getElementById('lightbox').classList.remove('open');
-  document.getElementById('lb-img').src='';
-}
-document.getElementById('email-modal').addEventListener('click',e=>{if(e.target===document.getElementById('email-modal'))closeEmailModal();});
-</script>
-
-</div>
-
-<!-- ROUTING: /manager → show manager panel -->
-<script>
-// Show manager panel if URL contains /manager or ?manager
-function routePanel() {
-  const path = window.location.pathname + window.location.search + window.location.hash;
-  if(path.includes('manager') || window.location.hash === '#manager') {
-    document.getElementById('staff-panel').style.display = 'none';
-    document.getElementById('mgr-panel').style.display = 'block';
-  }
-}
-routePanel();
-// Init stock rows for staff panel
-if(document.getElementById('stock-rows')){
-  addStockRow();
-  addStockRow();
-}
-</script>
-
-<!-- STAFF SCRIPTS -->
-<script>
-const NEXT_SHIFT={Morning:'Afternoon',Afternoon:'Evening',Evening:'Morning'};
-const RESEND_KEY = localStorage.getItem('cadf_resend_key') || '';
-const getRecipient = () => {
-  const raw = localStorage.getItem('cadf_recipient') || '';
-  // Support comma or semicolon separated emails
-  return raw.split(/[,;]/).map(e=>e.trim()).filter(e=>e);
+window.removeBrand = (cat,brand) => {
+  catalog=catalog.filter(c=>!(c.cat===cat&&c.brand===brand));
+  LS.set('cadf_catalog',catalog);
+  renderCatalogList(); buildCatDropdown();
+  activeItems=activeItems.filter(e=>!(e.cat===cat&&e.brand===brand));
+  delete counts[brand]; renderStock();
+  toast('Removed','');
 };
 
-document.getElementById && (() => {
-  const el = document.getElementById('hdr-date');
-  if(el) el.textContent = new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-})();
+// ─── DROPDOWNS ───────────────────────────────────
+function buildCatDropdown() {
+  const cats=[...new Set(catalog.map(c=>c.cat))];
+  $('dd-cat').innerHTML='<option value="">Select category…</option>'+cats.map(c=>`<option value="${c}">${c}</option>`).join('');
+  $('dd-brand').innerHTML='<option value="">Select brand…</option>';
+  $('dd-brand').disabled=true;
+}
+$('dd-cat').addEventListener('change', function() {
+  const brands=catalog.filter(c=>c.cat===this.value).map(c=>c.brand);
+  const sel=$('dd-brand');
+  if(!this.value||!brands.length){ sel.innerHTML='<option value="">Select brand…</option>'; sel.disabled=true; return; }
+  sel.innerHTML='<option value="">Select brand…</option>'+brands.map(b=>`<option value="${b}">${b}</option>`).join('');
+  sel.disabled=false;
+});
 
-let selShift='', selTeam='', photos=[];
+$('btn-add-count').addEventListener('click', () => {
+  const cat=$('dd-cat').value, brand=$('dd-brand').value;
+  if(!cat||!brand){ toast('Select a category and brand first','err'); return; }
+  if(activeItems.find(e=>e.brand===brand&&e.cat===cat)){ toast(brand+' already in count','err'); return; }
+  activeItems.push({cat,brand});
+  renderStock();
+  toast(brand+' added ✓','ok');
+  $('dd-brand').value='';
+});
 
-function selectShift(val, el){
-  selShift=val;
-  document.getElementById('shift').value=val;
-  document.querySelectorAll('.shift-pill').forEach(p=>p.classList.remove('sel'));
-  el.classList.add('sel');
-  const badge=document.getElementById('shift-badge');
-  if(badge){badge.textContent=val+' Shift';badge.className='shift-badge '+val.toLowerCase();badge.style.display='block';}
-  const nextShift=NEXT_SHIFT[val]||'';
-  const fromBox=document.getElementById('from-shift-box');
-  const toBox=document.getElementById('to-shift-box');
-  if(fromBox){fromBox.textContent='🌅 '+val+' Shift';fromBox.className='flow-box '+val.toLowerCase()+'-box';}
-  if(toBox){toBox.textContent=(nextShift==='Morning'?'🌅':nextShift==='Afternoon'?'☀️':'🌙')+' '+nextShift+' Shift';toBox.className='flow-box '+nextShift.toLowerCase()+'-box';}
-  updateHandoverCard();
+// ─── STOCK COUNT ─────────────────────────────────
+function getOpeningQty(brand) {
+  const term=$('terminal').value; if(!term) return null;
+  const prev=LS.get('cadf_last_'+term); if(!prev||!prev.stockCount) return null;
+  const e=prev.stockCount.find(x=>x.brand===brand); return e!=null?e.count:null;
 }
 
-function selectTeam(val, el){
-  selTeam=val;
-  document.getElementById('team').value=val;
-  document.querySelectorAll('.team-pill:not(#to-team-pills .team-pill)').forEach(p=>p.classList.remove('sel'));
-  el.classList.add('sel');
-  const fromBox=document.getElementById('from-team-box');
-  const icons={Green:'🟢',Blue:'🔵',Yellow:'🟡'};
-  if(fromBox){fromBox.textContent=(icons[val]||'')+' '+val+' Team';fromBox.className='flow-box '+val.toLowerCase()+'-box';}
-  updateHandoverCard();
-}
-
-function selectToTeam(val, el){
-  document.getElementById('to-team').value=val;
-  document.querySelectorAll('#to-team-pills .team-pill').forEach(p=>p.classList.remove('sel'));
-  el.classList.add('sel');
-}
-
-function updateHandoverCard(){
-  const card=document.getElementById('handover-card');
-  if(card&&(selShift||selTeam)) card.style.display='block';
-  const staffVal=document.getElementById('staff')?.value.trim();
-  if(staffVal){const fb=document.getElementById('from-staff-box');if(fb)fb.textContent=staffVal;}
-}
-
-function updateFromStaff(){
-  const v=document.getElementById('staff').value.trim();
-  const fb=document.getElementById('from-staff-box');
-  if(fb) fb.textContent=v||'–';
-}
-
-function calcHandover(){
-  const d=parseFloat(document.getElementById('display-stock').value)||0;
-  const dl=parseFloat(document.getElementById('delivery-stock').value)||0;
-  const s=parseFloat(document.getElementById('sold').value)||0;
-  const h=(d+dl)-s;
-  const hv=document.getElementById('handover-val');
-  if(hv) hv.textContent=isNaN(h)?'–':h;
-  const badge=document.getElementById('disc-badge');
-  if(badge&&(d||dl||s)){
-    badge.innerHTML=h>=0?'<span class="disc-ok">✓ OK</span>':'<span class="disc-warn">⚠ Negative — check figures</span>';
-  }else if(badge) badge.innerHTML='';
-}
-
-function toggleConfirm(){
-  const cb = document.getElementById('confirm-check');
-  cb.checked = !cb.checked;
-  cb.dispatchEvent(new Event('change'));
-}
-
-function handlePhotos(input){
-  Array.from(input.files).forEach(f=>{
-    if(photos.length>=5){alert('Max 5 photos');return;}
-    if(f.size>5*1024*1024){alert('Max 5MB per photo');return;}
-    const canvas=document.createElement('canvas'),img=new Image();
-    img.onload=()=>{
-      const MAX=1200;let w=img.width,h=img.height;
-      if(w>h){if(w>MAX){h=Math.round(h*MAX/w);w=MAX;}}else{if(h>MAX){w=Math.round(w*MAX/h);h=MAX;}}
-      canvas.width=w;canvas.height=h;
-      canvas.getContext('2d').drawImage(img,0,0,w,h);
-      photos.push(canvas.toDataURL('image/jpeg',.82));
-      renderPhotos();
-    };
-    img.src=URL.createObjectURL(f);
-  });
-  input.value='';
-}
-function renderPhotos(){
-  const grid=document.getElementById('photo-grid');
-  if(grid) grid.innerHTML=photos.map((p,i)=>`<div class="photo-thumb"><img src="${p}"><button class="photo-del" onclick="removePhoto(${i})">✕</button></div>`).join('');
-  const badge=document.getElementById('photo-count-badge');
-  if(badge) badge.innerHTML=photos.length?`<span style="background:var(--teal);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;display:inline-block;margin-top:8px">✅ ${photos.length} photo${photos.length>1?'s':''} attached</span>`:'';
-  const zone=document.getElementById('photo-zone');
-  if(zone) zone.className='photo-zone'+(photos.length?' has':'');
-}
-function removePhoto(i){photos.splice(i,1);renderPhotos();}
-
-function generateExcelContent(r){
-  const photoCount = r.photos && r.photos.length > 0
-    ? `${r.photos.length} photo(s) attached as separate files in this email`
-    : 'No photos attached';
-
-  return `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
-<head><meta charset="UTF-8">
-<style>
-  table{border-collapse:collapse;font-family:Arial,sans-serif;font-size:11px}
-  th{background:#1B3A6B;color:#fff;padding:8px 12px;text-align:left;border:1px solid #ccc;white-space:nowrap}
-  td{padding:8px 12px;border:1px solid #ddd;vertical-align:middle}
-  .section{background:#EEF3FA;font-weight:bold;color:#1B3A6B;font-size:12px;padding:8px 12px}
-</style>
-</head><body>
-<h2 style="font-family:Arial;color:#1B3A6B;margin-bottom:4px">CADF Shift Handover Report</h2>
-<p style="font-family:Arial;font-size:12px;color:#666;margin-bottom:16px">${r.dateStr} at ${r.timeStr}</p>
-<table width="700">
-  <tr><td colspan="2" class="section">SHIFT INFORMATION</td></tr>
-  <tr><th>Terminal</th><td>${r.terminal||'–'}</td></tr>
-  <tr><th>Shift</th><td>${r.shift||'–'} Shift</td></tr>
-  <tr><th>Team</th><td>${r.team||'–'} Team</td></tr>
-  <tr><th>Staff Name</th><td>${r.fromStaff||r.staff||'–'}</td></tr>
-  <tr><td colspan="2" class="section">HANDOVER</td></tr>
-  <tr><th>Shift Handover</th><td>${r.fromShift||'–'} → ${r.toShift||'–'}</td></tr>
-  <tr><th>Team Handover</th><td>${r.fromTeam||r.team||'–'} Team → ${r.toTeam||'–'} Team</td></tr>
-  <tr><th>Staff Handover</th><td>${(r.fromStaff||r.staff||'–')}${r.fromStaffCode?' ('+r.fromStaffCode+')':''} → ${r.toStaff||'–'}${r.toStaffCode?' ('+r.toStaffCode+')':''}</td></tr>
-  <tr><td colspan="2" class="section">CATEGORY & BRAND</td></tr>
-  <tr><th>Category</th><td>${r.category||'–'}</td></tr>
-  <tr><th>Brand</th><td>${r.brand||'–'}</td></tr>
-  <tr><td colspan="2" class="section">STOCK COUNT</td></tr>
-  <tr><th>Display Stock</th><td>${r.display||0}</td></tr>
-  <tr><th>Delivery Stock</th><td>${r.delivery||0}</td></tr>
-  <tr><th>Sold</th><td>${r.sold||0}</td></tr>
-  <tr><th style="background:#1B3A6B">Handover Stock</th><td style="font-size:16px;font-weight:bold;color:#1B3A6B">${r.handover||0}</td></tr>
-  <tr><td colspan="2" class="section">COUNT PHOTOS</td></tr>
-  <tr><td colspan="2">${photoCount}</td></tr>
-  <tr><td colspan="2" class="section">NOTES</td></tr>
-  <tr><td colspan="2">${r.notes||'None'}</td></tr>
-</table>
-</body></html>`;
-}
-
-async function submitHandover(){
-  const terminal=document.getElementById('terminal').value;
-  const team=document.getElementById('team').value;
-  const shift=document.getElementById('shift').value;
-  const staff=document.getElementById('staff').value.trim();
-  const toTeam=document.getElementById('to-team').value;
-  const toStaff=document.getElementById('to-staff').value.trim();
-  const staffCode=document.getElementById('staff-code')?document.getElementById('staff-code').value.trim():'';
-  const toStaffCode=document.getElementById('to-staff-code')?document.getElementById('to-staff-code').value.trim():'';
-  const staffCode=document.getElementById('staff-code').value.trim();
-  const toStaffCode=document.getElementById('to-staff-code').value.trim();
-  const stockRows = getStockRows();
-  const category = stockRows.map(r=>r.category).filter(Boolean).join(', ') || '–';
-  const brand = stockRows.map(r=>r.brand).filter(Boolean).join(', ') || '–';
-  const display = stockRows.reduce((a,r)=>a+r.display,0);
-  const delivery = stockRows.reduce((a,r)=>a+r.delivery,0);
-  const sold = stockRows.reduce((a,r)=>a+r.sold,0);
-  const notes=document.getElementById('notes').value.trim();
-
-  if(!terminal){showStatus('err','Please select a terminal.');return;}
-  if(!team){showStatus('err','Please select a team.');return;}
-  if(!shift){showStatus('err','Please select a shift.');return;}
-  if(!staff){showStatus('err','Please enter your name.');return;}
-  if(!toTeam){showStatus('err','Please select the team you are handing over to.');return;}
-  if(!toStaff){showStatus('err','⚠️ Please enter the Receiving Staff Name.');return;}
-  if(!staffCode){showStatus('err','⚠️ Please enter your Employee Code.');return;}
-  if(!toStaffCode){showStatus('err','⚠️ Please enter the Receiving Staff Employee Code.');return;}
-  if(!staffCode){showStatus('err','Please enter your employee code.');return;}
-  if(!toStaffCode){showStatus('err','Please enter the receiving staff employee code.');return;}
-  if(stockRows.length===0){showStatus('err','Please add at least one stock count row.');return;}
-  if(!document.getElementById('confirm-check').checked){showStatus('err','Please confirm the stock count before submitting.');return;}
-
-  const handover=(display)+(delivery)-(sold);
-  const now=new Date();
-  const dateStr=now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-  const timeStr=now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
-  const fromShift=selShift+' Shift';
-  const toShift=NEXT_SHIFT[selShift]?NEXT_SHIFT[selShift]+' Shift':'–';
-
-  const record={
-    id:Date.now(),date:now.toISOString(),dateStr,timeStr,
-    terminal,team,shift,staff,staffCode,fromShift,toShift,
-    fromTeam:team,toTeam,fromStaff:staff,toStaff,
-    fromStaffCode:staffCode,toStaffCode,
-    category,brand,stockRows,
-    display:parseFloat(display)||0,
-    delivery:parseFloat(delivery)||0,
-    sold:parseFloat(sold)||0,
-    handover,notes,
-    photos:[...photos]
-  };
-  const all=JSON.parse(localStorage.getItem('cadf_handovers')||'[]');
-  all.unshift(record);
-  localStorage.setItem('cadf_handovers',JSON.stringify(all.slice(0,200)));
-  // Save last handover stock per terminal for next shift reference
-  if(terminal && allRows.length){
-    const lastHandover = {
-      shift: selShift, team: team, staff: staff, time: timeStr, date: dateStr,
-      rows: allRows.map(function(r){ return {category:r.category, brand:r.brand, handover:r.handover}; })
-    };
-    localStorage.setItem('cadf_last_handover_'+terminal, JSON.stringify(lastHandover));
-  }
-
-  const btn=document.getElementById('submit-btn');
-  const lbl=document.getElementById('submit-label');
-  btn.disabled=true;btn.className='btn-submit sending';lbl.textContent='Sending…';
-
-  const photoNote=photos.length>0?`${photos.length} photo(s) attached — view in manager dashboard`:'No photos attached';
-  const emailBody=`CADF Shift Handover Report
-════════════════════════════════
-Date:      ${dateStr} at ${timeStr}
-Terminal:  ${terminal}
-Team:      ${team} Team
-Shift:     ${shift} Shift
-Staff:     ${staff}
-
-HANDOVER
-────────
-Shift:  ${fromShift} → ${toShift}
-Team:   ${team} Team → ${toTeam} Team
-Staff:  ${staff}${staffCode?' ('+staffCode+')':''} → ${toStaff}${toStaffCode?' ('+toStaffCode+')':''}
-
-STOCK COUNT BY CATEGORY
-───────────────────────
-${stockRows.map((r,i)=>`Row ${i+1}: ${r.category||'–'} / ${r.brand||'–'}
-  Display: ${r.display} | Delivery: ${r.delivery} | Sold: ${r.sold} | Handover: ${r.handover}`).join('\n')}
-───────────────────────
-TOTAL Handover Stock: ${handover}
-
-PHOTOS
-──────
-${photoNote}
-
-NOTES
-─────
-${notes||'None'}
-════════════════════════════════
-Submitted via CADF Handover App`;
-
-  try{
-    const key=localStorage.getItem('cadf_resend_key')||'';
-    // Generate Excel attachment
-    const excelContent = generateExcelContent(record);
-    const excelB64 = btoa(unescape(encodeURIComponent(excelContent)));
-
-    // Attach photos as separate JPEG files
-    const photoAttachments = (record.photos||[]).map((p, i) => ({
-      filename: `photo_${i+1}_${terminal}_${shift}_${team}.jpg`,
-      content: p.split(',')[1] // strip data:image/jpeg;base64, prefix
-    }));
-
-    const res=await fetch('https://cadf-email-proxy.chokri-salmi.workers.dev',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        apiKey:key,
-        to:getRecipient(),
-        subject:`CADF Handover — ${shift} Shift — ${terminal} — ${team} Team — ${dateStr}`,
-        text:emailBody,
-        attachments:[
-          {
-            filename:`CADF_Handover_${terminal}_${shift}_${team}_${now.toISOString().slice(0,10)}.xls`,
-            content:excelB64
-          },
-          ...photoAttachments
-        ]
-      })
-    });
-    const data=await res.json();
-    if(data.id){
-      btn.className='btn-submit sent';lbl.textContent='✅ Handover submitted & email sent!';
-      showStatus('ok','✅ Handover saved and email sent successfully.');
-      resetForm();
-    }else throw new Error(data.message||data.name||'Unknown error');
-  }catch(e){
-    btn.disabled=false;btn.className='btn-submit';lbl.textContent='Submit Handover & Send Email';
-    showStatus('err',`Handover saved to dashboard. Email failed: ${e.message}`);
-  }
-}
-
-function resetForm(){
-  setTimeout(()=>{
-    document.getElementById('terminal').value='';
-    document.getElementById('team').value='';
-    document.getElementById('shift').value='';
-    document.getElementById('staff').value='';
-    document.getElementById('stock-rows').innerHTML='';
-    rowCount=0;
-    addStockRow();
-    document.getElementById('staff-code').value='';
-    document.getElementById('to-team').value='';
-    document.getElementById('to-staff').value='';
-    document.getElementById('to-staff-code').value='';
-
-    document.getElementById('notes').value='';
-    document.getElementById('confirm-check').checked=false;
-    document.getElementById('handover-val').textContent='–';
-    document.getElementById('disc-badge').innerHTML='';
-    const sb=document.getElementById('shift-badge');if(sb)sb.style.display='none';
-    document.querySelectorAll('.shift-pill,.team-pill').forEach(p=>p.classList.remove('sel'));
-    const hc=document.getElementById('handover-card');if(hc)hc.style.display='none';
-    selShift='';selTeam='';photos=[];renderPhotos();
-    const btn=document.getElementById('submit-btn');
-    btn.disabled=false;btn.className='btn-submit';
-    document.getElementById('submit-label').textContent='Submit Handover & Send Email';
-  },3000);
-}
-
-function showStatus(type,msg){
-  const bar=document.getElementById('status-bar');
-  if(!bar)return;
-  bar.className=`status-bar show ${type}`;
-  bar.innerHTML=(type==='ok'?'✅ ':'⚠️ ')+msg;
-  bar.scrollIntoView({behavior:'smooth',block:'nearest'});
-  setTimeout(()=>bar.classList.remove('show'),8000);
-}
-</script>
-
-<!-- MANAGER SCRIPTS -->
-<script>
-const CREDS={user:'CADF',pass:'Chalhoub2026'};
-let fShift='All',fTerminal='All',fTeam='All';
-
-function login(){
-  const u=document.getElementById('u').value.trim();
-  const p=document.getElementById('p').value;
-  if(u===CREDS.user&&p===CREDS.pass){
-    document.getElementById('login-screen').style.display='none';
-    document.getElementById('dashboard').style.display='block';
-    const hd=document.getElementById('hdr-date');
-    if(hd) hd.textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-    render();
-  }else{
-    document.getElementById('login-err').style.display='block';
-  }
-}
-function logout(){
-  document.getElementById('login-screen').style.display='flex';
-  document.getElementById('dashboard').style.display='none';
-  document.getElementById('u').value='';
-  document.getElementById('p').value='';
-}
-function getAll(){return JSON.parse(localStorage.getItem('cadf_handovers')||'[]');}
-function render(){renderKPIs();renderFilters();renderRecords();}
-
-function renderKPIs(){
-  const all=getAll();
-  const today=new Date().toISOString().slice(0,10);
-  const todayRecs=all.filter(r=>r.date.slice(0,10)===today);
-  const withPhotos=all.filter(r=>r.photos&&r.photos.length>0).length;
-  const totalStock=all.reduce((a,r)=>a+(r.handover||0),0);
-  const kg=document.getElementById('kpi-grid');
-  if(kg) kg.innerHTML=`
-    <div class="kpi"><div class="kpi-val" style="color:var(--navy)">${all.length}</div><div class="kpi-lbl">Total Records</div></div>
-    <div class="kpi"><div class="kpi-val" style="color:var(--teal)">${todayRecs.length}</div><div class="kpi-lbl">Today</div></div>
-    <div class="kpi"><div class="kpi-val" style="color:var(--sky)">${totalStock}</div><div class="kpi-lbl">Total Handover Stock</div></div>
-    <div class="kpi"><div class="kpi-val" style="color:#27AE60">${withPhotos}</div><div class="kpi-lbl">With Photos</div></div>`;
-}
-
-function renderFilters(){
-  const shiftOpts=[{v:'All',cls:''},{v:'Morning',cls:'morning'},{v:'Afternoon',cls:'afternoon'},{v:'Evening',cls:'evening'}];
-  const sf=document.getElementById('shift-filters');
-  if(sf) sf.innerHTML=shiftOpts.map(o=>`<button class="fpill${o.cls?' '+o.cls:''}${o.v===fShift?' active':''}" onclick="setFShift('${o.v}')">${o.v==='Morning'?'🌅 ':o.v==='Afternoon'?'☀️ ':o.v==='Evening'?'🌙 ':''}<span>${o.v}</span></button>`).join('');
-  const termOpts=['All','Terminal 1','Terminal 2','Terminal 3'];
-  const tf=document.getElementById('terminal-filters');
-  if(tf) tf.innerHTML=termOpts.map(o=>`<button class="fpill${o===fTerminal?' active':''}" onclick="setFTerminal('${o}')">${o}</button>`).join('');
-  const teamOpts=[{v:'All',cls:''},{v:'Green',cls:'green'},{v:'Blue',cls:'blue'},{v:'Yellow',cls:'yellow'},{v:'Red',cls:'red-team'}];
-  const teamF=document.getElementById('team-filters');
-  if(teamF) teamF.innerHTML=teamOpts.map(o=>`<button class="fpill${o.cls?' '+o.cls:''}${o.v===fTeam?' active':''}" onclick="setFTeam('${o.v}')">${o.v==='Green'?'🟢 ':o.v==='Blue'?'🔵 ':o.v==='Yellow'?'🟡 ':''}<span>${o.v}</span></button>`).join('');
-}
-function setFShift(v){fShift=v;render();}
-function setFTerminal(v){fTerminal=v;render();}
-function setFTeam(v){fTeam=v;render();}
-
-function renderRecords(){
-  let recs=getAll();
-  if(fShift!=='All') recs=recs.filter(r=>r.shift===fShift);
-  if(fTerminal!=='All') recs=recs.filter(r=>r.terminal===fTerminal);
-  if(fTeam!=='All') recs=recs.filter(r=>r.team===fTeam);
-  const rc=document.getElementById('rec-count');
-  if(rc) rc.textContent=`(${recs.length} record${recs.length!==1?'s':''})`;
-  const rl=document.getElementById('records-list');
-  if(!rl) return;
-  if(!recs.length){
-    rl.innerHTML=`<div class="empty"><div style="font-size:44px;margin-bottom:10px">📋</div><div style="font-weight:600">No records yet</div><div style="font-size:13px;margin-top:4px">Records appear here after staff submit handovers.</div></div>`;
+function renderStock() {
+  if(!activeItems.length){
+    $('stock-list').innerHTML='<div class="empty"><div class="empty-ico">📦</div><div class="empty-txt">Select a category &amp; brand above,<br>then tap "+ Add to Stock Count"</div></div>';
     return;
   }
-  rl.innerHTML=recs.map((r,i)=>{
-    const shiftCls=r.shift?r.shift.toLowerCase():'navy';
-    const rawTeamCls=r.team?r.team.toLowerCase():'navy';
-    const teamCls=rawTeamCls==='red'?'red':rawTeamCls;
-    const hasPhotos=r.photos&&r.photos.length>0;
-    return `<div class="rec">
-      <div class="rec-hdr" onclick="toggleRec(${i})">
-        <div style="flex:1">
-          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:5px">
-            <span style="font-size:14px;font-weight:700">${r.staff||'Unknown'}</span>
-            ${r.staffCode?`<span style="font-size:11px;background:var(--color-background-secondary);color:var(--tx2);border:0.5px solid var(--color-border-tertiary);padding:2px 8px;border-radius:12px;font-weight:600">${r.staffCode}</span>`:''}
-            ${hasPhotos?`<span class="badge badge-teal">📷 ${r.photos.length} photo${r.photos.length>1?'s':''}</span>`:''}
-            ${r.mgrComment?`<span class="badge" style="background:#FFFBEC;color:#8a7000;border:1px solid #F5D000">⚠️ Commented</span>`:''}
-          </div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap">
-            <span class="badge badge-navy">${r.terminal||'–'}</span>
-            <span class="badge badge-${shiftCls}">${r.shift||'–'} Shift</span>
-            <span class="badge badge-${teamCls}">${r.team||'–'} Team</span>
-            <span class="badge badge-navy">📦 ${r.handover}</span>
-            ${r.category?`<span class="badge badge-navy">${r.category}</span>`:''}
-            ${r.brand?`<span class="badge badge-teal">${r.brand}</span>`:''}
-          </div>
-          <div style="font-size:11px;color:var(--tx2);margin-top:4px">${r.dateStr||''} at ${r.timeStr||''}</div>
-        </div>
-        <div class="arrow" id="arr-${i}">▼</div>
-      </div>
-      <div class="rec-body" id="body-${i}">
-        <div class="handover-flow-grid">
-          <div class="hf-col"><div class="hf-lbl">Shift</div><div class="hf-val">${r.fromShift||r.shift||'–'} <span class="hf-arrow">→</span> ${r.toShift||'–'}</div></div>
-          <div class="hf-col"><div class="hf-lbl">Team</div><div class="hf-val">${r.fromTeam||r.team||'–'} <span class="hf-arrow">→</span> ${r.toTeam||'–'}</div></div>
-          <div class="hf-col"><div class="hf-lbl">Staff</div><div class="hf-val">${r.fromStaff||r.staff||'–'}${r.fromStaffCode?' ('+r.fromStaffCode+')':''} <span class="hf-arrow">→</span> ${r.toStaff||'–'}${r.toStaffCode?' ('+r.toStaffCode+')':''}</div></div>
-        </div>
-        ${(r.category||r.brand)?`<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
-          ${r.category?`<span class="badge badge-navy">📦 ${r.category}</span>`:''}
-          ${r.brand?`<span class="badge badge-teal">🏷️ ${r.brand}</span>`:''}
-          ${hasPhotos?`<div style="display:flex;gap:3px;margin-top:5px;flex-wrap:wrap">${r.photos.slice(0,3).map(p=>`<img src="${p}" style="width:36px;height:36px;object-fit:cover;border-radius:4px;border:1.5px solid var(--teal)">`).join('')}${r.photos.length>3?`<div style="width:36px;height:36px;border-radius:4px;background:var(--teal);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">+${r.photos.length-3}</div>`:''}</div>`:''}
-        </div>`:''}
-        <div class="stock-row">
-          <div class="chip"><div class="chip-val">${r.display}</div><div class="chip-lbl">Display</div></div>
-          <div class="chip"><div class="chip-val">${r.delivery}</div><div class="chip-lbl">Delivery</div></div>
-          <div class="chip"><div class="chip-val">${r.sold}</div><div class="chip-lbl">Sold</div></div>
-          <div class="chip result"><div class="chip-val">${r.handover}</div><div class="chip-lbl">Handover</div></div>
-        </div>
-        ${hasPhotos?`<div class="photo-section">
-          <div class="photo-section-title">📷 Count Photos (${r.photos.length})</div>
-          <div class="photo-grid-dash">${r.photos.map((p,pi)=>`<div class="photo-item" onclick="openLightbox('${p}','Photo ${pi+1} — ${r.staff} — ${r.shift} Shift')"><img src="${p}" loading="lazy"></div>`).join('')}</div>
-        </div>`:`<div class="no-photo">No photos attached</div>`}
-        ${r.notes?`<div class="notes-box"><strong style="font-size:11px;color:var(--tx2);text-transform:uppercase;letter-spacing:.05em">Notes:</strong><br>${r.notes}</div>`:''}
-        
-        <!-- MANAGER COMMENT -->
-        <div style="margin-top:12px;background:#FFFBEC;border:1px solid #F5D000;border-radius:var(--rsm);padding:12px">
-          <div style="font-size:11px;font-weight:700;color:#8a7000;text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px">⚠️ Manager Comment</div>
-          <textarea id="mgr-comment-${r.id}" rows="2" placeholder="Add your investigation comment here…" style="width:100%;padding:8px 10px;border:1px solid #E0E8F0;border-radius:var(--rsm);font-size:13px;font-family:inherit;resize:vertical;background:#fff">${r.mgrComment||''}</textarea>
-          <div style="display:flex;justify-content:flex-end;margin-top:6px">
-            <button onclick="saveMgrComment('${r.id}')" style="padding:6px 16px;background:#1B3A6B;color:#fff;border:none;border-radius:var(--rsm);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">💾 Save Comment</button>
-          </div>
-          ${r.mgrComment?`<div style="font-size:10px;color:#8a7000;margin-top:4px">Last saved: ${r.mgrCommentDate||''}</div>`:''}
-        </div>
+  const grp={};
+  activeItems.forEach(({cat,brand})=>{ if(!grp[cat])grp[cat]=[]; grp[cat].push(brand); });
+  let h='';
+  Object.entries(grp).forEach(([cat,brands])=>{
+    h+=`<div class="sc-cat">${cat}</div>`;
+    brands.forEach(brand=>{
+      const v=counts[brand]||0, op=getOpeningQty(brand);
+      const sid='sc_'+brand.replace(/\W/g,'_');
+      const openHtml=op!=null?`<div class="sc-open">Opening stock: <span>${op}</span></div>`:'';
+      h+=`<div class="sc-row">
+        <div style="flex:1;min-width:0"><div class="sc-name">${brand}</div>${openHtml}</div>
+        <button class="cnt-btn" onclick="adj('${esc(brand)}',-1)">−</button>
+        <input class="cnt-inp" type="number" min="0" id="${sid}" value="${v}" onchange="setVal('${esc(brand)}',this.value)">
+        <button class="cnt-btn" onclick="adj('${esc(brand)}',1)">+</button>
+        <button class="rm-btn" onclick="removeItem('${esc(cat)}','${esc(brand)}')">✕</button>
+      </div>`;
+    });
+  });
+  $('stock-list').innerHTML=h;
+}
 
-        <div style="margin-top:12px;text-align:right">
-          <button class="btn btn-sm" onclick="deleteRec(${r.id})" style="color:var(--red);border-color:var(--red)">Delete</button>
+window.adj = (brand,d) => {
+  const v=Math.max(0,(counts[brand]||0)+d); counts[brand]=v;
+  const el=$('sc_'+brand.replace(/\W/g,'_')); if(el) el.value=v;
+};
+window.setVal = (brand,v) => { counts[brand]=Math.max(0,parseInt(v)||0); };
+window.removeItem = (cat,brand) => {
+  activeItems=activeItems.filter(e=>!(e.cat===cat&&e.brand===brand));
+  delete counts[brand]; renderStock();
+};
+
+// ─── PHOTOS ──────────────────────────────────────
+$('ph-area').addEventListener('click', ()=>$('fileInput').click());
+$('btn-lib').addEventListener('click', ()=>$('fileInput').click());
+$('btn-cam').addEventListener('click', ()=>$('camInput').click());
+function addFiles(files){
+  const rem=5-photos.length; if(rem<=0){toast('Max 5 photos','err');return;}
+  let loaded=0; const toAdd=Array.from(files).slice(0,rem);
+  toAdd.forEach(f=>{ const r=new FileReader(); r.onload=e=>{ photos.push(e.target.result); loaded++; if(loaded===toAdd.length)renderPhotos(); }; r.readAsDataURL(f); });
+}
+$('fileInput').addEventListener('change',e=>{addFiles(e.target.files);e.target.value='';});
+$('camInput').addEventListener('change',e=>{addFiles(e.target.files);e.target.value='';});
+function renderPhotos(){
+  $('ph-grid').innerHTML=photos.map((s,i)=>`<div class="ph-thumb"><img src="${s}"><button class="ph-rm" onclick="rmPhoto(${i})">✕</button></div>`).join('');
+}
+window.rmPhoto = i=>{ photos.splice(i,1); renderPhotos(); };
+
+// ─── CONFIRM & SUBMIT ────────────────────────────
+$('chk-confirm').addEventListener('change',()=>{ $('btn-submit').disabled=!$('chk-confirm').checked; });
+
+$('btn-submit').addEventListener('click', async()=>{
+  const term=$('terminal').value;
+  if(!term){toast('Select a terminal','err');return;}
+  if(!selTeam){toast('Select your team','err');return;}
+  if(!selShift){toast('Select a shift','err');return;}
+  if(!$('staff-name').value.trim()){toast('Enter staff name','err');return;}
+  const btn=$('btn-submit'); btn.disabled=true; btn.textContent='⏳ Submitting…';
+  const stockArr=activeItems.map(({cat,brand})=>({cat,brand,count:counts[brand]||0}));
+  const rec={
+    id:Date.now().toString(), ts:Date.now(), terminal:term,
+    team:selTeam, shift:selShift,
+    staffName:$('staff-name').value.trim(), staffCode:$('staff-code').value.trim(),
+    toTeam:selToTeam, recvName:$('recv-name').value.trim(), recvCode:$('recv-code').value.trim(),
+    stockCount:stockArr, notes:$('notes').value.trim(), photos:photos.slice(), comment:''
+  };
+  const all=LS.get('cadf_handovers')||[];
+  all.unshift(rec); if(all.length>200) all.pop();
+  LS.set('cadf_handovers',all);
+  LS.set('cadf_last_'+term,rec);
+  await sendEmail(rec);
+  toast('Handover submitted ✓','ok',4000);
+  btn.textContent='✅ Submitted!';
+  setTimeout(()=>{
+    $('chk-confirm').checked=false; btn.disabled=true; btn.textContent='📤 Submit Handover & Send Email';
+    counts={}; activeItems=[]; photos=[]; renderPhotos(); $('notes').value=''; renderStock();
+    buildCatDropdown(); renderPrevRef();
+    document.querySelectorAll('#shift-pills .pill').forEach(b=>b.classList.remove('on'));
+    document.querySelectorAll('#team-pills .pill').forEach(b=>b.classList.remove('on'));
+    document.querySelectorAll('#to-team-pills .pill').forEach(b=>b.classList.remove('on'));
+    selTeam=''; selShift=''; selToTeam=''; updateBadge(); renderSummary();
+  },2200);
+});
+
+// ─── EMAIL ───────────────────────────────────────
+async function sendEmail(rec){
+  const key=LS.get('cadf_resend_key'), recip=LS.get('cadf_recipient');
+  if(!key||!recip) return;
+  let csv='Category,Brand,Count\n'; rec.stockCount.forEach(({cat,brand,count})=>csv+=`"${cat}","${brand}",${count}\n`);
+  const b64=btoa(unescape(encodeURIComponent(csv)));
+  const atts=[{filename:`handover_${rec.terminal}_${rec.shift}.csv`,content:b64}];
+  rec.photos.forEach((p,i)=>{ const [m,d]=p.split(','); atts.push({filename:`photo_${i+1}.jpg`,content:d}); });
+  const html=`<h2>CADF Handover</h2><table border="1" cellpadding="5">
+    <tr><th>Terminal</th><td>${rec.terminal}</td></tr><tr><th>Shift</th><td>${rec.shift}</td></tr>
+    <tr><th>Team</th><td>${rec.team}</td></tr><tr><th>Staff</th><td>${rec.staffName} (${rec.staffCode})</td></tr>
+    <tr><th>Handover To</th><td>${rec.toTeam} — ${rec.recvName} (${rec.recvCode})</td></tr>
+    <tr><th>Time</th><td>${fmtDate(rec.ts)}</td></tr>${rec.notes?`<tr><th>Notes</th><td>${rec.notes}</td></tr>`:''}
+  </table>
+  <h3>Stock Count</h3><table border="1" cellpadding="5"><tr><th>Category</th><th>Brand</th><th>Count</th></tr>
+  ${rec.stockCount.map(({cat,brand,count})=>`<tr><td>${cat}</td><td>${brand}</td><td>${count}</td></tr>`).join('')}
+  </table>`;
+  try {
+    await fetch('https://cadf-email-proxy.chokri-salmi.workers.dev',{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({api_key:key,to:recip.split(/[,;]/).map(e=>e.trim()).filter(Boolean),
+        subject:`CADF Handover — ${rec.terminal} · ${rec.shift} · ${rec.team}`,html,attachments:atts})
+    });
+  } catch(e){ console.error('Email error',e); }
+}
+
+// ─── MANAGER ─────────────────────────────────────
+const MGR_U='CADF', MGR_P='Chalhoub2026';
+function initMgr(){
+  if(sessionStorage.getItem('mgr')==='1'){ showDash(); }
+  else { $('mgr-login').style.display='flex'; $('mgr-main').style.display='none'; }
+}
+$('btn-login').addEventListener('click',doLogin);
+$('mgr-pass').addEventListener('keydown',e=>{ if(e.key==='Enter')doLogin(); });
+function doLogin(){
+  if($('mgr-user').value.trim()===MGR_U&&$('mgr-pass').value.trim()===MGR_P){
+    sessionStorage.setItem('mgr','1'); $('login-err').style.display='none'; showDash();
+  } else { $('login-err').style.display='block'; }
+}
+$('btn-signout').addEventListener('click',()=>{
+  sessionStorage.removeItem('mgr');
+  $('mgr-main').style.display='none'; $('mgr-login').style.display='flex';
+  $('mgr-user').value=''; $('mgr-pass').value='';
+});
+function showDash(){
+  $('mgr-login').style.display='none'; $('mgr-main').style.display='block'; renderDash();
+}
+function renderDash(){
+  const all=LS.get('cadf_handovers')||[];
+  $('kpi-total').textContent=all.length;
+  $('kpi-today').textContent=all.filter(r=>isToday(r.ts)).length;
+  $('kpi-am').textContent=all.filter(r=>r.shift==='Morning').length;
+  $('kpi-pm').textContent=all.filter(r=>r.shift==='Afternoon').length;
+  $('kpi-ev').textContent=all.filter(r=>r.shift==='Evening').length;
+  renderRecords(applyFilters(all));
+}
+function applyFilters(recs){
+  const s=$('f-shift').value,t=$('f-term').value,tm=$('f-team').value;
+  return recs.filter(r=>(!s||r.shift===s)&&(!t||r.terminal===t)&&(!tm||r.team===tm));
+}
+['f-shift','f-term','f-team'].forEach(id=>$(id).addEventListener('change',()=>renderRecords(applyFilters(LS.get('cadf_handovers')||[]))));
+$('btn-clear-all').addEventListener('click',()=>{
+  if(!confirm('Delete ALL handover records?')) return;
+  LS.del('cadf_handovers'); renderDash(); toast('All records cleared','');
+});
+function renderRecords(recs){
+  if(!recs.length){
+    $('rec-list').innerHTML='<div class="empty"><div class="empty-ico">📋</div><div class="empty-txt">No records yet</div></div>'; return;
+  }
+  const tc={Green:'var(--green)',Blue:'var(--blue)',Yellow:'var(--yell)',Red:'var(--red)'};
+  $('rec-list').innerHTML=recs.map(r=>{
+    const col=tc[r.team]||'var(--muted)';
+    const stockHtml=(r.stockCount||[]).map(({cat,brand,count})=>`<tr><td>${cat}</td><td>${brand}</td><td>${count}</td></tr>`).join('');
+    const photoHtml=(r.photos||[]).map((s,i)=>`<img class="rec-ph" src="${s}" alt="" onclick="openLb('${encodeURIComponent(s)}')">`).join('');
+    return `<div class="rec-card" id="rc-${r.id}">
+      <div class="rec-hdr" onclick="togRec('${r.id}')">
+        <span class="rec-term">${r.terminal}</span>
+        <span class="rec-shift">${r.shift}</span>
+        <span class="rec-team" style="color:${col}">● ${r.team}</span>
+        <div class="rec-info">
+          <div class="rec-staff">${r.staffName}${r.staffCode?' · '+r.staffCode:''}</div>
+          <div class="rec-time">${fmtDate(r.ts)}</div>
+        </div>
+        <span class="rec-chev">▼</span>
+      </div>
+      <div class="rec-body">
+        <div class="det-sec">
+          <div class="det-ttl">Handover Flow</div>
+          <table class="det-tbl">
+            <tr><td>From Shift</td><td>${r.shift} → ${shiftNext(r.shift)}</td></tr>
+            <tr><td>From Team</td><td style="color:${col}">${r.team}</td></tr>
+            <tr><td>Staff</td><td>${r.staffName}${r.staffCode?' ('+r.staffCode+')':''}</td></tr>
+            <tr><td>To Team</td><td>${r.toTeam||'—'}</td></tr>
+            <tr><td>Receiving</td><td>${r.recvName?r.recvName+(r.recvCode?' ('+r.recvCode+')':''):'—'}</td></tr>
+            ${r.notes?`<tr><td>Notes</td><td>${r.notes}</td></tr>`:''}
+          </table>
+        </div>
+        ${stockHtml?`<div class="det-sec"><div class="det-ttl">Stock Count</div><table class="det-tbl"><tr><td><b>Category</b></td><td><b>Brand</b></td><td><b>Count</b></td></tr>${stockHtml}</table></div>`:''}
+        ${photoHtml?`<div class="det-sec"><div class="det-ttl">Photos</div><div class="rec-photos">${photoHtml}</div></div>`:''}
+        <div class="det-sec">
+          <div class="det-ttl">Manager Comment</div>
+          <textarea class="cmt-area" id="cmt-${r.id}">${r.comment||''}</textarea>
+          <div style="margin-top:7px"><button class="btn btn-p btn-sm" onclick="saveCmt('${r.id}')">Save Comment</button></div>
         </div>
       </div>
     </div>`;
   }).join('');
 }
+window.togRec = id=>{ const el=$('rc-'+id); if(el)el.classList.toggle('open'); };
+window.saveCmt = id=>{
+  const txt=$('cmt-'+id).value.trim();
+  const all=LS.get('cadf_handovers')||[], i=all.findIndex(r=>r.id===id);
+  if(i!==-1){ all[i].comment=txt; LS.set('cadf_handovers',all); toast('Comment saved ✓','ok'); }
+};
+window.openLb = src=>{ $('lb-img').src=decodeURIComponent(src); $('lightbox').classList.add('open'); };
+$('lb-close').addEventListener('click',()=>$('lightbox').classList.remove('open'));
+$('lightbox').addEventListener('click',e=>{ if(e.target===$('lightbox'))$('lightbox').classList.remove('open'); });
 
-function toggleRec(i){
-  const body=document.getElementById(`body-${i}`);
-  const arr=document.getElementById(`arr-${i}`);
-  const open=body.classList.toggle('open');
-  arr.classList.toggle('open',open);
-}
-function deleteRec(id){
-  if(!confirm('Delete this record?'))return;
-  localStorage.setItem('cadf_handovers',JSON.stringify(getAll().filter(r=>r.id!==id)));
-  render();
-}
-function clearAll(){
-  if(!confirm('Delete ALL records? This cannot be undone.'))return;
-  localStorage.removeItem('cadf_handovers');render();
-}
-function openEmailSettings(){
-  document.getElementById('cfg-recipient').value=localStorage.getItem('cadf_recipient')||'';
-  document.getElementById('cfg-key').value=localStorage.getItem('cadf_resend_key')||'';
-  document.getElementById('email-status').style.display='none';
-  document.getElementById('email-modal').classList.add('open');
-}
-function closeEmailModal(){document.getElementById('email-modal').classList.remove('open');}
-function saveEmailSettings(){
-  const r=document.getElementById('cfg-recipient').value.trim();
-  const k=document.getElementById('cfg-key').value.trim();
-  if(r)localStorage.setItem('cadf_recipient',r);
-  if(k)localStorage.setItem('cadf_resend_key',k);
-  closeEmailModal();
-  showToast('✅ Email settings saved');
-}
-async function testEmail(){
-  const r=document.getElementById('cfg-recipient').value.trim();
-  const k=document.getElementById('cfg-key').value.trim();
-  if(!r||!k){alert('Please fill in both fields first.');return;}
-  const st=document.getElementById('email-status');
-  st.style.display='block';st.style.color='var(--sky)';st.textContent='Sending test email…';
-  try{
-    const res=await fetch('https://cadf-email-proxy.chokri-salmi.workers.dev',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({apiKey:k,to:r.split(/[,;]/).map(e=>e.trim()).filter(e=>e),subject:'CADF Handover — Test Email',text:'This is a test email from CADF Shift Handover system. Email is configured correctly!'})
-    });
-    const d=await res.json();
-    if(d.id){st.style.color='#27AE60';st.textContent='✅ Test email sent successfully!';}
-    else throw new Error(d.message||'Failed');
-  }catch(e){st.style.color='var(--red)';st.textContent='❌ Failed: '+e.message;}
-}
-function exportExcel(){
-  let recs = getAll();
-  if(fShift!=='All') recs=recs.filter(r=>r.shift===fShift);
-  if(fTerminal!=='All') recs=recs.filter(r=>r.terminal===fTerminal);
-  if(fTeam!=='All') recs=recs.filter(r=>r.team===fTeam);
+// Export
+$('btn-export').addEventListener('click',()=>{
+  const all=LS.get('cadf_handovers')||[]; if(!all.length){toast('No records','err');return;}
+  let csv='Timestamp,Terminal,Shift,Team,Staff,Code,To Team,Receiving,Recv Code,Notes,Comment\n';
+  all.forEach(r=>{ csv+=[fmtDate(r.ts),r.terminal,r.shift,r.team,r.staffName,r.staffCode,r.toTeam,r.recvName,r.recvCode,r.notes||'',r.comment||''].map(v=>`"${String(v||'').replace(/"/g,'""')}"`).join(',')+'\n'; });
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download=`CADF_${new Date().toISOString().slice(0,10)}.csv`; a.click(); toast('Exported ✓','ok');
+});
 
-  if(!recs.length){showToast('No records to export');return;}
-
-  // Build HTML table for Excel (supports embedded images via data URIs)
-  const imgSize = 80; // px
-
-  let tableRows = recs.map(r => {
-    const photoCell = r.photos && r.photos.length > 0
-      ? r.photos.slice(0,3).map(p =>
-          `<img src="${p}" width="${imgSize}" height="${imgSize}" style="object-fit:cover;margin:2px;border-radius:4px">`
-        ).join('')
-      : 'No photos';
-
-    return `<tr>
-      <td>${r.dateStr||''}</td>
-      <td>${r.timeStr||''}</td>
-      <td>${r.terminal||''}</td>
-      <td>${r.shift||''} Shift</td>
-      <td>${r.team||''} Team</td>
-      <td>${r.staff||''}</td>
-      <td>${r.toStaff||''}</td>
-      <td>${r.toTeam||''} Team</td>
-      <td>${r.category||''}</td>
-      <td>${r.brand||''}</td>
-      <td style="text-align:center">${r.display||0}</td>
-      <td style="text-align:center">${r.delivery||0}</td>
-      <td style="text-align:center">${r.sold||0}</td>
-      <td style="text-align:center;font-weight:bold">${r.handover||0}</td>
-      <td>${r.notes||''}</td>
-      <td style="text-align:center">${photoCell}</td>
-    </tr>`;
-  }).join('');
-
-  const now = new Date();
-  const dateStr = now.toLocaleDateString('en-GB');
-
-  const excelHtml = `
-    <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
-    <head><meta charset="UTF-8">
-    <style>
-      table{border-collapse:collapse;font-family:Arial,sans-serif;font-size:11px}
-      th{background:#1B3A6B;color:#fff;padding:8px 10px;text-align:left;white-space:nowrap;border:1px solid #ccc}
-      td{padding:6px 10px;border:1px solid #ddd;vertical-align:middle}
-      tr:nth-child(even) td{background:#f5f8fc}
-      img{border-radius:4px}
-    </style>
-    </head><body>
-    <h2 style="font-family:Arial;color:#1B3A6B">CADF Shift Handover Report — ${dateStr}</h2>
-    <table>
-      <thead><tr>
-        <th>Date</th><th>Time</th><th>Terminal</th><th>Shift</th><th>From Team</th>
-        <th>From Staff</th><th>To Staff</th><th>To Team</th>
-        <th>Category</th><th>Brand</th>
-        <th>Display</th><th>Delivery</th><th>Sold</th><th>Handover Stock</th>
-        <th>Notes</th><th>Photos</th>
-      </tr></thead>
-      <tbody>${tableRows}</tbody>
-    </table>
-    </body></html>`;
-
-  const blob = new Blob([excelHtml], {type:'application/vnd.ms-excel;charset=utf-8'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `CADF_Handover_${now.toISOString().slice(0,10)}.xls`;
-  document.body.appendChild(a);
-  a.click();
-  setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(url);},200);
-  showToast('✅ Excel file downloaded');
-}
-
-function saveMgrComment(id){
-  const textarea = document.getElementById('mgr-comment-'+id);
-  if(!textarea) return;
-  const comment = textarea.value.trim();
-  const all = getAll();
-  const rec = all.find(r=>String(r.id)===String(id));
-  if(!rec) return;
-  rec.mgrComment = comment;
-  rec.mgrCommentDate = new Date().toLocaleString('en-GB',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
-  localStorage.setItem('cadf_handovers', JSON.stringify(all));
-  showToast('✅ Manager comment saved');
-  render();
-}
-
-function showToast(msg){
-  const t=document.createElement('div');
-  t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a2a3a;color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:600;z-index:999';
-  t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3000);
-}
-function openLightbox(src,info){
-  document.getElementById('lb-img').src=src;
-  document.getElementById('lb-info').textContent=info;
-  document.getElementById('lightbox').classList.add('open');
-}
-function closeLightbox(){
-  document.getElementById('lightbox').classList.remove('open');
-  document.getElementById('lb-img').src='';
-}
-const em=document.getElementById('email-modal');
-if(em) em.addEventListener('click',e=>{if(e.target===em)closeEmailModal();});
+// Email settings
+$('btn-email-set').addEventListener('click',()=>{ $('set-emails').value=LS.get('cadf_recipient')||''; $('set-key').value=LS.get('cadf_resend_key')||''; $('email-modal').classList.add('open'); });
+$('btn-email-cancel').addEventListener('click',()=>$('email-modal').classList.remove('open'));
+$('btn-email-save').addEventListener('click',()=>{
+  LS.set('cadf_recipient',$('set-emails').value.trim());
+  LS.set('cadf_resend_key',$('set-key').value.trim());
+  $('email-modal').classList.remove('open'); toast('Email settings saved ✓','ok');
+});
+$('btn-test-email').addEventListener('click',async()=>{
+  const key=$('set-key').value.trim(), em=$('set-emails').value.trim();
+  if(!key||!em){toast('Enter API key and email first','err');return;}
+  toast('Sending…','',5000);
+  try {
+    const r=await fetch('https://cadf-email-proxy.chokri-salmi.workers.dev',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({api_key:key,to:em.split(/[,;]/).map(e=>e.trim()).filter(Boolean),subject:'CADF — Test Email',html:'<p>Test from CADF Handover System. Email is working.</p>',attachments:[]})});
+    r.ok?toast('Test email sent ✓','ok'):toast('Failed — check API key','err');
+  } catch { toast('Network error','err'); }
+});
 </script>
-
 </body>
 </html>
